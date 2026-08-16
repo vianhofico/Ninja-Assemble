@@ -8,8 +8,6 @@ import com.ninjaassemble.equipment.domain.EquipmentInstance;
 import com.ninjaassemble.equipment.domain.EquipmentLoadout;
 import com.ninjaassemble.equipment.domain.EquipmentSlot;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
-import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +50,7 @@ public class EquipmentApplicationService {
 
     @Transactional
     public EquipmentView view(UUID playerId) {
-        ownership.list(playerId); // validates the player/ownership data path without trusting Unity.
+        ownership.list(playerId);
         ensureDefinitions();
         ensureStarterGear(playerId);
         return new EquipmentView(CATALOG_VERSION, ENHANCE_PROFILE_VERSION, COMBAT_BONUS_VERSION,
@@ -66,7 +64,6 @@ public class EquipmentApplicationService {
         EquipmentRow row = requireEquipment(playerId, equipmentId, true);
         EquipmentDefinition definition = requireDefinition(row.definitionId());
 
-        // Exercise the domain loadout invariant before persistence.
         EquipmentLoadout loadout = new EquipmentLoadout();
         loadout.equip(definition, row.instance());
 
@@ -95,13 +92,15 @@ public class EquipmentApplicationService {
     public EnhanceResult enhance(UUID playerId, UUID equipmentId, UUID requestId) {
         if (requestId == null) throw new IllegalArgumentException("requestId is required");
         String key = "equipment-enhance:" + requestId;
+
+        // Lock first, then inspect the ledger. Two concurrent retries with the same requestId
+        // therefore serialize on the equipment row and cannot advance two levels.
+        EquipmentRow row = requireEquipment(playerId, equipmentId, true);
         Long seen = jdbc.queryForObject("select count(*) from wallet_ledger where player_id = ? and idempotency_key = ?", Long.class, playerId, key);
         if (seen != null && seen > 0) {
-            EquipmentRow replay = requireEquipment(playerId, equipmentId, false);
-            return new EnhanceResult(replayView(replay), 0, wallet.getBalance(playerId, Currency.GOLD), true, ENHANCE_PROFILE_VERSION);
+            return new EnhanceResult(replayView(row), 0, wallet.getBalance(playerId, Currency.GOLD), true, ENHANCE_PROFILE_VERSION);
         }
 
-        EquipmentRow row = requireEquipment(playerId, equipmentId, true);
         EquipmentDefinition definition = requireDefinition(row.definitionId());
         if (row.enhanceLevel() >= definition.maxEnhanceLevel()) throw new IllegalStateException("equipment is already at max enhance level");
         int targetLevel = row.enhanceLevel() + 1;
