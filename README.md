@@ -69,6 +69,36 @@ Strict release checks intentionally fail while real art/reference/device evidenc
 docker compose up -d postgres redis
 ```
 
+## Quick local playtest
+
+Start PostgreSQL + Redis, then launch the server with the playtest-only dev endpoints enabled:
+
+```bash
+docker compose up -d postgres redis
+GAME_DEV_ENABLED=true mvn -f server/pom.xml spring-boot:run
+```
+
+PowerShell:
+
+```powershell
+$env:GAME_DEV_ENABLED="true"
+mvn -f server/pom.xml spring-boot:run
+```
+
+Open `client-unity` in Unity 6000.0 and run:
+
+`Ninja Assemble → Mobile → Play Development Game`
+
+The command regenerates the mobile scene shell when needed, opens Bootstrap and enters Play Mode. A `DEV` button appears in the top-right corner in Unity Editor and development builds only. It provides:
+
+- +1,000,000 Gold / +10,000 Diamond;
+- unlock all base heroes and rebuild the first five-ninja formation;
+- refill Energy;
+- jump to Battle and Summon test screens;
+- reset the local guest identity.
+
+The backing `/api/v1/dev/**` endpoints do not exist unless `GAME_DEV_ENABLED=true`; keep this disabled outside local/playtest environments.
+
 ## Generate the Unity mobile scene shell
 
 Open `client-unity` in Unity 6000.0 and run:
@@ -87,6 +117,18 @@ UNITY_PATH=/path/to/Unity ./scripts/build-mobile.sh release
 ```
 
 Development produces an APK; release produces an AAB. Build output is written under `builds/android/` and is ignored by Git.
+
+## Automated playtest APK
+
+`.github/workflows/playtest-apk.yml` builds a development APK after relevant changes land on `main`, and it can also be started manually with **Actions → Playtest APK → Run workflow**.
+
+Before the first CI build, configure these repository Actions secrets for the Unity license used by GameCI:
+
+- `UNITY_LICENSE`
+- `UNITY_EMAIL`
+- `UNITY_PASSWORD`
+
+Successful runs upload `NinjaAssemble-playtest-<run number>` as a GitHub Actions artifact containing `NinjaAssemble.apk`. The artifact is retained for 14 days.
 
 ## Art production rule
 
