@@ -105,6 +105,40 @@ namespace NinjaAssemble.Playable
             return result;
         }
 
+        public async Task<DevStateDto> GrantDevStandardPackAsync()
+        {
+            DevStateDto result = await api.GrantDevStandardPackAsync(PlayerId);
+            ApplyDevState(result);
+            await RefreshShopAsync();
+            return result;
+        }
+
+        public async Task<DevRosterResultDto> UnlockAllHeroesDevAsync()
+        {
+            DevRosterResultDto result = await api.UnlockAllHeroesDevAsync(PlayerId);
+            Heroes = await api.GetOwnedHeroesAsync(PlayerId);
+            if (Heroes.Length >= 5)
+                Formation = await api.SaveFormationAsync(PlayerId, Heroes.Take(5).Select(h => h.id).ToArray());
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshArenaAsync(), RefreshShopAsync());
+            return result;
+        }
+
+        public async Task<DevStateDto> RefillEnergyDevAsync()
+        {
+            DevStateDto result = await api.RefillEnergyDevAsync(PlayerId);
+            ApplyDevState(result);
+            await RefreshCampaignAsync();
+            return result;
+        }
+
+        private void ApplyDevState(DevStateDto result)
+        {
+            if (result == null) return;
+            Gold = result.gold;
+            Diamond = result.diamond;
+            Energy = result.energy;
+        }
+
         public const long CompleteRosterSummonCost = 200;
     }
 }
