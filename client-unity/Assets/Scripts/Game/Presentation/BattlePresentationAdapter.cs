@@ -31,7 +31,8 @@ namespace NinjaAssemble.Presentation
                     EnergyAfter = item.energyAfter,
                     EffectType = item.effectType ?? string.Empty,
                     StatusId = item.statusId ?? string.Empty,
-                    DurationTurns = item.durationTurns
+                    DurationTurns = item.durationTurns,
+                    TriggerId = item.triggerId ?? string.Empty
                 });
             }
             return result;

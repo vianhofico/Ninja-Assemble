@@ -4,5 +4,6 @@ public enum BattleAbilityKind {
     BASIC,
     SKILL1,
     SKILL2,
-    ULTIMATE
+    ULTIMATE,
+    PASSIVE
 }

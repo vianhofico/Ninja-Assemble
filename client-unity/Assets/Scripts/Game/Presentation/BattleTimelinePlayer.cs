@@ -40,6 +40,9 @@ namespace NinjaAssemble.Presentation
                 BattleActorView actor;
                 switch (item.Type)
                 {
+                    case "PASSIVE_TRIGGER":
+                        if (TryGetActor(item.ActorId, out actor)) actor.PlayPassive();
+                        break;
                     case "ATTACK":
                         if (TryGetActor(item.ActorId, out actor))
                         {

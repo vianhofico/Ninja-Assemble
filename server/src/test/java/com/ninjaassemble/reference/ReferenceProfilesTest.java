@@ -15,6 +15,7 @@ class ReferenceProfilesTest {
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.ABILITY_CYCLE));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.STRUCTURED_EFFECTS));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.TECHNIQUE_MAPPING));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.PASSIVE_LIFECYCLE));
     }
 
     @Test

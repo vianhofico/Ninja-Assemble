@@ -6,6 +6,7 @@ import com.ninjaassemble.hero.domain.SkillEffectDefinition;
 import com.ninjaassemble.hero.domain.TargetSelector;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,9 @@ public final class DeterministicBattleEngine {
         EventSink sink = new EventSink();
         sink.emit(BattleEventType.BATTLE_START, 0, null, null, 0, false, null, null, null, -1, null, null, 0);
 
+        states.stream().sorted(Comparator.comparing(State::side).thenComparingInt(State::slot))
+                .forEach(owner -> triggerPassives(owner, PassiveTrigger.BATTLE_START, states, request.ruleset(), random, 0, sink));
+
         int completedRounds = 0;
         for (int round = 1; round <= request.ruleset().maxRounds(); round++) {
             if (winner(states) != null) break;
@@ -34,11 +38,15 @@ public final class DeterministicBattleEngine {
 
             for (State actor : order) {
                 if (!actor.alive() || winner(states) != null) continue;
-                processTurnStart(actor, round, sink);
+                processTurnStart(actor, states, request.ruleset(), random, round, sink);
                 if (!actor.alive()) {
                     actor.advanceStatuses();
                     continue;
                 }
+
+                triggerPassives(actor, PassiveTrigger.TURN_START, states, request.ruleset(), random, round, sink);
+                triggerPassives(actor, PassiveTrigger.SELF_LOW_HP, states, request.ruleset(), random, round, sink);
+
                 if (actor.hasStatus("STUN")) {
                     sink.emit(BattleEventType.TURN_SKIPPED, round, actor.id(), actor.id(), 0, false,
                             null, null, null, actor.energy, "STATUS", "STUN", actor.statusDuration("STUN"));
@@ -50,12 +58,12 @@ public final class DeterministicBattleEngine {
                 BattleAbility ability = actor.nextAbility(silenced);
                 int energyAfter = actor.applyEnergy(ability.energyDelta());
                 List<SkillEffectDefinition> effects = ability.effects().isEmpty() ? List.of(fallbackDamage(ability)) : ability.effects();
-                State primaryTarget = firstTarget(effects, states, actor, random);
+                State primaryTarget = firstTarget(effects, states, actor, random, false);
                 sink.emit(BattleEventType.ATTACK, round, actor.id(), primaryTarget == null ? null : primaryTarget.id(), 0, false,
                         ability.id(), ability.kind(), ability.effectKey(), energyAfter, null, null, 0);
 
                 for (SkillEffectDefinition effect : effects) {
-                    applyEffect(effect, ability, actor, states, request.ruleset(), random, round, sink);
+                    applyEffect(effect, ability, actor, states, request.ruleset(), random, round, sink, false);
                     if (winner(states) != null) break;
                 }
                 actor.advanceStatuses();
@@ -74,7 +82,8 @@ public final class DeterministicBattleEngine {
                 ability.coefficientBps(), 0, null, 10_000, 0);
     }
 
-    private static void processTurnStart(State actor, int round, EventSink sink) {
+    private static void processTurnStart(State actor, List<State> states, BattleRuleset rules, SplittableRandom random,
+                                         int round, EventSink sink) {
         for (StatusState status : List.copyOf(actor.statuses.values())) {
             if (!DOT_STATUSES.contains(status.id) || status.tickAmount <= 0 || !actor.alive()) continue;
             DamageResult damage = actor.damage(status.tickAmount);
@@ -84,27 +93,61 @@ public final class DeterministicBattleEngine {
             }
             sink.emit(BattleEventType.STATUS_TICK, round, actor.id(), actor.id(), damage.hpDamage, false,
                     null, null, null, actor.energy, "STATUS", status.id, status.remainingTurns);
-            if (!actor.alive()) {
+            if (actor.alive()) {
+                triggerPassives(actor, PassiveTrigger.AFTER_DAMAGE_TAKEN, states, rules, random, round, sink);
+                triggerPassives(actor, PassiveTrigger.SELF_LOW_HP, states, rules, random, round, sink);
+            } else {
                 sink.emit(BattleEventType.KO, round, actor.id(), actor.id(), 0, false,
                         null, null, null, actor.energy, "STATUS", status.id, status.remainingTurns);
+                triggerAllyKo(actor, states, rules, random, round, sink);
             }
         }
     }
 
-    private static State firstTarget(List<SkillEffectDefinition> effects, List<State> states, State actor, SplittableRandom random) {
+    private static void triggerPassives(State owner, PassiveTrigger trigger, List<State> states, BattleRuleset rules,
+                                        SplittableRandom random, int round, EventSink sink) {
+        if (!owner.alive()) return;
+        for (BattlePassive passive : owner.seed.passives()) {
+            if (passive.trigger() != trigger) continue;
+            if (passive.oncePerBattle() && owner.firedPassives.contains(passive.id())) continue;
+            if (trigger == PassiveTrigger.SELF_LOW_HP) {
+                int threshold = passive.thresholdBps();
+                if (threshold <= 0 || owner.hp * 10_000L > owner.seed.maxHp() * (long) threshold) continue;
+            }
+            if (passive.oncePerBattle()) owner.firedPassives.add(passive.id());
+            BattleAbility wrapper = new BattleAbility(
+                    passive.id(), BattleAbilityKind.PASSIVE, owner.seed.primaryChannel(), 10_000, 0,
+                    "vfx/passives/" + passive.id(), passive.effects());
+            sink.emitPassive(round, owner.id(), passive.id(), trigger, owner.energy);
+            for (SkillEffectDefinition effect : passive.effects()) {
+                applyEffect(effect, wrapper, owner, states, rules, random, round, sink, true);
+            }
+        }
+    }
+
+    private static void triggerAllyKo(State defeated, List<State> states, BattleRuleset rules, SplittableRandom random,
+                                      int round, EventSink sink) {
+        states.stream().filter(State::alive).filter(it -> it.side() == defeated.side()).filter(it -> it != defeated)
+                .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id))
+                .forEach(owner -> triggerPassives(owner, PassiveTrigger.ALLY_KO, states, rules, random, round, sink));
+    }
+
+    private static State firstTarget(List<SkillEffectDefinition> effects, List<State> states, State actor,
+                                     SplittableRandom random, boolean consumeRandom) {
         for (SkillEffectDefinition effect : effects) {
-            List<State> targets = targets(effect, states, actor, random);
-            if (!targets.isEmpty()) return targets.get(0);
+            List<State> resolved = targets(effect, states, actor, random, consumeRandom);
+            if (!resolved.isEmpty()) return resolved.get(0);
         }
         return null;
     }
 
     private static void applyEffect(SkillEffectDefinition effect, BattleAbility ability, State actor, List<State> states,
-                                    BattleRuleset rules, SplittableRandom random, int round, EventSink sink) {
-        List<State> targets = targets(effect, states, actor, random);
-        for (State target : targets) {
+                                    BattleRuleset rules, SplittableRandom random, int round, EventSink sink,
+                                    boolean passiveContext) {
+        List<State> resolved = targets(effect, states, actor, random, true);
+        for (State target : resolved) {
             switch (effect.type()) {
-                case DAMAGE -> applyDamage(effect, ability, actor, target, rules, random, round, sink);
+                case DAMAGE -> applyDamage(effect, ability, actor, target, states, rules, random, round, sink, passiveContext);
                 case HEAL -> applyHeal(effect, ability, actor, target, round, sink);
                 case SHIELD -> applyShield(effect, ability, actor, target, round, sink);
                 case ENERGY -> applyEnergy(effect, ability, actor, target, round, sink);
@@ -117,7 +160,8 @@ public final class DeterministicBattleEngine {
     }
 
     private static void applyDamage(SkillEffectDefinition effect, BattleAbility ability, State actor, State target,
-                                    BattleRuleset rules, SplittableRandom random, int round, EventSink sink) {
+                                    List<State> states, BattleRuleset rules, SplittableRandom random, int round,
+                                    EventSink sink, boolean passiveContext) {
         DamageChannel channel = effect.channel() == null ? ability.channel() : effect.channel();
         int coefficient = effect.coefficientBps() > 0 ? effect.coefficientBps() : ability.coefficientBps();
         boolean critical = rollCritical(random, actor.seed, channel);
@@ -132,6 +176,16 @@ public final class DeterministicBattleEngine {
         if (!target.alive()) {
             sink.emit(BattleEventType.KO, round, actor.id(), target.id(), 0, false,
                     ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
+        }
+
+        if (!passiveContext && applied.hpDamage > 0) {
+            if (actor.alive()) triggerPassives(actor, PassiveTrigger.AFTER_DAMAGE_DEALT, states, rules, random, round, sink);
+            if (target.alive()) {
+                triggerPassives(target, PassiveTrigger.AFTER_DAMAGE_TAKEN, states, rules, random, round, sink);
+                triggerPassives(target, PassiveTrigger.SELF_LOW_HP, states, rules, random, round, sink);
+            } else {
+                triggerAllyKo(target, states, rules, random, round, sink);
+            }
         }
     }
 
@@ -192,7 +246,8 @@ public final class DeterministicBattleEngine {
                 ability.id(), ability.kind(), ability.effectKey(), target.energy, effect.type().name(), null, 0);
     }
 
-    private static List<State> targets(SkillEffectDefinition effect, List<State> states, State actor, SplittableRandom random) {
+    private static List<State> targets(SkillEffectDefinition effect, List<State> states, State actor,
+                                       SplittableRandom random, boolean consumeRandom) {
         boolean revive = effect.type() == EffectType.REVIVE;
         return switch (effect.target()) {
             case SELF -> List.of(actor);
@@ -200,8 +255,11 @@ public final class DeterministicBattleEngine {
                     .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id)).toList());
             case LOWEST_HP_ENEMY -> first(states.stream().filter(it -> it.side() != actor.side() && it.alive())
                     .sorted(Comparator.comparingDouble(State::hpRatio).thenComparing(State::id)).toList());
-            case RANDOM_ENEMY -> randomOne(states.stream().filter(it -> it.side() != actor.side() && it.alive())
-                    .sorted(Comparator.comparing(State::id)).toList(), random);
+            case RANDOM_ENEMY -> {
+                List<State> values = states.stream().filter(it -> it.side() != actor.side() && it.alive())
+                        .sorted(Comparator.comparing(State::id)).toList();
+                yield consumeRandom ? randomOne(values, random) : first(values);
+            }
             case ALL_ENEMIES -> states.stream().filter(it -> it.side() != actor.side() && it.alive())
                     .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id)).toList();
             case LOWEST_HP_ALLY -> first(states.stream().filter(it -> it.side() == actor.side() && (revive ? !it.alive() : it.alive()))
@@ -257,17 +315,25 @@ public final class DeterministicBattleEngine {
     private static final class EventSink {
         private final List<BattleEvent> events = new ArrayList<>();
         private long sequence;
+
         private void emit(BattleEventType type, int round, String actorId, String targetId, long amount, boolean critical,
                           String abilityId, BattleAbilityKind abilityKind, String effectKey, int energyAfter,
                           String effectType, String statusId, int durationTurns) {
             events.add(new BattleEvent(sequence++, type, round, actorId, targetId, amount, critical,
                     abilityId, abilityKind, effectKey, energyAfter, effectType, statusId, durationTurns));
         }
+
+        private void emitPassive(int round, String ownerId, String passiveId, PassiveTrigger trigger, int energyAfter) {
+            events.add(new BattleEvent(sequence++, BattleEventType.PASSIVE_TRIGGER, round, ownerId, ownerId, 0, false,
+                    passiveId, BattleAbilityKind.PASSIVE, "vfx/passives/" + passiveId, energyAfter,
+                    "PASSIVE", null, 0, trigger.name()));
+        }
     }
 
     private static final class State {
         private final BattleUnitSeed seed;
         private final Map<String, StatusState> statuses = new LinkedHashMap<>();
+        private final Set<String> firedPassives = new HashSet<>();
         private long hp;
         private long shield;
         private int energy;

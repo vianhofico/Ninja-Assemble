@@ -5,6 +5,7 @@ import com.ninjaassemble.battle.sim.BattleUnitSeed;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.hero.catalog.HeroContentCatalogService;
 import com.ninjaassemble.reference.ReferenceProfiles;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,10 +13,12 @@ public class ExperimentalCombatStatsResolver {
     public static final String VERSION = ReferenceProfiles.COMBAT_STATS;
     private final HeroContentCatalogService content;
     private final ExperimentalAbilityProfile abilities;
+    private final PassiveEffectResolver passiveResolver;
 
-    public ExperimentalCombatStatsResolver(HeroContentCatalogService content, ExperimentalAbilityProfile abilities) {
+    public ExperimentalCombatStatsResolver(HeroContentCatalogService content, ExperimentalAbilityProfile abilities, PassiveEffectResolver passiveResolver) {
         this.content = content;
         this.abilities = abilities;
+        this.passiveResolver = passiveResolver;
     }
 
     public BattleUnitSeed resolve(String battleUnitId, String characterId, String variant, int level, TeamSide side, int slot) {
@@ -32,6 +35,8 @@ public class ExperimentalCombatStatsResolver {
         long cDef = 80L + level * 10L + (hash / 13) % 31;
         int speed = 90 + hash % 31;
         int crit = 800 + hash % 1_201;
-        return new BattleUnitSeed(battleUnitId, side, slot, hp, pAtk, cAtk, pDef, cDef, speed, crit, crit, channel, abilities.resolve(kit));
+        return new BattleUnitSeed(
+                battleUnitId, side, slot, hp, pAtk, cAtk, pDef, cDef, speed, crit, crit, channel,
+                abilities.resolve(kit), List.of(passiveResolver.resolve(kit.techniques().get(4))));
     }
 }

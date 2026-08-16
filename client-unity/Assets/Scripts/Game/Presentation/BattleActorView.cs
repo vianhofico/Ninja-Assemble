@@ -25,6 +25,7 @@ namespace NinjaAssemble.Presentation
         [SerializeField] private AudioClip attackClip;
         [SerializeField] private AudioClip skillClip;
         [SerializeField] private AudioClip ultimateClip;
+        [SerializeField] private AudioClip passiveClip;
         [SerializeField] private AudioClip hitClip;
         [SerializeField] private AudioClip deathClip;
         [SerializeField] private AudioClip victoryClip;
@@ -79,11 +80,20 @@ namespace NinjaAssemble.Presentation
                     TriggerWithFallback("Skill2", "Attack");
                     PlayClip(skillClip != null ? skillClip : attackClip);
                     break;
+                case "PASSIVE":
+                    PlayPassive();
+                    break;
                 default:
                     Trigger("Attack");
                     PlayClip(attackClip);
                     break;
             }
+        }
+
+        public void PlayPassive()
+        {
+            TryTrigger("Passive");
+            PlayClip(passiveClip != null ? passiveClip : skillClip);
         }
 
         public void SetEnergy(int value)
@@ -176,17 +186,22 @@ namespace NinjaAssemble.Presentation
 
         private void TriggerWithFallback(string primary, string fallback)
         {
-            if (animator == null) return;
-            int primaryHash = Animator.StringToHash(primary);
+            if (!TryTrigger(primary)) Trigger(fallback);
+        }
+
+        private bool TryTrigger(string trigger)
+        {
+            if (animator == null) return false;
+            int hash = Animator.StringToHash(trigger);
             foreach (AnimatorControllerParameter parameter in animator.parameters)
             {
-                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.nameHash == primaryHash)
+                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.nameHash == hash)
                 {
-                    animator.SetTrigger(primaryHash);
-                    return;
+                    animator.SetTrigger(hash);
+                    return true;
                 }
             }
-            Trigger(fallback);
+            return false;
         }
 
         private void Trigger(string trigger) { if (animator != null) animator.SetTrigger(trigger); }

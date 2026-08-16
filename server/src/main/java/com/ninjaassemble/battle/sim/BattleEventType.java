@@ -3,6 +3,7 @@ package com.ninjaassemble.battle.sim;
 public enum BattleEventType {
     BATTLE_START,
     ROUND_START,
+    PASSIVE_TRIGGER,
     ATTACK,
     DAMAGE,
     SHIELD_ABSORB,
