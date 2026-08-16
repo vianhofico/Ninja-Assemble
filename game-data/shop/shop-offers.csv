@@ -1,0 +1,9 @@
+shop_id,shop_name_en,shop_name_vi,refresh_profile,offer_id,item_id,quantity,currency,price,purchase_limit,status
+general,General Supplies,Vật phẩm thường,DAILY_05,training-scroll-pack,training-scroll,3,GOLD,1200,5,DESIGN_BASELINE
+general,General Supplies,Vật phẩm thường,DAILY_05,chakra-crystal-pack,chakra-crystal,2,GOLD,2500,3,DESIGN_BASELINE
+general,General Supplies,Vật phẩm thường,DAILY_05,summon-ticket-gold,summon-ticket,1,GOLD,10000,1,DESIGN_BASELINE
+arena,Arena Exchange,Đổi Arena,DAILY_05,training-scroll-arena,training-scroll,5,ARENA_COIN,60,3,DESIGN_BASELINE
+arena,Arena Exchange,Đổi Arena,DAILY_05,elite-seal-arena,elite-seal,2,ARENA_COIN,100,2,DESIGN_BASELINE
+arena,Arena Exchange,Đổi Arena,DAILY_05,summon-ticket-arena,summon-ticket,1,ARENA_COIN,180,1,DESIGN_BASELINE
+hero,Hero Exchange,Đổi Tướng,DAILY_05,chakra-crystal-hero,chakra-crystal,3,HERO_COIN,80,2,DESIGN_BASELINE
+hero,Hero Exchange,Đổi Tướng,DAILY_05,heroic-token-hero,heroic-token,1,HERO_COIN,120,1,DESIGN_BASELINE
