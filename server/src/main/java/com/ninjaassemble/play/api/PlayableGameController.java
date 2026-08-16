@@ -10,6 +10,7 @@ import com.ninjaassemble.play.application.PlayableBattleService;
 import com.ninjaassemble.play.application.StarterRosterService;
 import com.ninjaassemble.play.application.SummonApplicationService;
 import com.ninjaassemble.pvp.application.ArenaApplicationService;
+import com.ninjaassemble.shop.application.ShopApplicationService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,12 +31,14 @@ public class PlayableGameController {
     private final CampaignStageFlowService campaign;
     private final InventoryService inventory;
     private final ArenaApplicationService arena;
+    private final ShopApplicationService shop;
     private final SummonApplicationService summons;
     private final HeroUpgradeService upgrades;
 
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
                                   PlayableBattleService battles, CampaignStageFlowService campaign, InventoryService inventory,
-                                  ArenaApplicationService arena, SummonApplicationService summons, HeroUpgradeService upgrades) {
+                                  ArenaApplicationService arena, ShopApplicationService shop,
+                                  SummonApplicationService summons, HeroUpgradeService upgrades) {
         this.bootstrap = bootstrap;
         this.ownership = ownership;
         this.formations = formations;
@@ -43,6 +46,7 @@ public class PlayableGameController {
         this.campaign = campaign;
         this.inventory = inventory;
         this.arena = arena;
+        this.shop = shop;
         this.summons = summons;
         this.upgrades = upgrades;
     }
@@ -78,6 +82,15 @@ public class PlayableGameController {
     @PostMapping("/arena/{opponentPlayerId}/battle")
     public ArenaApplicationService.ArenaBattleView arenaBattle(@PathVariable UUID playerId, @PathVariable UUID opponentPlayerId) {
         return arena.fight(playerId, opponentPlayerId);
+    }
+
+    @GetMapping("/shop")
+    public ShopApplicationService.ShopView shop(@PathVariable UUID playerId) { return shop.view(playerId); }
+
+    @PostMapping("/shop/{shopId}/{offerId}/purchase")
+    public ShopApplicationService.PurchaseResult purchase(@PathVariable UUID playerId, @PathVariable String shopId,
+                                                          @PathVariable String offerId, @RequestBody ActionRequest request) {
+        return shop.purchase(playerId, shopId, offerId, requireRequestId(request));
     }
 
     @PostMapping("/battle")
