@@ -1,0 +1,72 @@
+id,character,group,scope
+naruto-uzumaki,Naruto Uzumaki,Konoha,CORE
+sasuke-uchiha,Sasuke Uchiha,Konoha,CORE
+sakura-haruno,Sakura Haruno,Konoha,CORE
+kakashi-hatake,Kakashi Hatake,Konoha,CORE
+sai,Sai,Konoha,CORE
+yamato,Yamato,Konoha,CORE
+shikamaru-nara,Shikamaru Nara,Konoha,CORE
+ino-yamanaka,Ino Yamanaka,Konoha,CORE
+choji-akimichi,Choji Akimichi,Konoha,CORE
+hinata-hyuga,Hinata Hyuga,Konoha,CORE
+kiba-inuzuka,Kiba Inuzuka,Konoha,CORE
+shino-aburame,Shino Aburame,Konoha,CORE
+neji-hyuga,Neji Hyuga,Konoha,CORE
+rock-lee,Rock Lee,Konoha,CORE
+tenten,Tenten,Konoha,CORE
+might-guy,Might Guy,Konoha,CORE
+tsunade,Tsunade,Konoha,CORE
+jiraiya,Jiraiya,Konoha,CORE
+hiruzen-sarutobi,Hiruzen Sarutobi,Konoha,CORE
+minato-namikaze,Minato Namikaze,Konoha,CORE
+kushina-uzumaki,Kushina Uzumaki,Konoha,CORE
+hashirama-senju,Hashirama Senju,Konoha,CORE
+tobirama-senju,Tobirama Senju,Konoha,CORE
+danzo-shimura,Danzo Shimura,Konoha,CORE
+shisui-uchiha,Shisui Uchiha,Konoha,CORE
+madara-uchiha,Madara Uchiha,Konoha,CORE
+obito-uchiha,Obito Uchiha,Konoha,CORE
+gaara,Gaara,Sunagakure,CORE
+temari,Temari,Sunagakure,CORE
+kankuro,Kankuro,Sunagakure,CORE
+rasa,Rasa,Sunagakure,CORE
+chiyo,Chiyo,Sunagakure,CORE
+sasori,Sasori,Sunagakure,CORE
+mei-terumi,Mei Terumi,Kirigakure,CORE
+chojuro,Chojuro,Kirigakure,CORE
+yagura-karatachi,Yagura Karatachi,Kirigakure,CORE
+zabuza-momochi,Zabuza Momochi,Kirigakure,CORE
+haku,Haku,Kirigakure,CORE
+kisame-hoshigaki,Kisame Hoshigaki,Kirigakure,CORE
+a-fourth-raikage,A (Fourth Raikage),Kumogakure,CORE
+third-raikage,Third Raikage,Kumogakure,CORE
+killer-b,Killer B,Kumogakure,CORE
+yugito-nii,Yugito Nii,Kumogakure,CORE
+darui,Darui,Kumogakure,CORE
+onoki,Onoki,Iwagakure,CORE
+kurotsuchi,Kurotsuchi,Iwagakure,CORE
+deidara,Deidara,Iwagakure,CORE
+roshi,Roshi,Iwagakure,CORE
+han,Han,Iwagakure,CORE
+nagato,Nagato,Amegakure,CORE
+yahiko,Yahiko,Amegakure,CORE
+konan,Konan,Amegakure,CORE
+hanzo,Hanzo,Amegakure,CORE
+orochimaru,Orochimaru,Otogakure,CORE
+kabuto-yakushi,Kabuto Yakushi,Otogakure,CORE
+kimimaro,Kimimaro,Otogakure,CORE
+jugo,Jugo,Otogakure,CORE
+karin,Karin,Otogakure,CORE
+itachi-uchiha,Itachi Uchiha,Akatsuki,CORE
+hidan,Hidan,Akatsuki,CORE
+kakuzu,Kakuzu,Akatsuki,CORE
+black-zetsu,Black Zetsu,Akatsuki,CORE
+white-zetsu,White Zetsu,Akatsuki,CORE
+utakata,Utakata,Jinchuriki,CORE
+fu,Fu,Jinchuriki,CORE
+kaguya-otsutsuki,Kaguya Otsutsuki,Ancients,CORE
+hagoromo-otsutsuki,Hagoromo Otsutsuki,Ancients,CORE
+hamura-otsutsuki,Hamura Otsutsuki,Ancients,CORE
+indra-otsutsuki,Indra Otsutsuki,Ancients,CORE
+asura-otsutsuki,Asura Otsutsuki,Ancients,CORE
+toneri-otsutsuki,Toneri Otsutsuki,AnimeMovieExpansion,EXPANSION
