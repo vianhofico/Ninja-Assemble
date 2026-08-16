@@ -22,6 +22,11 @@ def require(path: str, *tokens: str) -> list[str]:
     return [f"{path}: missing {token}" for token in tokens if token not in text]
 
 
+def reject(path: str, *tokens: str) -> list[str]:
+    text = read(path)
+    return [f"{path}: legacy token present {token}" for token in tokens if token in text]
+
+
 def csv_rows(path: str) -> list[dict[str, str]]:
     with (ROOT / path).open(encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
@@ -47,9 +52,12 @@ def main() -> int:
                       "ScreenId.Home", "ScreenId.Adventure", "ScreenId.Battle", "ScreenId.Summon", "ScreenId.Arena",
                       "ScreenId.ShadowArena", "ScreenId.Shop", "ScreenId.Inventory", "ScreenId.Quest", "ScreenId.Mail")
     errors += require("client-unity/Assets/Scripts/Game/Heroes/RosterFormationPlayableBridge.cs",
-                      "ScreenId.NinjaRoster", "ScreenId.HeroDetail", "ScreenId.Formation", "SaveFormationAsync")
+                      "ScreenId.NinjaRoster", "ScreenId.HeroDetail", "ScreenId.Formation", "SaveFormationAsync",
+                      "AWAKEN", "GetAwakeningAsync", "AwakenAsync")
     errors += require("client-unity/Assets/Scripts/Game/Heroes/HeroProgressionPlayableBridge.cs",
-                      "FRAME ADVANCE", "EVOLVE", "frame-advance", "/evolve")
+                      "FRAME ADVANCE", "frame-advance")
+    errors += reject("client-unity/Assets/Scripts/Game/Heroes/HeroProgressionPlayableBridge.cs",
+                     "EVOLVE", "/evolve", "EvolutionPathDto", "targetVariant")
     errors += require("client-unity/Assets/Scripts/Game/Guild/GuildPlayableBridge.cs", "ScreenId.Guild", "HIT GUILD BOSS")
     errors += require("client-unity/Assets/Scripts/Game/Equipment/EquipmentPlayableBridge.cs", "ScreenId.Inventory", "ENHANCE GEAR")
     errors += require("client-unity/Assets/Scripts/Game/Events/WeeklyEventPlayableBridge.cs", "ScreenId.Events", "/events")
@@ -71,10 +79,14 @@ def main() -> int:
         "Summon": ("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java", '"/summon"'),
         "LevelUp": ("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java", '"/heroes/{playerHeroId}/level-up"'),
         "FrameAdvance": ("server/src/main/java/com/ninjaassemble/progression/api/HeroProgressionController.java", '"/heroes/{playerHeroId}/frame-advance"'),
-        "Evolution": ("server/src/main/java/com/ninjaassemble/progression/api/HeroProgressionController.java", '"/heroes/{playerHeroId}/evolve"'),
+        "Awakening": ("server/src/main/java/com/ninjaassemble/hero/awakening/HeroAwakeningController.java", '"/api/v1/play/{playerId}/heroes/{playerHeroId}/awakening"'),
     }
     for name, (path, token) in server_contracts.items():
         if token not in read(path): errors.append(f"server contract missing: {name} {token}")
+    errors += reject("server/src/main/java/com/ninjaassemble/progression/api/HeroProgressionController.java",
+                     "/evolve", "/evolution-paths", "targetVariant")
+    errors += reject("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java",
+                     '"/heroes/{playerHeroId}/variant"', "VariantRequest")
 
     required_workflows = [
         "server-core.yml", "content-integrity.yml", "guild-integrity.yml", "roster-formation-integrity.yml",
