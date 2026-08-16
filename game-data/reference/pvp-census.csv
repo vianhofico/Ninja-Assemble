@@ -1,0 +1,10 @@
+feature,status,verified_rule,unknowns
+arena-team-size,VERIFIED,Exactly 5 ninjas,
+arena-defense,COMMUNITY_CONFIRMED,Asynchronous opponent/defense concept,Exact refresh/matchmaking algorithm
+arena-auto-ultimate,COMMUNITY_CONFIRMED,Auto battle/ultimate behavior referenced,Exact energy/AI priority
+arena-rating,UNKNOWN,Ranking exists,Exact rating formula and season reset
+arena-reward,COMMUNITY_CONFIRMED,Arena Coin/rewards exist,Exact tiers/timing
+shadow-roster-size,VERIFIED,15 ninjas split into three squads,
+shadow-series,VERIFIED,Best of three; first to two wins,
+shadow-matchmaking,UNKNOWN,Competitive mode exists,Exact matchmaking/rating formula
+shadow-reward,COMMUNITY_CONFIRMED,Shadow Coin/reward economy exists,Exact tiers/timing
