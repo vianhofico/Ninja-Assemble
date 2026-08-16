@@ -22,15 +22,8 @@ namespace NinjaAssemble.Presentation
             actors[actor.BattleUnitId] = actor;
         }
 
-        public bool TryGetActor(string battleUnitId, out BattleActorView actor)
-        {
-            return actors.TryGetValue(battleUnitId ?? string.Empty, out actor);
-        }
-
-        public void ClearActors()
-        {
-            actors.Clear();
-        }
+        public bool TryGetActor(string battleUnitId, out BattleActorView actor) => actors.TryGetValue(battleUnitId ?? string.Empty, out actor);
+        public void ClearActors() => actors.Clear();
 
         public Coroutine Play(IReadOnlyList<BattlePresentationEvent> events)
         {
@@ -44,10 +37,10 @@ namespace NinjaAssemble.Presentation
         {
             foreach (BattlePresentationEvent item in events)
             {
+                BattleActorView actor;
                 switch (item.Type)
                 {
                     case "ATTACK":
-                        BattleActorView actor;
                         if (TryGetActor(item.ActorId, out actor))
                         {
                             actor.PlayAbility(item.AbilityKind);
@@ -56,13 +49,34 @@ namespace NinjaAssemble.Presentation
                         yield return new WaitForSeconds(attackLeadSeconds);
                         break;
                     case "DAMAGE":
-                        BattleActorView target;
-                        if (TryGetActor(item.TargetId, out target)) target.ApplyDamage(item.Amount, item.Critical);
+                    case "STATUS_TICK":
+                        if (TryGetActor(item.TargetId, out actor)) actor.ApplyDamage(item.Amount, item.Critical);
                         yield return new WaitForSeconds(impactHoldSeconds);
                         break;
+                    case "SHIELD_ABSORB":
+                        if (TryGetActor(item.TargetId, out actor)) actor.AbsorbShield(item.Amount);
+                        break;
+                    case "HEAL":
+                        if (TryGetActor(item.TargetId, out actor)) actor.ApplyHeal(item.Amount);
+                        break;
+                    case "SHIELD":
+                        if (TryGetActor(item.TargetId, out actor)) actor.AddShield(item.Amount);
+                        break;
+                    case "ENERGY":
+                        if (TryGetActor(item.TargetId, out actor)) actor.SetEnergy(item.EnergyAfter);
+                        break;
+                    case "STATUS_APPLIED":
+                    case "TURN_SKIPPED":
+                        if (TryGetActor(item.TargetId, out actor)) actor.ApplyStatus(item.StatusId, item.DurationTurns);
+                        break;
+                    case "STATUS_CLEANSED":
+                        if (TryGetActor(item.TargetId, out actor)) actor.ClearStatus(item.StatusId);
+                        break;
+                    case "REVIVE":
+                        if (TryGetActor(item.TargetId, out actor)) actor.Revive(item.Amount);
+                        break;
                     case "KO":
-                        BattleActorView defeated;
-                        if (TryGetActor(item.TargetId, out defeated)) defeated.PlayDeath();
+                        if (TryGetActor(item.TargetId, out actor)) actor.PlayDeath();
                         break;
                 }
                 EventPresented?.Invoke(item);

@@ -11,12 +11,14 @@ namespace NinjaAssemble.Presentation
         [field: SerializeField] public string Variant { get; private set; }
         [field: SerializeField] public long MaxHp { get; private set; }
         [field: SerializeField] public long CurrentHp { get; private set; }
+        [field: SerializeField] public long Shield { get; private set; }
         [field: SerializeField] public int Energy { get; private set; }
 
         [SerializeField] private Animator animator;
         [SerializeField] private Transform hitAnchor;
         [SerializeField] private TMP_Text nameLabel;
         [SerializeField] private TMP_Text levelLabel;
+        [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private Slider healthSlider;
         [SerializeField] private Slider energySlider;
         [SerializeField] private AudioSource audioSource;
@@ -30,27 +32,20 @@ namespace NinjaAssemble.Presentation
         public Transform HitAnchor => hitAnchor != null ? hitAnchor : transform;
         public bool IsAlive => CurrentHp > 0;
 
-        public void Bind(string battleUnitId)
-        {
-            BattleUnitId = battleUnitId;
-        }
+        public void Bind(string battleUnitId) => BattleUnitId = battleUnitId;
 
-        public void Configure(
-            string battleUnitId,
-            string characterId,
-            string variant,
-            string displayName,
-            int level,
-            long maxHp)
+        public void Configure(string battleUnitId, string characterId, string variant, string displayName, int level, long maxHp)
         {
             BattleUnitId = battleUnitId ?? string.Empty;
             CharacterId = characterId ?? string.Empty;
             Variant = variant ?? string.Empty;
             MaxHp = System.Math.Max(1L, maxHp);
             CurrentHp = MaxHp;
+            Shield = 0;
             Energy = 0;
             if (nameLabel != null) nameLabel.text = string.IsNullOrWhiteSpace(displayName) ? CharacterId : displayName;
             if (levelLabel != null) levelLabel.text = "Lv." + Mathf.Max(1, level);
+            if (statusLabel != null) statusLabel.text = string.Empty;
             UpdateHealthUi();
             UpdateEnergyUi();
         }
@@ -63,12 +58,8 @@ namespace NinjaAssemble.Presentation
             UpdateHealthUi();
         }
 
-        public void ConfigureEnergyUi(Slider energy)
-        {
-            energySlider = energy;
-            UpdateEnergyUi();
-        }
-
+        public void ConfigureStatusUi(TMP_Text status) { statusLabel = status; }
+        public void ConfigureEnergyUi(Slider energy) { energySlider = energy; UpdateEnergyUi(); }
         public void PlayAttack() => PlayAbility("BASIC");
 
         public void PlayAbility(string abilityKind)
@@ -107,6 +98,46 @@ namespace NinjaAssemble.Presentation
             if (amount > 0) CurrentHp = System.Math.Max(0L, CurrentHp - amount);
             Trigger(critical ? "CriticalHit" : "Hit");
             PlayClip(hitClip);
+            UpdateHealthUi();
+        }
+
+        public void ApplyHeal(long amount)
+        {
+            if (amount <= 0 || !IsAlive) return;
+            CurrentHp = System.Math.Min(MaxHp, CurrentHp + amount);
+            TriggerWithFallback("Heal", "Hit");
+            UpdateHealthUi();
+        }
+
+        public void AddShield(long amount)
+        {
+            if (amount <= 0) return;
+            Shield = System.Math.Max(0L, Shield + amount);
+            TriggerWithFallback("Shield", "Hit");
+        }
+
+        public void AbsorbShield(long amount)
+        {
+            if (amount <= 0) return;
+            Shield = System.Math.Max(0L, Shield - amount);
+        }
+
+        public void ApplyStatus(string statusId, int durationTurns)
+        {
+            if (statusLabel != null)
+                statusLabel.text = string.IsNullOrWhiteSpace(statusId) ? string.Empty : statusId + (durationTurns > 0 ? " " + durationTurns : string.Empty);
+        }
+
+        public void ClearStatus(string statusId)
+        {
+            if (statusLabel != null && (string.IsNullOrWhiteSpace(statusId) || statusLabel.text.StartsWith(statusId))) statusLabel.text = string.Empty;
+        }
+
+        public void Revive(long amount)
+        {
+            CurrentHp = System.Math.Min(MaxHp, System.Math.Max(1L, amount));
+            Shield = 0;
+            TriggerWithFallback("Revive", "Hit");
             UpdateHealthUi();
         }
 
@@ -158,14 +189,7 @@ namespace NinjaAssemble.Presentation
             Trigger(fallback);
         }
 
-        private void Trigger(string trigger)
-        {
-            if (animator != null) animator.SetTrigger(trigger);
-        }
-
-        private void PlayClip(AudioClip clip)
-        {
-            if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
-        }
+        private void Trigger(string trigger) { if (animator != null) animator.SetTrigger(trigger); }
+        private void PlayClip(AudioClip clip) { if (audioSource != null && clip != null) audioSource.PlayOneShot(clip); }
     }
 }

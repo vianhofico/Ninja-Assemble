@@ -4,3 +4,4 @@ experimental-v1-unverified-formula,DAMAGE_FORMULA,EXPERIMENTAL,50,15,3,Temporary
 complete-roster-experimental-v1,SUMMON_PROFILE,EXPERIMENTAL,500,10,3,Development Complete Roster+ summon rates rarity and pity
 experimental-level-cost-v1,LEVEL_COST,EXPERIMENTAL,20,10,2,Temporary hero level-up Gold cost profile
 experimental-ability-cycle-v1,ABILITY_CYCLE,EXPERIMENTAL,60,20,3,Temporary basic/skill/ultimate coefficients and energy cycle
+experimental-structured-effects-v1,STRUCTURED_EFFECTS,EXPERIMENTAL,100,30,4,Temporary targeting heal shield status cleanse revive and damage-over-time semantics
