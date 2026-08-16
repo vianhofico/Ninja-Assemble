@@ -2,6 +2,7 @@ package com.ninjaassemble.hero.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,27 @@ class HeroContentCatalogServiceTest {
         assertEquals("awaken-skill-naruto-sage", awakened.skills().get(5).skillId());
         assertFalse(awakened.skills().get(5).executable(), "M47 must explicitly design the sixth skill before execution");
         assertTrue(normal.techniques().stream().allMatch(t -> !t.nameVi().isBlank() && !t.descriptionVi().isBlank()));
+    }
+
+    @Test
+    void curatedM47OverridesDifferentiateSameCharacterVersionsAtRuntime() {
+        HeroContentCatalogService content = new HeroContentCatalogService();
+
+        var kakashiYoung = content.resolveHero("kakashi-young", false);
+        var kakashiWar = content.resolveHero("kakashi-war", false);
+        assertEquals("chidori", kakashiYoung.skill("ULTIMATE").sourceTechniqueId());
+        assertEquals("kamui", kakashiWar.skill("ULTIMATE").sourceTechniqueId());
+        assertNotEquals(kakashiYoung.skill("ULTIMATE").sourceTechniqueId(), kakashiWar.skill("ULTIMATE").sourceTechniqueId());
+
+        var narutoHokage = content.resolveHero("naruto-hokage", false);
+        var narutoSixPaths = content.resolveHero("naruto-six-paths", false);
+        assertEquals("tailed-beast-bomb", narutoHokage.skill("ULTIMATE").sourceTechniqueId());
+        assertEquals("six-paths-barrage", narutoSixPaths.skill("ULTIMATE").sourceTechniqueId());
+
+        var obitoYoung = content.resolveHero("obito-young", false);
+        var obitoWhiteMask = content.resolveHero("obito-white-mask", false);
+        assertEquals("fireball-jutsu", obitoYoung.skill("SKILL_2").sourceTechniqueId());
+        assertEquals("passive-rinnegan", obitoWhiteMask.skill("PASSIVE").sourceTechniqueId());
     }
 
     @Test
