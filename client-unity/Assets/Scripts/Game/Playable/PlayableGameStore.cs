@@ -14,6 +14,7 @@ namespace NinjaAssemble.Playable
         public CampaignStageListDto Campaign { get; private set; }
         public InventoryViewDto Inventory { get; private set; }
         public ArenaStateDto Arena { get; private set; }
+        public ShadowArenaStateDto ShadowArena { get; private set; }
         public ShopViewDto Shop { get; private set; }
         public QuestBoardDto Quests { get; private set; }
         public MailboxDto Mail { get; private set; }
@@ -23,6 +24,7 @@ namespace NinjaAssemble.Playable
 
         public CampaignStageDto RecommendedStage { get { CampaignStageDto[] stages = Campaign?.stages ?? Array.Empty<CampaignStageDto>(); return stages.FirstOrDefault(stage => stage.unlocked && stage.clearCount == 0) ?? stages.LastOrDefault(stage => stage.unlocked); } }
         public ArenaOpponentDto RecommendedArenaOpponent => Arena?.opponents?.FirstOrDefault();
+        public ShadowArenaOpponentDto RecommendedShadowOpponent => ShadowArena?.eligible == true ? ShadowArena.opponents?.FirstOrDefault() : null;
         public QuestDto ClaimableQuest => Quests?.quests?.FirstOrDefault(quest => quest.claimable);
         public MailDto ClaimableMail => Mail?.mails?.FirstOrDefault(mail => !mail.claimed && (mail.attachments?.Length ?? 0) > 0);
 
@@ -34,7 +36,7 @@ namespace NinjaAssemble.Playable
             BootstrapDto bootstrap = await api.BootstrapAsync(PlayerId); Heroes = bootstrap.heroes ?? Array.Empty<OwnedHeroDto>();
             Gold = bootstrap.gold; Diamond = bootstrap.diamond; Energy = bootstrap.energy;
             if (Heroes.Length >= 5) Formation = await api.SaveFormationAsync(PlayerId, Heroes.Take(5).Select(h => h.id).ToArray());
-            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync(), RefreshMailAsync());
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshArenaAsync(), RefreshShadowArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync(), RefreshMailAsync());
         }
 
         public Task<PlayBattleDto> BattleAsync() => BattleCampaignAsync("c1-s1");
@@ -47,6 +49,7 @@ namespace NinjaAssemble.Playable
         public async Task RefreshCampaignAsync() { Campaign = await api.GetCampaignStagesAsync(PlayerId); if (Campaign != null) Energy = Campaign.energy; }
         public async Task RefreshInventoryAsync() => Inventory = await api.GetInventoryAsync(PlayerId);
         public async Task RefreshArenaAsync() => Arena = await api.GetArenaAsync(PlayerId);
+        public async Task RefreshShadowArenaAsync() => ShadowArena = await api.GetShadowArenaAsync(PlayerId);
         public async Task RefreshShopAsync() => Shop = await api.GetShopAsync(PlayerId);
         public async Task RefreshQuestsAsync() => Quests = await api.GetQuestsAsync(PlayerId);
         public async Task RefreshMailAsync() => Mail = await api.GetMailAsync(PlayerId);
@@ -55,6 +58,14 @@ namespace NinjaAssemble.Playable
         {
             if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
             ArenaBattleDto result = await api.FightArenaAsync(PlayerId, opponentPlayerId); await Task.WhenAll(RefreshArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
+        }
+        public async Task<ShadowArenaBattleDto> FightShadowArenaAsync(string opponentPlayerId)
+        {
+            if (ShadowArena?.eligible != true) throw new InvalidOperationException("Shadow Arena requires 15 owned ninja");
+            if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
+            ShadowArenaBattleDto result = await api.FightShadowArenaAsync(PlayerId, opponentPlayerId);
+            await Task.WhenAll(RefreshShadowArenaAsync(), RefreshShopAsync());
+            return result;
         }
         public async Task<ShopPurchaseResultDto> PurchaseShopAsync(string shopId, string offerId)
         {
@@ -87,12 +98,12 @@ namespace NinjaAssemble.Playable
         public async Task<SummonResultDto> SummonAsync()
         {
             SummonResultDto result = await api.SummonAsync(PlayerId, Guid.NewGuid().ToString()); Diamond -= CompleteRosterSummonCost; Heroes = await api.GetOwnedHeroesAsync(PlayerId);
-            await Task.WhenAll(RefreshShopAsync(), RefreshQuestsAsync()); return result;
+            await Task.WhenAll(RefreshShopAsync(), RefreshQuestsAsync(), RefreshShadowArenaAsync()); return result;
         }
         public async Task<UpgradeResultDto> LevelUpAsync(string playerHeroId)
         {
             UpgradeResultDto result = await api.LevelUpAsync(PlayerId, playerHeroId, Guid.NewGuid().ToString()); Gold -= result.goldCost; Heroes = await api.GetOwnedHeroesAsync(PlayerId);
-            await Task.WhenAll(RefreshShopAsync(), RefreshQuestsAsync()); return result;
+            await Task.WhenAll(RefreshShopAsync(), RefreshQuestsAsync(), RefreshShadowArenaAsync()); return result;
         }
 
         public const long CompleteRosterSummonCost = 200;
