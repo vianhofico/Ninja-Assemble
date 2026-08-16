@@ -14,7 +14,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HEROES = ROOT / "game-data/heroes/heroes.csv"
 ALIASES = ROOT / "game-data/skills/hero-version-skills.csv"
-AWAKENINGS = ROOT / "game-data/heroes/awakenings.csv"
 AWAKENING_SKILLS = ROOT / "game-data/skills/awakening-skills.csv"
 TECHNIQUE_FILES = [ROOT / f"game-data/skills/technique-library-0{i}.csv" for i in range(1, 5)]
 
@@ -42,7 +41,6 @@ def require(value: str | None, message: str) -> str:
 def main() -> int:
     heroes = rows(HEROES)
     aliases = rows(ALIASES)
-    awakening_defs = rows(AWAKENINGS)
     awakening_skills = rows(AWAKENING_SKILLS)
 
     if not heroes:
@@ -125,17 +123,18 @@ def main() -> int:
         detail = "; ".join(f"{character}:{'|'.join(ids)}" for character, ids in duplicate_same_character_kits[:20])
         raise SystemExit(f"M47_SKILL_IDENTITY_INVALID identical same-character five-slot kits: {detail}")
 
-    awakening_by_hero: dict[str, dict[str, str]] = {}
+    # `heroes.csv` is the production source of truth for one-Awakening ownership.
+    # Design proposal CSVs intentionally use form IDs, while runtime references a stable awakening_id.
+    awakening_by_hero: dict[str, str] = {}
     awakening_ids: set[str] = set()
-    for definition in awakening_defs:
-        awakening_id = require(definition.get("awakening_id"), "awakening_id required")
-        hero_id = require(definition.get("hero_id"), f"{awakening_id} hero_id required")
+    for hero_id, hero in hero_by_id.items():
+        awakening_id = (hero.get("awakening_id") or "").strip()
+        if not awakening_id:
+            continue
         if awakening_id in awakening_ids:
-            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID duplicate awakening={awakening_id}")
+            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID duplicate awakening_id={awakening_id}")
         awakening_ids.add(awakening_id)
-        if hero_id in awakening_by_hero:
-            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID hero has >1 Awakening hero={hero_id}")
-        awakening_by_hero[hero_id] = definition
+        awakening_by_hero[hero_id] = awakening_id
 
     awakening_skill_by_hero: dict[str, dict[str, str]] = {}
     baseline_awakening_slots = 0
@@ -147,7 +146,7 @@ def main() -> int:
             raise SystemExit(f"M47_SKILL_IDENTITY_INVALID >1 Awakening Skill hero={hero_id}")
         if hero_id not in awakening_by_hero:
             raise SystemExit(f"M47_SKILL_IDENTITY_INVALID Awakening Skill without Awakening hero={hero_id}")
-        if awakening_by_hero[hero_id]["awakening_id"] != awakening_id:
+        if awakening_by_hero[hero_id] != awakening_id:
             raise SystemExit(f"M47_SKILL_IDENTITY_INVALID Awakening Skill pair mismatch hero={hero_id}")
         require(skill.get("name_en"), f"{skill_id} name_en required")
         require(skill.get("name_vi"), f"{skill_id} name_vi required")
@@ -167,7 +166,7 @@ def main() -> int:
     multi_version_characters = sum(1 for signatures in character_kits.values() if sum(len(v) for v in signatures.values()) > 1)
     print(
         "M47_SKILL_IDENTITY_OK "
-        f"heroes={len(heroes)} base_slots={len(aliases)} awakenings={len(awakening_defs)} "
+        f"heroes={len(heroes)} base_slots={len(aliases)} awakenings={len(awakening_by_hero)} "
         f"awakening_slots={len(awakening_skills)} techniques={len(techniques)} "
         f"multi_version_characters={multi_version_characters} "
         f"baseline_base_slots={baseline_base_slots} baseline_awakening_slots={baseline_awakening_slots} "
