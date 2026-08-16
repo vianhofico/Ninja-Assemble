@@ -1,6 +1,7 @@
 package com.ninjaassemble.play.api;
 
 import com.ninjaassemble.campaign.application.CampaignStageFlowService;
+import com.ninjaassemble.guild.application.GuildApplicationService;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.inventory.application.InventoryService;
@@ -35,6 +36,7 @@ public class PlayableGameController {
     private final InventoryService inventory;
     private final ArenaApplicationService arena;
     private final ShadowArenaApplicationService shadowArena;
+    private final GuildApplicationService guild;
     private final ShopApplicationService shop;
     private final DailyQuestService quests;
     private final MailApplicationService mail;
@@ -44,11 +46,11 @@ public class PlayableGameController {
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
                                   PlayableBattleService battles, CampaignStageFlowService campaign, InventoryService inventory,
                                   ArenaApplicationService arena, ShadowArenaApplicationService shadowArena,
-                                  ShopApplicationService shop, DailyQuestService quests,
+                                  GuildApplicationService guild, ShopApplicationService shop, DailyQuestService quests,
                                   MailApplicationService mail, SummonApplicationService summons, HeroUpgradeService upgrades) {
         this.bootstrap = bootstrap; this.ownership = ownership; this.formations = formations; this.battles = battles;
         this.campaign = campaign; this.inventory = inventory; this.arena = arena; this.shadowArena = shadowArena;
-        this.shop = shop; this.quests = quests; this.mail = mail; this.summons = summons; this.upgrades = upgrades;
+        this.guild = guild; this.shop = shop; this.quests = quests; this.mail = mail; this.summons = summons; this.upgrades = upgrades;
     }
 
     @PostMapping("/bootstrap") public StarterRosterService.BootstrapResult bootstrap(@PathVariable UUID playerId) { return bootstrap.bootstrap(playerId); }
@@ -62,6 +64,17 @@ public class PlayableGameController {
     @PostMapping("/arena/{opponentPlayerId}/battle") public ArenaApplicationService.ArenaBattleView arenaBattle(@PathVariable UUID playerId, @PathVariable UUID opponentPlayerId) { return arena.fight(playerId, opponentPlayerId); }
     @GetMapping("/shadow-arena") public ShadowArenaApplicationService.ShadowArenaState shadowArena(@PathVariable UUID playerId) { return shadowArena.state(playerId); }
     @PostMapping("/shadow-arena/{opponentPlayerId}/battle") public ShadowArenaApplicationService.ShadowArenaBattleView shadowArenaBattle(@PathVariable UUID playerId, @PathVariable UUID opponentPlayerId) { return shadowArena.fight(playerId, opponentPlayerId); }
+
+    @GetMapping("/guild") public GuildApplicationService.GuildState guild(@PathVariable UUID playerId) { return guild.state(playerId); }
+    @PostMapping("/guild/create") public GuildApplicationService.GuildState createGuild(@PathVariable UUID playerId, @RequestBody GuildNameRequest request) { return guild.create(playerId, request == null ? null : request.name()); }
+    @PostMapping("/guild/{guildId}/join") public GuildApplicationService.GuildState joinGuild(@PathVariable UUID playerId, @PathVariable UUID guildId) { return guild.join(playerId, guildId); }
+    @PostMapping("/guild/leave") public GuildApplicationService.GuildState leaveGuild(@PathVariable UUID playerId) { return guild.leave(playerId); }
+    @PostMapping("/guild/contribute") public GuildApplicationService.DonationResult contributeGuild(@PathVariable UUID playerId, @RequestBody GuildContributionRequest request) {
+        if (request == null || request.requestId() == null) throw new IllegalArgumentException("requestId is required");
+        return guild.contribute(playerId, request.goldAmount(), request.requestId());
+    }
+    @PostMapping("/guild/boss/hit") public GuildApplicationService.BossHitResult hitGuildBoss(@PathVariable UUID playerId, @RequestBody ActionRequest request) { return guild.hitBoss(playerId, requireRequestId(request)); }
+
     @GetMapping("/shop") public ShopApplicationService.ShopView shop(@PathVariable UUID playerId) { return shop.view(playerId); }
     @PostMapping("/shop/{shopId}/{offerId}/purchase") public ShopApplicationService.PurchaseResult purchase(@PathVariable UUID playerId, @PathVariable String shopId, @PathVariable String offerId, @RequestBody ActionRequest request) { return shop.purchase(playerId, shopId, offerId, requireRequestId(request)); }
     @GetMapping("/quests") public DailyQuestService.QuestBoard quests(@PathVariable UUID playerId) { return quests.view(playerId); }
@@ -78,4 +91,6 @@ public class PlayableGameController {
     public record FormationRequest(List<UUID> playerHeroIds) {}
     public record ActionRequest(UUID requestId) {}
     public record VariantRequest(String variant) {}
+    public record GuildNameRequest(String name) {}
+    public record GuildContributionRequest(long goldAmount, UUID requestId) {}
 }
