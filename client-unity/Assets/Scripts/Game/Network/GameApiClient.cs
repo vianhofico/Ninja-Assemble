@@ -32,6 +32,8 @@ namespace NinjaAssemble.Network
         public Task<InventoryViewDto> GetInventoryAsync(string playerId) => GetAsync<InventoryViewDto>($"/api/v1/play/{Escape(playerId)}/inventory");
         public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/arena");
         public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle", "{}");
+        public Task<ShadowArenaStateDto> GetShadowArenaAsync(string playerId) => GetAsync<ShadowArenaStateDto>($"/api/v1/play/{Escape(playerId)}/shadow-arena");
+        public Task<ShadowArenaBattleDto> FightShadowArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ShadowArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/shadow-arena/{Escape(opponentPlayerId)}/battle", "{}");
         public Task<ShopViewDto> GetShopAsync(string playerId) => GetAsync<ShopViewDto>($"/api/v1/play/{Escape(playerId)}/shop");
         public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId) => PostJsonAsync<ShopPurchaseResultDto>($"/api/v1/play/{Escape(playerId)}/shop/{Escape(shopId)}/{Escape(offerId)}/purchase", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<QuestBoardDto> GetQuestsAsync(string playerId) => GetAsync<QuestBoardDto>($"/api/v1/play/{Escape(playerId)}/quests");
