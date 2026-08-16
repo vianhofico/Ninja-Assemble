@@ -12,6 +12,7 @@ class ReferenceProfilesTest {
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.DAMAGE_FORMULA));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.COMPLETE_ROSTER_SUMMON));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.HERO_LEVEL_COST));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.ABILITY_CYCLE));
     }
 
     @Test
