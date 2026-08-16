@@ -1,0 +1,69 @@
+name: Playtest APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "client-unity/**"
+      - "game-data/**"
+      - "scripts/build-mobile.sh"
+      - ".github/workflows/playtest-apk.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  android-playtest:
+    name: Build Android development APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Require Unity CI credentials
+        shell: bash
+        run: |
+          if [[ -z "$UNITY_LICENSE" || -z "$UNITY_EMAIL" || -z "$UNITY_PASSWORD" ]]; then
+            echo "::error::Configure repository secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD before building the playtest APK."
+            exit 1
+          fi
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: client-unity/Library
+          key: unity-library-android-${{ hashFiles('client-unity/Assets/**', 'client-unity/Packages/**', 'client-unity/ProjectSettings/**') }}
+          restore-keys: |
+            unity-library-android-
+
+      - name: Build playtest APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          targetPlatform: Android
+          buildMethod: NinjaAssemble.EditorTools.MobileBuildAutomation.BuildAndroidDevelopment
+          androidExportType: androidPackage
+
+      - name: Upload playtest APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NinjaAssemble-playtest-${{ github.run_number }}
+          path: builds/android/NinjaAssemble.apk
+          if-no-files-found: error
+          retention-days: 14
