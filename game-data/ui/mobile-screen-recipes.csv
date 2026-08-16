@@ -1,0 +1,17 @@
+screen_id,scene_name,title_key,required_mobile_release
+Home,Home,screen.home,true
+NinjaRoster,NinjaRoster,screen.roster,true
+HeroDetail,HeroDetail,screen.heroDetail,true
+Formation,Formation,screen.formation,true
+Adventure,Adventure,screen.adventure,true
+Battle,Battle,screen.battle,true
+Summon,Summon,screen.summon,true
+Arena,Arena,screen.arena,true
+ShadowArena,ShadowArena,screen.shadowArena,true
+Guild,Guild,screen.guild,true
+Shop,Shop,screen.shop,true
+Inventory,Inventory,screen.inventory,true
+Quest,Quest,screen.quest,true
+Events,Events,screen.events,true
+Mail,Mail,screen.mail,true
+Settings,Settings,screen.settings,true
