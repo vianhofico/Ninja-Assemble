@@ -1,7 +1,9 @@
 package com.ninjaassemble.summon.domain;
 
-public record SummonPoolEntry(String heroVariantId, SummonRarity rarity, int weight, boolean featured) {
+public record SummonPoolEntry(String heroId, SummonRarity rarity, int weight, boolean featured) {
     public SummonPoolEntry {
-        if (heroVariantId == null || heroVariantId.isBlank() || rarity == null || weight <= 0) throw new IllegalArgumentException("invalid summon pool entry");
+        if (heroId == null || heroId.isBlank() || heroId.contains("::") || rarity == null || weight <= 0) {
+            throw new IllegalArgumentException("invalid Hero Version summon pool entry");
+        }
     }
 }

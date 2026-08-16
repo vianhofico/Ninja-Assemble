@@ -1,20 +1,44 @@
 package com.ninjaassemble.play.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import com.ninjaassemble.hero.catalog.HeroCatalogService;
-import com.ninjaassemble.hero.catalog.VariantCatalogService;
+
+import com.ninjaassemble.hero.catalog.HeroVersionAcquisitionCatalogService;
 import com.ninjaassemble.summon.domain.SummonRarity;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class CompleteRosterBannerFactoryTest {
     @Test
-    void bannerContainsEveryBaseCharacterAndVariant() {
-        CompleteRosterBannerFactory factory = new CompleteRosterBannerFactory(new HeroCatalogService(), new VariantCatalogService());
+    void bannerContainsOnlyApprovedSummonableHeroVersions() {
+        HeroVersionAcquisitionCatalogService catalog = new HeroVersionAcquisitionCatalogService();
+        CompleteRosterBannerFactory factory = new CompleteRosterBannerFactory(catalog);
+
         var banner = factory.create();
-        assertEquals(189 + 427, banner.pool().size());
-        assertTrue(banner.pool().stream().anyMatch(it -> it.heroVariantId().equals("naruto-uzumaki::Six Paths Sage Mode")));
-        assertEquals(SummonRarity.UR, CompleteRosterBannerFactory.rarityFor("Six Paths Sage Mode"));
-        assertEquals(SummonRarity.SSR, CompleteRosterBannerFactory.rarityFor("Sage Mode"));
+        Set<String> expectedHeroIds = catalog.summonable().stream()
+                .map(HeroVersionAcquisitionCatalogService.HeroVersionAcquisitionEntry::heroId)
+                .collect(Collectors.toSet());
+        Set<String> awakeningIds = catalog.all().stream()
+                .map(HeroVersionAcquisitionCatalogService.HeroVersionAcquisitionEntry::awakeningId)
+                .filter(value -> value != null && !value.isBlank())
+                .collect(Collectors.toSet());
+        Set<String> actualHeroIds = banner.pool().stream().map(entry -> entry.heroId()).collect(Collectors.toSet());
+
+        assertEquals(expectedHeroIds.size(), banner.pool().size());
+        assertEquals(expectedHeroIds, actualHeroIds);
+        assertTrue(banner.pool().stream().noneMatch(entry -> entry.heroId().contains("::")));
+        assertTrue(actualHeroIds.stream().noneMatch(awakeningIds::contains));
+        assertTrue(banner.pool().stream().allMatch(entry -> catalog.require(entry.heroId()).summonable()));
+        assertFalse(banner.pool().isEmpty());
+    }
+
+    @Test
+    void rarityWeightsComeFromHeroVersionRarityRatherThanVariantNames() {
+        assertEquals(25, CompleteRosterBannerFactory.weightFor(SummonRarity.UR));
+        assertEquals(150, CompleteRosterBannerFactory.weightFor(SummonRarity.SSR));
+        assertEquals(700, CompleteRosterBannerFactory.weightFor(SummonRarity.SR));
+        assertEquals(1_000, CompleteRosterBannerFactory.weightFor(SummonRarity.R));
     }
 }

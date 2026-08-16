@@ -1,0 +1,118 @@
+name: hero-version-acquisition-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-acquisition:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ninja_assemble_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ninja_assemble_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Validate Hero Version acquisition source/data contract
+        run: python scripts/validate-hero-version-acquisition.py
+
+      - name: Run focused summon tests
+        working-directory: server
+        run: mvn -B -Dtest=CompleteRosterBannerFactoryTest,SummonEngineTest test
+
+      - name: Apply Flyway SQL through V11
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for migration in $(find server/src/main/resources/db/migration -maxdepth 1 -type f -name 'V*.sql' ! -name 'V12__*.sql' | sort -V); do
+            echo "Applying $migration"
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+
+      - name: Seed pre-M45 summon history
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
+          insert into players(id, display_name)
+          values ('00000000-0000-0000-0000-000000000045', 'M45 Fixture');
+
+          insert into summon_history(
+            id, player_id, banner_id, banner_version, seed, hero_variant_id,
+            rarity, pity_triggered, duplicate, created_at
+          ) values
+            ('45000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000045',
+             'complete-roster', 'legacy-v1', 1, 'naruto-uzumaki::Sage Mode', 'SSR', false, false, now()),
+            ('45000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000045',
+             'complete-roster', 'legacy-v1', 2, 'sasuke-uchiha::BASE', 'SR', false, false, now());
+          SQL
+
+      - name: Apply V12 Hero Version acquisition migration
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f server/src/main/resources/db/migration/V12__hero_version_acquisition.sql
+
+      - name: Assert summon history preservation and new identity
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          declare
+            value text;
+            c integer;
+          begin
+            select hero_version_id into value from summon_history
+              where id='45000000-0000-0000-0000-000000000001';
+            if value is distinct from 'naruto-sage' then
+              raise exception 'legacy Sage Mode summon expected naruto-sage, got %', value;
+            end if;
+
+            select hero_version_id into value from summon_history
+              where id='45000000-0000-0000-0000-000000000002';
+            if value is distinct from 'sasuke-genin' then
+              raise exception 'legacy Sasuke BASE expected sasuke-genin, got %', value;
+            end if;
+
+            select count(*) into c from summon_history
+              where legacy_hero_variant_id is not null and hero_version_id is null;
+            if c <> 0 then
+              raise exception 'known fixture summon identities failed Hero Version backfill: %', c;
+            end if;
+
+            insert into summon_history(
+              id, player_id, banner_id, banner_version, seed, hero_version_id,
+              rarity, pity_triggered, duplicate, created_at
+            ) values (
+              '45000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000045',
+              'complete-roster', 'complete-roster-hero-version-experimental-v2', 3, 'naruto-sage',
+              'SSR', false, false, now()
+            );
+
+            select count(*) into c from summon_history
+              where id='45000000-0000-0000-0000-000000000003'
+                and hero_version_id='naruto-sage'
+                and legacy_hero_variant_id is null;
+            if c <> 1 then raise exception 'M45 direct Hero Version summon write failed'; end if;
+          end $$;
+          SQL
