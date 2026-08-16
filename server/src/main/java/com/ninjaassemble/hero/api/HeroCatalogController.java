@@ -30,14 +30,26 @@ public class HeroCatalogController {
         return catalog.byGroup(group);
     }
 
+    /** Legacy discovery surface retained until M45/M46 client migration. */
+    @Deprecated(forRemoval = true)
     @GetMapping("/{id}/variants")
     public List<HeroVariantEntry> variants(@PathVariable String id) {
         catalog.require(id);
         return variants.forCharacter(id);
     }
 
+    /** Production Hero Version kit endpoint: exactly 5 normal slots or 6 awakened slots. */
+    @GetMapping("/versions/{heroId}/kit")
+    public HeroContentCatalogService.HeroKitView heroVersionKit(@PathVariable String heroId,
+                                                                @RequestParam(defaultValue = "false") boolean awakened) {
+        return content.resolveHero(heroId, awakened);
+    }
+
+    /** Legacy compatibility endpoint. Resolution is bridge-only; generic character/variant fallback was removed. */
+    @Deprecated(forRemoval = true)
     @GetMapping("/{id}/kit")
-    public HeroContentCatalogService.HeroKitView kit(@PathVariable String id, @RequestParam(required = false) String variant) {
+    public HeroContentCatalogService.HeroKitView legacyKit(@PathVariable String id,
+                                                           @RequestParam(required = false) String variant) {
         catalog.require(id);
         return content.resolve(id, variant);
     }
