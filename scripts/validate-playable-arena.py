@@ -25,7 +25,7 @@ def main() -> int:
         '"/arena"', '"/arena/{opponentPlayerId}/battle"')
     require(
         "server/src/test/java/com/ninjaassemble/pvp/domain/ArenaRatingCalculatorTest.java",
-        "deterministicWinLossDeltasAndFloor", "experimental-v1-unverified")
+        "experimentalArenaProfileUsesDeterministicWinLossDeltasAndFloor", "experimental-v1-unverified")
     require(
         "client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
         "ArenaOpponentDto", "ArenaStateDto", "ArenaBattleDto", "arenaCoinReward")
