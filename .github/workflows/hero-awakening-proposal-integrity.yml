@@ -1,0 +1,30 @@
+name: hero-awakening-proposal-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  proposal-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate committed proposal artifacts
+        run: python scripts/validate-hero-awakening-proposal.py
+      - name: Regenerate proposal deterministically
+        run: |
+          python scripts/generate-hero-awakening-proposal.py --write
+          python scripts/refine-hero-awakening-proposal-v2.py
+      - name: Validate regenerated proposal
+        run: python scripts/validate-hero-awakening-proposal.py
+      - name: Require generated artifacts to be reproducible
+        run: |
+          git diff --exit-code -- \
+            game-data/design/character-form-pool.csv \
+            game-data/design/hero-awakening-pairs.csv \
+            game-data/design/variant-reclassification.csv \
+            docs/design/HERO_AWAKENING_PAIR_PROPOSAL.md
