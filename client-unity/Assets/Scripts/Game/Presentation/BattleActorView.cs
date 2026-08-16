@@ -8,6 +8,10 @@ namespace NinjaAssemble.Presentation
     {
         [field: SerializeField] public string BattleUnitId { get; private set; }
         [field: SerializeField] public string CharacterId { get; private set; }
+        [field: SerializeField] public string HeroId { get; private set; }
+        [field: SerializeField] public bool Awakened { get; private set; }
+        [field: SerializeField] public string AwakeningId { get; private set; }
+        [field: SerializeField] public string PresentationKey { get; private set; }
         [field: SerializeField] public string Variant { get; private set; }
         [field: SerializeField] public long MaxHp { get; private set; }
         [field: SerializeField] public long CurrentHp { get; private set; }
@@ -37,16 +41,35 @@ namespace NinjaAssemble.Presentation
 
         public void Configure(string battleUnitId, string characterId, string variant, string displayName, int level, long maxHp)
         {
+            Configure(battleUnitId, characterId, string.Empty, false, string.Empty, string.Empty, variant, displayName, level, maxHp);
+        }
+
+        public void Configure(
+            string battleUnitId,
+            string characterId,
+            string heroId,
+            bool awakened,
+            string awakeningId,
+            string presentationKey,
+            string variant,
+            string displayName,
+            int level,
+            long maxHp)
+        {
             BattleUnitId = battleUnitId ?? string.Empty;
             CharacterId = characterId ?? string.Empty;
+            HeroId = heroId ?? string.Empty;
+            Awakened = awakened;
+            AwakeningId = awakeningId ?? string.Empty;
+            PresentationKey = presentationKey ?? string.Empty;
             Variant = variant ?? string.Empty;
             MaxHp = System.Math.Max(1L, maxHp);
             CurrentHp = MaxHp;
             Shield = 0;
             Energy = 0;
-            if (nameLabel != null) nameLabel.text = string.IsNullOrWhiteSpace(displayName) ? CharacterId : displayName;
+            if (nameLabel != null) nameLabel.text = string.IsNullOrWhiteSpace(displayName) ? (string.IsNullOrWhiteSpace(HeroId) ? CharacterId : HeroId) : displayName;
             if (levelLabel != null) levelLabel.text = "Lv." + Mathf.Max(1, level);
-            if (statusLabel != null) statusLabel.text = string.Empty;
+            if (statusLabel != null) statusLabel.text = Awakened ? "AWAKENED" : string.Empty;
             UpdateHealthUi();
             UpdateEnergyUi();
         }
@@ -59,7 +82,7 @@ namespace NinjaAssemble.Presentation
             UpdateHealthUi();
         }
 
-        public void ConfigureStatusUi(TMP_Text status) { statusLabel = status; }
+        public void ConfigureStatusUi(TMP_Text status) { statusLabel = status; if (statusLabel != null && Awakened) statusLabel.text = "AWAKENED"; }
         public void ConfigureEnergyUi(Slider energy) { energySlider = energy; UpdateEnergyUi(); }
         public void PlayAttack() => PlayAbility("BASIC");
 
@@ -68,7 +91,12 @@ namespace NinjaAssemble.Presentation
             string kind = string.IsNullOrWhiteSpace(abilityKind) ? "BASIC" : abilityKind.ToUpperInvariant();
             switch (kind)
             {
+                case "AWAKENING_SKILL":
+                    TriggerWithFallback("AwakeningSkill", "Ultimate");
+                    PlayClip(ultimateClip != null ? ultimateClip : skillClip);
+                    break;
                 case "ULTIMATE":
+                case "RAGE_SKILL":
                     TriggerWithFallback("Ultimate", "Attack");
                     PlayClip(ultimateClip != null ? ultimateClip : skillClip);
                     break;
@@ -135,12 +163,12 @@ namespace NinjaAssemble.Presentation
         public void ApplyStatus(string statusId, int durationTurns)
         {
             if (statusLabel != null)
-                statusLabel.text = string.IsNullOrWhiteSpace(statusId) ? string.Empty : statusId + (durationTurns > 0 ? " " + durationTurns : string.Empty);
+                statusLabel.text = string.IsNullOrWhiteSpace(statusId) ? (Awakened ? "AWAKENED" : string.Empty) : statusId + (durationTurns > 0 ? " " + durationTurns : string.Empty);
         }
 
         public void ClearStatus(string statusId)
         {
-            if (statusLabel != null && (string.IsNullOrWhiteSpace(statusId) || statusLabel.text.StartsWith(statusId))) statusLabel.text = string.Empty;
+            if (statusLabel != null && (string.IsNullOrWhiteSpace(statusId) || statusLabel.text.StartsWith(statusId))) statusLabel.text = Awakened ? "AWAKENED" : string.Empty;
         }
 
         public void Revive(long amount)
