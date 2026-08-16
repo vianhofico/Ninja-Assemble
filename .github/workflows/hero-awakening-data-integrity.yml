@@ -1,0 +1,82 @@
+name: hero-awakening-data-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-awakening-data:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ninja_assemble_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ninja_assemble_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate committed M42 data
+        run: python scripts/validate-awakening-production-data.py
+      - name: Regenerate M42 data deterministically
+        run: python scripts/generate-awakening-production-data.py --write
+      - name: Validate regenerated M42 data
+        run: python scripts/validate-awakening-production-data.py
+      - name: Require generated artifacts to be reproducible
+        run: |
+          git diff --exit-code -- \
+            game-data/heroes/heroes.csv \
+            game-data/skills/hero-version-skills.csv \
+            game-data/progression/awakenings.csv \
+            game-data/skills/awakening-skills.csv \
+            game-data/assets/awakening-visuals.csv \
+            server/src/main/resources/db/migration/V10__hero_version_awakening_model.sql
+      - name: Apply Flyway SQL V1 through V10 to PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          for migration in $(find server/src/main/resources/db/migration -maxdepth 1 -type f -name 'V*.sql' | sort -V); do
+            echo "Applying $migration"
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Verify seeded one-Awakening schema in PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          declare
+            hero_count integer;
+            alias_count integer;
+            awakening_count integer;
+            skill_count integer;
+            visual_count integer;
+            collision_count integer;
+          begin
+            select count(*) into hero_count from hero_versions;
+            select count(*) into alias_count from hero_version_skill_aliases;
+            select count(*) into awakening_count from awakening_definitions;
+            select count(*) into skill_count from awakening_skill_definitions;
+            select count(*) into visual_count from awakening_visual_definitions;
+            select count(*) into collision_count
+              from hero_versions h join awakening_definitions a on h.base_form_id = a.awakened_form_id;
+            if hero_count <> 194 then raise exception 'hero_count expected 194 got %', hero_count; end if;
+            if alias_count <> 970 then raise exception 'alias_count expected 970 got %', alias_count; end if;
+            if awakening_count <> 61 then raise exception 'awakening_count expected 61 got %', awakening_count; end if;
+            if skill_count <> 61 then raise exception 'awakening skill count expected 61 got %', skill_count; end if;
+            if visual_count <> 61 then raise exception 'visual count expected 61 got %', visual_count; end if;
+            if collision_count <> 0 then raise exception 'base/Awakening form collision count %', collision_count; end if;
+          end $$;
+          SQL
