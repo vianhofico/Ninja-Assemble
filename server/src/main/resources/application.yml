@@ -29,3 +29,6 @@ game:
     # Tunable until exact parity is measured against the frozen reference build.
     cap: ${GAME_ENERGY_CAP:120}
     regen-seconds: ${GAME_ENERGY_REGEN_SECONDS:300}
+  dev:
+    # Playtest-only cheat endpoints. Keep disabled in production.
+    enabled: ${GAME_DEV_ENABLED:false}
