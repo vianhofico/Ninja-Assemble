@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HEROES = ROOT / "game-data/heroes/heroes.csv"
 ALIASES = ROOT / "game-data/skills/hero-version-skills.csv"
+OVERRIDES = ROOT / "game-data/skills/hero-version-skill-overrides.csv"
 AWAKENING_SKILLS = ROOT / "game-data/skills/awakening-skills.csv"
 TECHNIQUE_FILES = [ROOT / f"game-data/skills/technique-library-0{i}.csv" for i in range(1, 5)]
 
@@ -24,6 +25,7 @@ BASELINE_MARKERS = (
     "M47_EXPLICIT_DESIGN_REQUIRED",
     "SCHEMA_BASELINE_NOT_RUNTIME",
     "UNRESOLVED_EXPLICIT_DESIGN",
+    "M47_CANON_DIRECTION_BASELINE",
 )
 
 
@@ -41,6 +43,7 @@ def require(value: str | None, message: str) -> str:
 def main() -> int:
     heroes = rows(HEROES)
     aliases = rows(ALIASES)
+    overrides = rows(OVERRIDES)
     awakening_skills = rows(AWAKENING_SKILLS)
 
     if not heroes:
@@ -62,6 +65,7 @@ def main() -> int:
             techniques.add(technique_id)
 
     alias_by_hero: dict[str, dict[str, dict[str, str]]] = defaultdict(dict)
+    alias_by_skill_id: dict[str, dict[str, str]] = {}
     seen_skill_ids: set[str] = set()
     baseline_base_slots = 0
     for alias in aliases:
@@ -80,7 +84,9 @@ def main() -> int:
             raise SystemExit(f"M47_SKILL_IDENTITY_INVALID {hero_id} duplicate slot={slot}")
         if source not in techniques:
             raise SystemExit(f"M47_SKILL_IDENTITY_INVALID {skill_id} missing source technique={source}")
-        alias_by_hero[hero_id][slot] = alias
+        effective = dict(alias)
+        alias_by_hero[hero_id][slot] = effective
+        alias_by_skill_id[skill_id] = effective
         combined = " | ".join(alias.get(key, "") for key in ("status", "research_note", "explicitness"))
         if any(marker in combined for marker in BASELINE_MARKERS):
             baseline_base_slots += 1
@@ -89,6 +95,25 @@ def main() -> int:
         raise SystemExit(
             f"M47_SKILL_IDENTITY_INVALID expected {len(heroes) * len(SLOTS)} base slots got {len(aliases)}"
         )
+
+    seen_overrides: set[str] = set()
+    for override in overrides:
+        skill_id = require(override.get("skill_id"), "override skill_id required")
+        source = require(override.get("source_technique_id"), f"{skill_id} override source required")
+        require(override.get("canon_source"), f"{skill_id} canon_source required")
+        require(override.get("canon_confidence"), f"{skill_id} canon_confidence required")
+        require(override.get("status"), f"{skill_id} status required")
+        require(override.get("design_reason"), f"{skill_id} design_reason required")
+        if skill_id in seen_overrides:
+            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID duplicate override skill_id={skill_id}")
+        seen_overrides.add(skill_id)
+        if source not in techniques:
+            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID {skill_id} override missing source technique={source}")
+        current = alias_by_skill_id.get(skill_id)
+        if current is None:
+            raise SystemExit(f"M47_SKILL_IDENTITY_INVALID override references unknown skill_id={skill_id}")
+        current["source_technique_id"] = source
+        current["status"] = override["status"]
 
     for hero_id, hero in hero_by_id.items():
         actual = set(alias_by_hero[hero_id])
@@ -108,7 +133,7 @@ def main() -> int:
                     f"M47_SKILL_IDENTITY_INVALID {hero_id} {slot} hero_csv={expected_skill} alias={actual_skill}"
                 )
 
-    # Versions of the same character must not secretly share an identical five-technique identity.
+    # Versions of the same character must not secretly share an identical effective five-technique identity.
     character_kits: dict[str, dict[tuple[str, ...], list[str]]] = defaultdict(lambda: defaultdict(list))
     for hero_id, hero in hero_by_id.items():
         character_id = require(hero.get("character_id"), f"{hero_id} character_id required")
@@ -121,10 +146,9 @@ def main() -> int:
                 duplicate_same_character_kits.append((character_id, sorted(hero_ids)))
     if duplicate_same_character_kits:
         detail = "; ".join(f"{character}:{'|'.join(ids)}" for character, ids in duplicate_same_character_kits[:20])
-        raise SystemExit(f"M47_SKILL_IDENTITY_INVALID identical same-character five-slot kits: {detail}")
+        raise SystemExit(f"M47_SKILL_IDENTITY_INVALID identical same-character five-slot kits after overrides: {detail}")
 
     # `heroes.csv` is the production source of truth for one-Awakening ownership.
-    # Design proposal CSVs intentionally use form IDs, while runtime references a stable awakening_id.
     awakening_by_hero: dict[str, str] = {}
     awakening_ids: set[str] = set()
     for hero_id, hero in hero_by_id.items():
@@ -166,7 +190,7 @@ def main() -> int:
     multi_version_characters = sum(1 for signatures in character_kits.values() if sum(len(v) for v in signatures.values()) > 1)
     print(
         "M47_SKILL_IDENTITY_OK "
-        f"heroes={len(heroes)} base_slots={len(aliases)} awakenings={len(awakening_by_hero)} "
+        f"heroes={len(heroes)} base_slots={len(aliases)} overrides={len(overrides)} awakenings={len(awakening_by_hero)} "
         f"awakening_slots={len(awakening_skills)} techniques={len(techniques)} "
         f"multi_version_characters={multi_version_characters} "
         f"baseline_base_slots={baseline_base_slots} baseline_awakening_slots={baseline_awakening_slots} "
