@@ -1,0 +1,15 @@
+name: events-settings-integrity
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  validate-events-settings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate weekly events and persisted local settings
+        run: python scripts/validate-events-settings.py
