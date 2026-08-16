@@ -162,9 +162,9 @@ public final class ArenaApplicationService {
             OwnedHeroView hero = formation.heroes().get(slot);
             BattleUnitSeed unit = stats.resolve(prefix + hero.id(), hero.heroId(), hero.awakened(), hero.level(), side, slot);
             units.add(unit);
-            participants.add(new BattleParticipant(unit.id(), hero.characterId(), hero.displayName(),
-                    hero.awakened() ? hero.awakeningName() : hero.heroId(), hero.level(),
-                    unit.side(), unit.slot(), unit.maxHp()));
+            participants.add(BattleParticipant.heroVersion(
+                    unit.id(), hero.characterId(), hero.heroId(), hero.awakened(), hero.awakeningId(),
+                    hero.displayName(), hero.level(), unit.side(), unit.slot(), unit.maxHp()));
         }
     }
 
