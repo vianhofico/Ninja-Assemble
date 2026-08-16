@@ -14,6 +14,7 @@ import com.ninjaassemble.player.application.PlayerService;
 import com.ninjaassemble.play.domain.BattleParticipant;
 import com.ninjaassemble.play.domain.ExperimentalAbilityProfile;
 import com.ninjaassemble.play.domain.ExperimentalCombatStatsResolver;
+import com.ninjaassemble.play.domain.PassiveEffectResolver;
 import com.ninjaassemble.play.domain.TechniqueEffectResolver;
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -90,6 +91,7 @@ public class PlayableBattleService {
                 ExperimentalCombatStatsResolver.VERSION,
                 ExperimentalAbilityProfile.VERSION,
                 TechniqueEffectResolver.VERSION,
+                PassiveEffectResolver.VERSION,
                 List.copyOf(participants),
                 result);
     }
@@ -101,6 +103,7 @@ public class PlayableBattleService {
             String combatStatsVersion,
             String abilityProfileVersion,
             String techniqueMappingVersion,
+            String passiveProfileVersion,
             List<BattleParticipant> participants,
             BattleResult battle
     ) {}

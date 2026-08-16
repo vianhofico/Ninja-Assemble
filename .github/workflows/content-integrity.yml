@@ -33,6 +33,8 @@ jobs:
         run: python scripts/validate-structured-effects.py
       - name: Validate full technique effect mapping coverage
         run: python scripts/validate-technique-effect-coverage.py
+      - name: Validate passive lifecycle execution
+        run: python scripts/validate-passive-lifecycle.py
       - name: Verify Unity runtime art catalog can be regenerated from manifest
         run: |
           python scripts/generate-unity-art-runtime-catalog.py --output /tmp/hero-art-runtime-catalog.json

@@ -19,5 +19,6 @@ namespace NinjaAssemble.Presentation
         public string EffectType;
         public string StatusId;
         public int DurationTurns;
+        public string TriggerId;
     }
 }

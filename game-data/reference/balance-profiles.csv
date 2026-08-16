@@ -6,3 +6,4 @@ experimental-level-cost-v1,LEVEL_COST,EXPERIMENTAL,20,10,2,Temporary hero level-
 experimental-ability-cycle-v1,ABILITY_CYCLE,EXPERIMENTAL,60,20,3,Temporary basic/skill/ultimate coefficients and energy cycle
 experimental-structured-effects-v1,STRUCTURED_EFFECTS,EXPERIMENTAL,100,30,4,Temporary targeting heal shield status cleanse revive and damage-over-time semantics
 experimental-technique-mapping-v1,TECHNIQUE_MAPPING,EXPERIMENTAL,120,40,4,Temporary canonical technique-to-effect mapping and fallback rules
+experimental-passive-lifecycle-v1,PASSIVE_LIFECYCLE,EXPERIMENTAL,80,20,3,Temporary passive trigger lifecycle thresholds and reaction semantics
