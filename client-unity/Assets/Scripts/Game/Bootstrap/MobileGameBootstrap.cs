@@ -10,6 +10,9 @@ namespace NinjaAssemble.Bootstrap
 {
     public sealed class MobileGameBootstrap : MonoBehaviour
     {
+        private const string GuestKeyPreference = "ninjaassemble.guest-key";
+        private static MobileGameBootstrap instance;
+
         [SerializeField] private GameApiConfig apiConfig;
         [SerializeField] private string guestDisplayName = "Ninja";
         [SerializeField] private bool autoEnterHome = true;
@@ -26,6 +29,13 @@ namespace NinjaAssemble.Bootstrap
 
         private async void Awake()
         {
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this;
             DontDestroyOnLoad(gameObject);
             if (Store != null)
             {
@@ -48,18 +58,34 @@ namespace NinjaAssemble.Bootstrap
             }
         }
 
+        private void OnDestroy()
+        {
+            if (instance == this) instance = null;
+        }
+
         public static async Task WaitUntilReadyAsync()
         {
             while (!IsReady) await Task.Yield();
         }
 
+        public static void ResetLocalGuestAndRestart()
+        {
+            Store = null;
+            PlayerPrefs.DeleteKey(GuestKeyPreference);
+            PlayerPrefs.Save();
+
+            MobileGameBootstrap previous = instance;
+            instance = null;
+            if (previous != null) Destroy(previous.gameObject);
+            SceneManager.LoadScene(MobileSceneNames.Bootstrap);
+        }
+
         private static string LoadOrCreateGuestKey()
         {
-            const string key = "ninjaassemble.guest-key";
-            string value = PlayerPrefs.GetString(key, string.Empty);
+            string value = PlayerPrefs.GetString(GuestKeyPreference, string.Empty);
             if (!string.IsNullOrWhiteSpace(value)) return value;
             value = Guid.NewGuid().ToString("N");
-            PlayerPrefs.SetString(key, value);
+            PlayerPrefs.SetString(GuestKeyPreference, value);
             PlayerPrefs.Save();
             return value;
         }
