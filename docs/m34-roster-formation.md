@@ -11,7 +11,7 @@
 
 `roster-formation-integrity` checks the actual server invariants (`BattleRules.requireArenaTeamSize`, duplicate rejection, ownership validation, `formation_slots` persistence) rather than milestone-era naming tokens.
 
-The Guild regression gate likewise accepts the domain's overflow-safe `Math.addExact(totalDamage, applied)` accumulation rather than requiring a less-safe textual `totalDamage + applied` expression.
+The Guild regression gate accepts the domain's overflow-safe `Math.addExact(totalDamage, applied)` accumulation and the existing `damageIsCappedByRemainingBossHp` regression test.
 
 ## Scope
 
@@ -19,4 +19,4 @@ This milestone intentionally uses a compact one-button mobile interaction: cycle
 
 ## CI note
 
-PR #36 is the clean validation PR for this milestone; this documentation-only synchronize commit exists to ensure GitHub Actions evaluates the corrected validator head on the new branch.
+PR #36 is the clean validation PR for this milestone. This final documentation-only synchronize commit was made after the PR was marked Ready for Review so GitHub Actions can evaluate the corrected head independently of the superseded PR #35 history.
