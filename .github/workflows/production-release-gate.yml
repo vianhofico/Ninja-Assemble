@@ -1,0 +1,28 @@
+name: production-release-gate
+on:
+  workflow_dispatch:
+jobs:
+  validate-production-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Verify server core
+        run: |
+          bash scripts/validate-core.sh
+          mvn -B -f server/pom.xml test
+      - name: Require full release readiness
+        run: python scripts/validate-release-readiness.py --release
+      - name: Require all hero art packages READY
+        run: python scripts/validate-art-packages.py --release
+      - name: Verify files behind READY art components
+        run: python scripts/validate-production-assets.py
+      - name: Require real Android device evidence
+        run: python scripts/validate-mobile-release-evidence.py --release
