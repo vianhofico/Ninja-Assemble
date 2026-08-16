@@ -105,7 +105,7 @@ Golden battle/economy/progression tests, localization completeness, screenshot/a
 
 ### D0–D6 — Desktop after mobile
 
-Execute `docs/07-DESKTOP-AFTER-MOBILE.md`; reuse the same core project/data/assets.
+Desktop reuses the same Unity project, Java backend, hero/skill data, localization and art. Platform-specific work: responsive desktop layouts, mouse/keyboard/controller, 1080p/1440p/4K profiles, window/fullscreen modes, Windows x64 packaging/updater, then optional macOS and desktop parity audit.
 
 ## Hero definition of done
 
