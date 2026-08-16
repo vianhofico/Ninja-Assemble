@@ -185,9 +185,9 @@ public final class ShadowArenaApplicationService {
     private void addSquad(List<OwnedHeroView> squad, TeamSide side, String prefix, List<BattleUnitSeed> units, List<BattleParticipant> participants) {
         for (int slot = 0; slot < squad.size(); slot++) {
             OwnedHeroView hero = squad.get(slot);
-            BattleUnitSeed unit = stats.resolve(prefix + hero.id(), hero.characterId(), hero.currentVariant(), hero.level(), side, slot);
+            BattleUnitSeed unit = stats.resolve(prefix + hero.id(), hero.heroId(), hero.awakened(), hero.level(), side, slot);
             units.add(unit);
-            participants.add(new BattleParticipant(unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(), unit.side(), unit.slot(), unit.maxHp()));
+            participants.add(new BattleParticipant(unit.id(), hero.characterId(), hero.displayName(), hero.awakened() ? hero.awakeningName() : hero.heroId(), hero.level(), unit.side(), unit.slot(), unit.maxHp()));
         }
     }
 
@@ -211,12 +211,12 @@ public final class ShadowArenaApplicationService {
         List<ArenaFormationSnapshot> squads = new ArrayList<>();
         for (int squad = 0; squad < BattleRules.SHADOW_SQUAD_COUNT; squad++) {
             List<FormationMemberSnapshot> members = new ArrayList<>();
-            for (OwnedHeroView hero : roster.subList(squad * 5, squad * 5 + 5)) members.add(new FormationMemberSnapshot(hero.id().toString(), hero.characterId(), hero.currentVariant(), heroPower(hero)));
+            for (OwnedHeroView hero : roster.subList(squad * 5, squad * 5 + 5)) members.add(new FormationMemberSnapshot(hero.id().toString(), hero.heroId(), hero.awakened(), heroPower(hero)));
             squads.add(new ArenaFormationSnapshot(members));
         }
         new ShadowArenaRosterSnapshot(squads);
     }
-    private static long heroPower(OwnedHeroView hero) { return hero.level() * 1_000L + hero.awakeningLevel() * 250L + 500L; }
+    private static long heroPower(OwnedHeroView hero) { return hero.level() * 1_000L + (hero.awakened() ? 250L : 0L) + 500L; }
     private static long totalPower(List<OwnedHeroView> roster) { return roster.stream().mapToLong(ShadowArenaApplicationService::heroPower).sum(); }
     private static String rosterJson(List<OwnedHeroView> roster) {
         String squads = java.util.stream.IntStream.range(0, BattleRules.SHADOW_SQUAD_COUNT).mapToObj(squad -> roster.subList(squad * 5, squad * 5 + 5).stream()
