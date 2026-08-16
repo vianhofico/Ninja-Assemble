@@ -14,5 +14,5 @@ class ArenaFormationSnapshotTest {
         assertThrows(IllegalArgumentException.class, () -> new ArenaFormationSnapshot(List.of(member("1"), member("1"), member("3"), member("4"), member("5"))));
     }
 
-    private static FormationMemberSnapshot member(String id) { return new FormationMemberSnapshot(id, "hero-" + id, null, 10); }
+    private static FormationMemberSnapshot member(String id) { return new FormationMemberSnapshot(id, "hero-" + id, false, 10); }
 }

@@ -161,10 +161,11 @@ public class PlayableBattleService {
         for (int slot = 0; slot < formation.heroes().size(); slot++) {
             OwnedHeroView hero = formation.heroes().get(slot);
             BattleUnitSeed unit = stats.resolve(
-                    hero.id().toString(), hero.characterId(), hero.currentVariant(), hero.level(), TeamSide.A, slot);
+                    hero.id().toString(), hero.heroId(), hero.awakened(), hero.level(), TeamSide.A, slot);
             units.add(unit);
             participants.add(new BattleParticipant(
-                    unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(),
+                    unit.id(), hero.characterId(), hero.displayName(),
+                    hero.awakened() ? hero.awakeningName() : hero.heroId(), hero.level(),
                     unit.side(), unit.slot(), unit.maxHp()));
         }
     }

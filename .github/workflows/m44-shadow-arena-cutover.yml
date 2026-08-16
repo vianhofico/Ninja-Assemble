@@ -1,0 +1,35 @@
+name: m44-shadow-arena-cutover
+
+on:
+  push:
+    branches:
+      - agent/m44-runtime-hero-kit
+
+permissions:
+  contents: write
+
+jobs:
+  rewrite-shadow-arena:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/m44-runtime-hero-kit
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cut Shadow Arena owned-hero runtime to Hero Version identity
+        run: python scripts/m44-cutover-shadow-arena.py
+      - name: Commit rewritten service
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add server/src/main/java/com/ninjaassemble/pvp/application/ShadowArenaApplicationService.java
+          if git diff --cached --quiet; then
+            echo "Shadow Arena already cut over"
+          else
+            git commit -m "M44: cut Shadow Arena runtime to Hero Version identity"
+            git push origin HEAD:agent/m44-runtime-hero-kit
+          fi

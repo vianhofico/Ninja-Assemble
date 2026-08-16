@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ExperimentalCombatStatsResolver {
-    public static final String VERSION = ReferenceProfiles.COMBAT_STATS + "+" + EquipmentApplicationService.COMBAT_BONUS_VERSION;
+    public static final String VERSION = ReferenceProfiles.COMBAT_STATS + "+" + EquipmentApplicationService.COMBAT_BONUS_VERSION + "+hero-version-kit-v1";
     private final HeroContentCatalogService content;
     private final ExperimentalAbilityProfile abilities;
     private final PassiveEffectResolver passiveResolver;
@@ -36,11 +36,28 @@ public class ExperimentalCombatStatsResolver {
         this.equipment = null;
     }
 
+    /** Production player/runtime path. */
+    public BattleUnitSeed resolve(String battleUnitId, String heroId, boolean awakened, int level, TeamSide side, int slot) {
+        var kit = content.resolveHero(heroId, awakened);
+        return resolveKit(battleUnitId, heroId + "::" + awakened, kit, level, side, slot);
+    }
+
+    /**
+     * Compatibility path for legacy enemy/stage definitions. The content service must translate through the audited
+     * legacy bridge; there is no character/generic profile fallback.
+     */
+    @Deprecated(forRemoval = true)
     public BattleUnitSeed resolve(String battleUnitId, String characterId, String variant, int level, TeamSide side, int slot) {
+        var identity = content.resolveLegacyIdentity(characterId, variant);
+        var kit = content.resolveHero(identity.heroId(), identity.awakened());
+        return resolveKit(battleUnitId, identity.heroId() + "::" + identity.awakened(), kit, level, side, slot);
+    }
+
+    private BattleUnitSeed resolveKit(String battleUnitId, String identityKey, HeroContentCatalogService.HeroKitView kit,
+                                      int level, TeamSide side, int slot) {
         if (level < 1) throw new IllegalArgumentException("level must be positive");
-        var kit = content.resolve(characterId, variant);
         DamageChannel channel = DamageChannel.valueOf(kit.techniques().get(0).channel());
-        int hash = Math.floorMod((characterId + "::" + (variant == null ? "BASE" : variant)).hashCode(), 10_000);
+        int hash = Math.floorMod(identityKey.hashCode(), 10_000);
         long hp = 1_200L + level * 140L + hash % 401;
         long primary = 160L + level * 24L + hash % 61;
         long secondary = 120L + level * 18L + (hash / 7) % 51;
