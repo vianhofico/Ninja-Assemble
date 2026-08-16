@@ -1,0 +1,265 @@
+character_id,variant,status
+iruka-umino,Academy Instructor,EXPANSION_DESIGN
+iruka-umino,Protective Sensei,EXPANSION_DESIGN
+konohamaru-sarutobi,Academy Prodigy,EXPANSION_DESIGN
+konohamaru-sarutobi,Rasengan Disciple,EXPANSION_DESIGN
+moegi-kazamatsuri,Academy Squad,EXPANSION_DESIGN
+moegi-kazamatsuri,Chunin Leader,EXPANSION_DESIGN
+udon-ise,Academy Squad,EXPANSION_DESIGN
+udon-ise,Tactical Chunin,EXPANSION_DESIGN
+sai,Root Operative,EXPANSION_DESIGN
+sai,Team 7,EXPANSION_DESIGN
+yamato,ANBU Wood Style,EXPANSION_DESIGN
+yamato,Team Captain,EXPANSION_DESIGN
+kurenai-yuhi,Genjutsu Jonin,EXPANSION_DESIGN
+kurenai-yuhi,Team 8 Leader,EXPANSION_DESIGN
+kiba-inuzuka,Chunin Exams,EXPANSION_DESIGN
+kiba-inuzuka,Two-Headed Wolf,EXPANSION_DESIGN
+shino-aburame,Chunin Exams,EXPANSION_DESIGN
+shino-aburame,Insect Master,EXPANSION_DESIGN
+tenten,Chunin Exams,EXPANSION_DESIGN
+tenten,Bashosen Wielder,EXPANSION_DESIGN
+ebisu,Elite Tutor,EXPANSION_DESIGN
+ebisu,Special Jonin,EXPANSION_DESIGN
+anko-mitarashi,Chunin Exams Proctor,EXPANSION_DESIGN
+anko-mitarashi,Cursed Seal Survivor,EXPANSION_DESIGN
+shizune,Sannin Attendant,EXPANSION_DESIGN
+shizune,Medical Corps,EXPANSION_DESIGN
+fugaku-uchiha,Clan Head,EXPANSION_DESIGN
+fugaku-uchiha,Police Captain,EXPANSION_DESIGN
+izuna-uchiha,Warring States,EXPANSION_DESIGN
+izuna-uchiha,Mangekyo Sharingan,EXPANSION_DESIGN
+rin-nohara,Team Minato,EXPANSION_DESIGN
+rin-nohara,Three-Tails Vessel,EXPANSION_DESIGN
+sakumo-hatake,White Fang,EXPANSION_DESIGN
+sakumo-hatake,Prime,EXPANSION_DESIGN
+dan-kato,Jonin,EXPANSION_DESIGN
+dan-kato,Spirit Transformation,EXPANSION_DESIGN
+hiashi-hyuga,Clan Head,EXPANSION_DESIGN
+hiashi-hyuga,War Arc,EXPANSION_DESIGN
+hizashi-hyuga,Branch House,EXPANSION_DESIGN
+hizashi-hyuga,Reanimated,EXPANSION_DESIGN
+hanabi-hyuga,Hyuga Heiress,EXPANSION_DESIGN
+hanabi-hyuga,Byakugan Master,EXPANSION_DESIGN
+torune-aburame,Root Operative,EXPANSION_DESIGN
+torune-aburame,Nano Insects,EXPANSION_DESIGN
+fu-yamanaka,Root Operative,EXPANSION_DESIGN
+fu-yamanaka,Mind Transfer,EXPANSION_DESIGN
+kotetsu-hagane,Gate Guard,EXPANSION_DESIGN
+kotetsu-hagane,War Arc,EXPANSION_DESIGN
+izumo-kamizuki,Gate Guard,EXPANSION_DESIGN
+izumo-kamizuki,War Arc,EXPANSION_DESIGN
+genma-shiranui,Special Jonin,EXPANSION_DESIGN
+genma-shiranui,Fourth Hokage Guard,EXPANSION_DESIGN
+raido-namiashi,Special Jonin,EXPANSION_DESIGN
+raido-namiashi,Fourth Hokage Guard,EXPANSION_DESIGN
+aoba-yamashiro,Jonin,EXPANSION_DESIGN
+aoba-yamashiro,Intelligence Corps,EXPANSION_DESIGN
+ibiki-morino,Interrogation Chief,EXPANSION_DESIGN
+ibiki-morino,War Arc,EXPANSION_DESIGN
+hayate-gekko,Chunin Exams Proctor,EXPANSION_DESIGN
+hayate-gekko,Crescent Moon Blade,EXPANSION_DESIGN
+yugao-uzuki,ANBU,EXPANSION_DESIGN
+yugao-uzuki,Crescent Moon Blade,EXPANSION_DESIGN
+might-duy,Eternal Genin,EXPANSION_DESIGN
+might-duy,Eight Gates,EXPANSION_DESIGN
+shikaku-nara,Clan Head,EXPANSION_DESIGN
+shikaku-nara,Allied Strategy Chief,EXPANSION_DESIGN
+inoichi-yamanaka,Clan Head,EXPANSION_DESIGN
+inoichi-yamanaka,Allied Intelligence Chief,EXPANSION_DESIGN
+choza-akimichi,Clan Head,EXPANSION_DESIGN
+choza-akimichi,War Arc,EXPANSION_DESIGN
+kagami-uchiha,Tobirama Guard,EXPANSION_DESIGN
+kagami-uchiha,Sharingan Elite,EXPANSION_DESIGN
+torifu-akimichi,Tobirama Guard,EXPANSION_DESIGN
+torifu-akimichi,Akimichi Veteran,EXPANSION_DESIGN
+nono-yakushi,Orphanage Director,EXPANSION_DESIGN
+nono-yakushi,Root Spy,EXPANSION_DESIGN
+kosuke-maruboshi,Eternal Genin,EXPANSION_DESIGN
+kosuke-maruboshi,Water Style Veteran,EXPANSION_DESIGN
+mizuki,Academy Instructor,EXPANSION_DESIGN
+mizuki,Cursed Power,EXPANSION_DESIGN
+idate-morino,Runner,EXPANSION_DESIGN
+idate-morino,Ninja Trainee,EXPANSION_DESIGN
+temari,Chunin Exams,EXPANSION_DESIGN
+temari,War Fan Master,EXPANSION_DESIGN
+kankuro,Chunin Exams,EXPANSION_DESIGN
+kankuro,Master Puppeteer,EXPANSION_DESIGN
+ebizo,Sand Elder,EXPANSION_DESIGN
+ebizo,Puppet Strategist,EXPANSION_DESIGN
+pakura,Scorch Release,EXPANSION_DESIGN
+pakura,Reanimated,EXPANSION_DESIGN
+maki,Sealing Corps,EXPANSION_DESIGN
+maki,War Arc,EXPANSION_DESIGN
+baki,Sand Jonin,EXPANSION_DESIGN
+baki,Wind Blade,EXPANSION_DESIGN
+yashamaru,Sand Medic,EXPANSION_DESIGN
+yashamaru,Assassin,EXPANSION_DESIGN
+matsuri,Gaara Disciple,EXPANSION_DESIGN
+matsuri,Sand Chunin,EXPANSION_DESIGN
+sari,Sand Kunoichi,EXPANSION_DESIGN
+sari,Kazekage Guard,EXPANSION_DESIGN
+chojuro,Seven Swordsman,EXPANSION_DESIGN
+chojuro,Hiramekarei Master,EXPANSION_DESIGN
+ao,Byakugan Hunter,EXPANSION_DESIGN
+ao,Sensor Captain,EXPANSION_DESIGN
+mangetsu-hozuki,Seven Swordsman,EXPANSION_DESIGN
+mangetsu-hozuki,Reanimated,EXPANSION_DESIGN
+suigetsu-hozuki,Hebi,EXPANSION_DESIGN
+suigetsu-hozuki,Taka,EXPANSION_DESIGN
+fuguki-suikazan,Samehada Wielder,EXPANSION_DESIGN
+fuguki-suikazan,Reanimated,EXPANSION_DESIGN
+jinin-akebino,Kabutowari Wielder,EXPANSION_DESIGN
+jinin-akebino,Reanimated,EXPANSION_DESIGN
+jinpachi-munashi,Shibuki Wielder,EXPANSION_DESIGN
+jinpachi-munashi,Reanimated,EXPANSION_DESIGN
+kushimaru-kuriarare,Nuibari Wielder,EXPANSION_DESIGN
+kushimaru-kuriarare,Reanimated,EXPANSION_DESIGN
+ameyuri-ringo,Kiba Wielder,EXPANSION_DESIGN
+ameyuri-ringo,Reanimated,EXPANSION_DESIGN
+raiga-kurosuki,Kiba Wielder,EXPANSION_DESIGN
+raiga-kurosuki,Lightning Burial,EXPANSION_DESIGN
+byakuren,First Mizukage,EXPANSION_DESIGN
+byakuren,Prime,EXPANSION_DESIGN
+chukichi,Sensor Ninja,EXPANSION_DESIGN
+chukichi,Reanimated,EXPANSION_DESIGN
+a-fourth-raikage,Raikage,EXPANSION_DESIGN
+a-fourth-raikage,Lightning Armor,EXPANSION_DESIGN
+darui,Storm Release,EXPANSION_DESIGN
+darui,Raikage Guard,EXPANSION_DESIGN
+c,Sensor,EXPANSION_DESIGN
+c,Raikage Guard,EXPANSION_DESIGN
+omoi,Cloud Swordsman,EXPANSION_DESIGN
+omoi,War Arc,EXPANSION_DESIGN
+karui,Cloud Kunoichi,EXPANSION_DESIGN
+karui,War Arc,EXPANSION_DESIGN
+samui,Cloud Jonin,EXPANSION_DESIGN
+samui,War Arc,EXPANSION_DESIGN
+atsui,Cloud Ninja,EXPANSION_DESIGN
+atsui,War Arc,EXPANSION_DESIGN
+dodai,Lava Rubber Style,EXPANSION_DESIGN
+dodai,Third Raikage Aide,EXPANSION_DESIGN
+mabui,Raikage Secretary,EXPANSION_DESIGN
+mabui,Heavenly Transfer,EXPANSION_DESIGN
+toroi,Magnet Release,EXPANSION_DESIGN
+toroi,Reanimated,EXPANSION_DESIGN
+blue-b,Eight-Tails Host,EXPANSION_DESIGN
+blue-b,Jinchuriki Cloak,EXPANSION_DESIGN
+motoi,Cloud Jonin,EXPANSION_DESIGN
+motoi,Jinchuriki Handler,EXPANSION_DESIGN
+first-raikage,First Raikage,EXPANSION_DESIGN
+first-raikage,Prime,EXPANSION_DESIGN
+second-raikage,Second Raikage,EXPANSION_DESIGN
+second-raikage,Prime,EXPANSION_DESIGN
+onoki,Tsuchikage,EXPANSION_DESIGN
+onoki,Particle Style,EXPANSION_DESIGN
+kurotsuchi,Lava Release,EXPANSION_DESIGN
+kurotsuchi,Tsuchikage Guard,EXPANSION_DESIGN
+akatsuchi,Stone Golem,EXPANSION_DESIGN
+akatsuchi,Tsuchikage Guard,EXPANSION_DESIGN
+kitsuchi,Earth Commander,EXPANSION_DESIGN
+kitsuchi,Mountain Jutsu,EXPANSION_DESIGN
+gari,Explosion Release,EXPANSION_DESIGN
+gari,Reanimated,EXPANSION_DESIGN
+ishikawa,First Tsuchikage,EXPANSION_DESIGN
+ishikawa,Prime,EXPANSION_DESIGN
+kakko,Stone Jonin,EXPANSION_DESIGN
+kakko,Kannabi Bridge,EXPANSION_DESIGN
+taiseki,Stone Jonin,EXPANSION_DESIGN
+taiseki,Camouflage,EXPANSION_DESIGN
+mahiru,Stone Jonin,EXPANSION_DESIGN
+mahiru,Shadow Clone,EXPANSION_DESIGN
+yahiko,Akatsuki Founder,EXPANSION_DESIGN
+yahiko,Amegakure Leader,EXPANSION_DESIGN
+ajisai,Rain Kunoichi,EXPANSION_DESIGN
+ajisai,Animal Path Vessel,EXPANSION_DESIGN
+shigure,Rain Genin,EXPANSION_DESIGN
+shigure,Umbrella Needles,EXPANSION_DESIGN
+baiu,Rain Genin,EXPANSION_DESIGN
+baiu,Senbon Assault,EXPANSION_DESIGN
+midare,Rain Genin,EXPANSION_DESIGN
+midare,Umbrella Barrage,EXPANSION_DESIGN
+oboro,Rain Genin,EXPANSION_DESIGN
+oboro,Clone Ambush,EXPANSION_DESIGN
+mubi,Rain Genin,EXPANSION_DESIGN
+mubi,Earth Ambush,EXPANSION_DESIGN
+kagari,Rain Genin,EXPANSION_DESIGN
+kagari,Mist Ambush,EXPANSION_DESIGN
+jugo,Curse Mark Base,EXPANSION_DESIGN
+jugo,Sage Transformation,EXPANSION_DESIGN
+karin,Hebi Sensor,EXPANSION_DESIGN
+karin,Taka Healer,EXPANSION_DESIGN
+tayuya,Sound Four,EXPANSION_DESIGN
+tayuya,Curse Mark Level 2,EXPANSION_DESIGN
+kidomaru,Sound Four,EXPANSION_DESIGN
+kidomaru,Curse Mark Level 2,EXPANSION_DESIGN
+sakon,Sound Four,EXPANSION_DESIGN
+sakon,Curse Mark Level 2,EXPANSION_DESIGN
+ukon,Sound Four,EXPANSION_DESIGN
+ukon,Curse Mark Level 2,EXPANSION_DESIGN
+jirobo,Sound Four,EXPANSION_DESIGN
+jirobo,Curse Mark Level 2,EXPANSION_DESIGN
+dosu-kinuta,Sound Genin,EXPANSION_DESIGN
+dosu-kinuta,Resonating Echo,EXPANSION_DESIGN
+kin-tsuchi,Sound Genin,EXPANSION_DESIGN
+kin-tsuchi,Bell Genjutsu,EXPANSION_DESIGN
+zaku-abumi,Sound Genin,EXPANSION_DESIGN
+zaku-abumi,Air Pressure Arms,EXPANSION_DESIGN
+guren,Crystal Release,EXPANSION_DESIGN
+guren,Three-Tails Mission,EXPANSION_DESIGN
+yoroi-akado,Chakra Absorption,EXPANSION_DESIGN
+yoroi-akado,Kabuto Squad,EXPANSION_DESIGN
+misumi-tsurugi,Soft Physique,EXPANSION_DESIGN
+misumi-tsurugi,Kabuto Squad,EXPANSION_DESIGN
+black-zetsu,Akatsuki Spy,EXPANSION_DESIGN
+black-zetsu,Kaguya Will,EXPANSION_DESIGN
+white-zetsu,Akatsuki Scout,EXPANSION_DESIGN
+white-zetsu,Spore Clone,EXPANSION_DESIGN
+bunpuku,Shukaku Host,EXPANSION_DESIGN
+bunpuku,Monk Sage,EXPANSION_DESIGN
+mito-uzumaki,First Jinchuriki,EXPANSION_DESIGN
+mito-uzumaki,Uzumaki Seal Master,EXPANSION_DESIGN
+kinkaku,Gold Brother,EXPANSION_DESIGN
+kinkaku,Nine-Tails Cloak,EXPANSION_DESIGN
+ginkaku,Silver Brother,EXPANSION_DESIGN
+ginkaku,Nine-Tails Cloak,EXPANSION_DESIGN
+mifune,Samurai General,EXPANSION_DESIGN
+mifune,Iaido Master,EXPANSION_DESIGN
+okisuke,Samurai Captain,EXPANSION_DESIGN
+okisuke,War Arc,EXPANSION_DESIGN
+gamabunta,Toad Boss,EXPANSION_DESIGN
+gamabunta,Gamabunta Battle,EXPANSION_DESIGN
+gamakichi,Young Toad,EXPANSION_DESIGN
+gamakichi,War Arc Toad,EXPANSION_DESIGN
+fukasaku,Toad Sage,EXPANSION_DESIGN
+fukasaku,Sage Training,EXPANSION_DESIGN
+shima,Toad Sage,EXPANSION_DESIGN
+shima,Genjutsu Chorus,EXPANSION_DESIGN
+manda,Great Snake,EXPANSION_DESIGN
+manda,Orochimaru Summon,EXPANSION_DESIGN
+aoda,Great Snake,EXPANSION_DESIGN
+aoda,Sasuke Summon,EXPANSION_DESIGN
+katsuyu,Slug Queen,EXPANSION_DESIGN
+katsuyu,Hundred Healings Support,EXPANSION_DESIGN
+enma,Monkey King,EXPANSION_DESIGN
+enma,Adamantine Staff,EXPANSION_DESIGN
+sora,Temple Monk,EXPANSION_DESIGN
+sora,Pseudo Jinchuriki,EXPANSION_DESIGN
+menma-uzumaki,Masked Menma,EXPANSION_DESIGN
+menma-uzumaki,Nine-Tails Menma,EXPANSION_DESIGN
+hiruko,Missing Nin,EXPANSION_DESIGN
+hiruko,Chimera Technique,EXPANSION_DESIGN
+mukade,Suna Missing Nin,EXPANSION_DESIGN
+mukade,Ryumyaku Empowered,EXPANSION_DESIGN
+shinno,Doctor,EXPANSION_DESIGN
+shinno,Eight Gates Body,EXPANSION_DESIGN
+gozu,Demon Brothers,EXPANSION_DESIGN
+gozu,Chain Gauntlet,EXPANSION_DESIGN
+meizu,Demon Brothers,EXPANSION_DESIGN
+meizu,Chain Gauntlet,EXPANSION_DESIGN
+fuen,Four-Man Team,EXPANSION_DESIGN
+fuen,Barrier Specialist,EXPANSION_DESIGN
+fudo,Four-Man Team,EXPANSION_DESIGN
+fudo,Earth Body,EXPANSION_DESIGN
+fuka,Four-Man Team,EXPANSION_DESIGN
+fuka,Elemental Kiss,EXPANSION_DESIGN

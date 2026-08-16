@@ -1,0 +1,44 @@
+character_id,variant,profile_id,status
+naruto-uzumaki,Sage Mode,naruto-sage,DESIGN_BASELINE
+naruto-uzumaki,KCM1,naruto-kcm,DESIGN_BASELINE
+naruto-uzumaki,KCM2,naruto-kcm,DESIGN_BASELINE
+naruto-uzumaki,Bijuu Mode,naruto-kcm,DESIGN_BASELINE
+naruto-uzumaki,Six Paths Sage Mode,naruto-sixpaths,DESIGN_BASELINE
+naruto-uzumaki,Hokage,naruto-sixpaths,DESIGN_BASELINE
+sasuke-uchiha,Mangekyo Sharingan,sasuke-ms,DESIGN_BASELINE
+sasuke-uchiha,Eternal Mangekyo Sharingan,sasuke-ms,DESIGN_BASELINE
+sasuke-uchiha,Rinnegan,sasuke-rinnegan,DESIGN_BASELINE
+sasuke-uchiha,Six Paths,sasuke-rinnegan,DESIGN_BASELINE
+sasuke-uchiha,Adult,sasuke-rinnegan,DESIGN_BASELINE
+itachi-uchiha,Susanoo,itachi,DESIGN_BASELINE
+itachi-uchiha,Edo Tensei,itachi,DESIGN_BASELINE
+madara-uchiha,Ten-Tails Jinchuriki,sixpaths,DESIGN_BASELINE
+madara-uchiha,Six Paths,sixpaths,DESIGN_BASELINE
+madara-uchiha,Rinnegan,madara,DESIGN_BASELINE
+obito-uchiha,Ten-Tails Jinchuriki,sixpaths,DESIGN_BASELINE
+obito-uchiha,White Mask,obito,DESIGN_BASELINE
+obito-uchiha,Mangekyo,obito,DESIGN_BASELINE
+kakashi-hatake,Double Mangekyo,kakashi,DESIGN_BASELINE
+gaara,Shukaku Cloak,jinchuriki,DESIGN_BASELINE
+killer-b,Eight-Tails Cloak,jinchuriki,DESIGN_BASELINE
+killer-b,Full Gyuki,jinchuriki,DESIGN_BASELINE
+yugito-nii,Two-Tails Cloak,jinchuriki,DESIGN_BASELINE
+yagura-karatachi,Three-Tails Cloak,jinchuriki,DESIGN_BASELINE
+roshi,Four-Tails Cloak,jinchuriki,DESIGN_BASELINE
+han,Five-Tails Cloak,jinchuriki,DESIGN_BASELINE
+utakata,Six-Tails Cloak,jinchuriki,DESIGN_BASELINE
+fu,Seven-Tails Cloak,jinchuriki,DESIGN_BASELINE
+might-guy,Seventh Gate,gates,DESIGN_BASELINE
+might-guy,Eighth Gate,gates,DESIGN_BASELINE
+kabuto-yakushi,Snake Sage,kabuto,DESIGN_BASELINE
+kabuto-yakushi,War Arc,kabuto,DESIGN_BASELINE
+toneri-otsutsuki,Tenseigan Chakra Mode,sixpaths,DESIGN_BASELINE
+kaguya-otsutsuki,Rabbit Goddess,sixpaths,DESIGN_BASELINE
+minato-namikaze,KCM,jinchuriki,DESIGN_BASELINE
+hashirama-senju,Sage Mode,wood,DESIGN_BASELINE
+orochimaru,White Snake,orochimaru,DESIGN_BASELINE
+jugo,Sage Transformation,gates,DESIGN_BASELINE
+kimimaro,Curse Mark Level 2,gates,DESIGN_BASELINE
+deidara,C4,deidara,DESIGN_BASELINE
+kisame-hoshigaki,Samehada Fusion,kisame,DESIGN_BASELINE
+hidan,Curse Ritual,hidan,DESIGN_BASELINE
