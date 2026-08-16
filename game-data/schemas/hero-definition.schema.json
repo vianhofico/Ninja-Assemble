@@ -3,17 +3,65 @@
   "$id": "https://local.ninja-assemble/schema/hero-definition.json",
   "title": "HeroDefinition",
   "type": "object",
-  "required": ["id", "displayName", "archetype", "skills", "parity"],
+  "required": ["id", "characterId", "variantId", "nameKey", "archetype", "skills", "presentation", "parity"],
   "properties": {
     "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
-    "displayName": {"type": "string", "minLength": 1},
-    "variant": {"type": "string"},
+    "characterId": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "variantId": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "nameKey": {"type": "string", "minLength": 1},
+    "titleKey": {"type": "string"},
+    "era": {"enum": ["NARUTO", "SHIPPUDEN", "CROSS_ERA", "OTHER"]},
+    "canonSource": {"type": "string"},
+    "rarity": {"enum": ["R", "SR", "SSR", "UR", "LR", "UNVERIFIED"]},
     "archetype": {"enum": ["PHYSICAL", "CHAKRA", "HYBRID", "UNKNOWN"]},
     "position": {"enum": ["FRONT", "REAR", "FLEX", "UNKNOWN"]},
-    "skills": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
-    "frame": {"type": "object", "properties": {"sixPathEligible": {"type": "boolean"}, "awakeningEligible": {"type": "boolean"}}, "additionalProperties": false},
-    "presentation": {"type": "object", "properties": {"portraitAddress": {"type": "string"}, "prefabAddress": {"type": "string"}, "animationSet": {"type": "string"}, "vfxSet": {"type": "string"}}, "additionalProperties": false},
-    "parity": {"type": "object", "required": ["status", "evidence"], "properties": {"status": {"enum": ["DISCOVERED", "DOCUMENTED", "IMPLEMENTED", "VERIFIED", "PARITY_PASS"]}, "evidence": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}
+    "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "skills": {"type": "array", "items": {"type": "string"}, "minItems": 1, "maxItems": 8},
+    "frame": {
+      "type": "object",
+      "properties": {
+        "sixPathEligible": {"type": "boolean"},
+        "awakeningEligible": {"type": "boolean"},
+        "transformations": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "presentation": {
+      "type": "object",
+      "required": ["portraitAddress", "iconAddress", "prefabAddress", "animationSet", "vfxSet", "audioSet"],
+      "properties": {
+        "portraitAddress": {"type": "string"},
+        "iconAddress": {"type": "string"},
+        "prefabAddress": {"type": "string"},
+        "animationSet": {"type": "string"},
+        "vfxSet": {"type": "string"},
+        "audioSet": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "localization": {
+      "type": "object",
+      "required": ["requiredLocales"],
+      "properties": {
+        "requiredLocales": {
+          "type": "array",
+          "items": {"enum": ["en", "vi"]},
+          "minItems": 2,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "parity": {
+      "type": "object",
+      "required": ["status", "evidence", "artStatus"],
+      "properties": {
+        "status": {"enum": ["DISCOVERED", "DOCUMENTED", "GAMEPLAY_READY", "ART_READY", "VERIFIED", "CONTENT_COMPLETE"]},
+        "artStatus": {"enum": ["MISSING", "IN_PROGRESS", "READY", "VERIFIED"]},
+        "evidence": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": false
 }
