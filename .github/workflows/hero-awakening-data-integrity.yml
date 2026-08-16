@@ -1,0 +1,81 @@
+name: hero-awakening-data-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-awakening-data:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ninja_assemble_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ninja_assemble_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate committed M42 data
+        run: python scripts/validate-awakening-production-data.py
+      - name: Regenerate M42 data deterministically
+        run: python scripts/generate-awakening-production-data-v2.py --write
+      - name: Validate regenerated M42 data
+        run: python scripts/validate-awakening-production-data.py
+      - name: Require generated artifacts to be reproducible
+        run: |
+          git diff --exit-code -- \
+            game-data/heroes/heroes.csv \
+            game-data/skills/hero-version-skills.csv \
+            game-data/progression/awakenings.csv \
+            game-data/skills/awakening-skills.csv \
+            game-data/assets/awakening-visuals.csv \
+            server/src/main/resources/db/migration/V10__hero_version_awakening_model.sql
+      - name: Apply Flyway SQL V1 through V10 to PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          command -v psql >/dev/null || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+          for migration in $(find server/src/main/resources/db/migration -maxdepth 1 -type f -name 'V*.sql' | sort -V); do
+            echo "Applying $migration"
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Verify seeded one-Awakening schema in PostgreSQL
+        env:
+          PGPASSWORD: postgres
+        run: |
+          hero_expected=$(($(wc -l < game-data/heroes/heroes.csv) - 1))
+          alias_expected=$(($(wc -l < game-data/skills/hero-version-skills.csv) - 1))
+          awakening_expected=$(($(wc -l < game-data/progression/awakenings.csv) - 1))
+          skill_expected=$(($(wc -l < game-data/skills/awakening-skills.csv) - 1))
+          visual_expected=$(($(wc -l < game-data/assets/awakening-visuals.csv) - 1))
+
+          query_count() {
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -tA -c "$1" | tr -d '[:space:]'
+          }
+          assert_count() {
+            label="$1"; expected="$2"; actual="$3"
+            if [ "$actual" != "$expected" ]; then
+              echo "$label expected=$expected actual=$actual" >&2
+              exit 1
+            fi
+          }
+
+          assert_count hero_versions "$hero_expected" "$(query_count 'select count(*) from hero_versions')"
+          assert_count hero_version_skill_aliases "$alias_expected" "$(query_count 'select count(*) from hero_version_skill_aliases')"
+          assert_count awakening_definitions "$awakening_expected" "$(query_count 'select count(*) from awakening_definitions')"
+          assert_count awakening_skill_definitions "$skill_expected" "$(query_count 'select count(*) from awakening_skill_definitions')"
+          assert_count awakening_visual_definitions "$visual_expected" "$(query_count 'select count(*) from awakening_visual_definitions')"
+          assert_count base_awakening_collision 0 "$(query_count 'select count(*) from hero_versions h join awakening_definitions a on h.base_form_id = a.awakened_form_id')"
+          echo "POSTGRES_AWAKENING_SCHEMA_OK heroes=$hero_expected aliases=$alias_expected awakenings=$awakening_expected"
