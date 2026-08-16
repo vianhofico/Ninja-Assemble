@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NinjaAssemble.Bootstrap;
+using NinjaAssemble.Network;
 using NinjaAssemble.Playable;
 using NinjaAssemble.Presentation;
 using TMPro;
@@ -54,13 +55,25 @@ namespace NinjaAssemble.UI
                 switch (screenId)
                 {
                     case ScreenId.Battle:
-                    case ScreenId.Adventure:
                     {
                         SetStatus("Battle in progress...");
-                        var result = await store.BattleAsync();
-                        if (battleVisualStage == null) battleVisualStage = gameObject.AddComponent<BattleVisualStage>();
-                        await battleVisualStage.PresentAsync(result);
-                        SetStatus($"{result.battle.outcome} • {result.battle.rounds} rounds • +{result.goldReward} Gold • visual replay running");
+                        PlayBattleDto result = await store.BattleAsync();
+                        await PresentBattle(result);
+                        SetStatus(BattleStatus(result));
+                        break;
+                    }
+                    case ScreenId.Adventure:
+                    {
+                        CampaignStageDto stage = store.RecommendedStage;
+                        if (stage == null)
+                        {
+                            SetStatus("No campaign stage is currently unlocked. Check level or energy requirements.");
+                            break;
+                        }
+                        SetStatus($"{stage.stageId} • {stage.nameEn} • battle in progress...");
+                        PlayBattleDto result = await store.BattleCampaignAsync(stage.stageId);
+                        await PresentBattle(result);
+                        SetStatus(BattleStatus(result));
                         break;
                     }
                     case ScreenId.Summon:
@@ -92,6 +105,19 @@ namespace NinjaAssemble.UI
             }
         }
 
+        private async System.Threading.Tasks.Task PresentBattle(PlayBattleDto result)
+        {
+            if (battleVisualStage == null) battleVisualStage = gameObject.AddComponent<BattleVisualStage>();
+            await battleVisualStage.PresentAsync(result);
+        }
+
+        private static string BattleStatus(PlayBattleDto result)
+        {
+            string clear = result.firstClear ? " • FIRST CLEAR" : string.Empty;
+            return $"{result.stageId} • {result.battle.outcome} • {result.stars}★ • {result.battle.rounds} rounds" +
+                   $" • +{result.goldReward} Gold • +{result.diamondReward} Diamond • +{result.playerExpReward} EXP{clear}";
+        }
+
         private void Render()
         {
             if (!MobileGameBootstrap.IsReady)
@@ -114,12 +140,12 @@ namespace NinjaAssemble.UI
         {
             return screenId switch
             {
-                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\n\nChoose a destination from the navigation below.",
+                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\nCampaign: {store.Campaign?.stages?.Count(s => s.clearCount > 0) ?? 0}/{store.Campaign?.stages?.Length ?? 0} cleared\n\nChoose a destination from the navigation below.",
                 ScreenId.NinjaRoster => "Ninja Roster\n\n" + string.Join("\n", store.Heroes.Take(18).Select(h => $"• {h.displayName}  Lv.{h.level}  [{h.currentVariant ?? "BASE"}]")),
                 ScreenId.HeroDetail => store.Heroes.FirstOrDefault() is { } h ? $"{h.displayName}\nLv.{h.level} • {h.frameTier}\nVariant: {h.currentVariant ?? "BASE"}\nAwakening: {h.awakeningLevel}\n\nUse TRAIN to exercise the live progression endpoint." : "No owned ninja yet.",
-                ScreenId.Formation => "Formation 5\n\n" + string.Join("\n", (store.Formation?.heroes ?? Array.Empty<NinjaAssemble.Network.OwnedHeroDto>()).Select((h, i) => $"{i + 1}. {h.displayName}  Lv.{h.level}")),
-                ScreenId.Adventure => "Adventure\n\nNormal • Elite • Heroic\n\nFIGHT launches the deterministic server battle and its 5v5 visual replay.",
-                ScreenId.Battle => "Battle\n\n5 vs 5 deterministic simulation\nServer seed • participant metadata • replay timeline • authoritative rewards\n\nFIGHT runs the encounter and visual replay.",
+                ScreenId.Formation => "Formation 5\n\n" + string.Join("\n", (store.Formation?.heroes ?? Array.Empty<OwnedHeroDto>()).Select((h, i) => $"{i + 1}. {h.displayName}  Lv.{h.level}")),
+                ScreenId.Adventure => BuildAdventure(store),
+                ScreenId.Battle => "Battle Debug\n\n5 vs 5 deterministic simulation\nDefault stage: c1-s1\nServer seed • structured skills/passives • authoritative rewards\n\nUse Adventure for campaign progression.",
                 ScreenId.Summon => $"Complete Roster+ Summon\n\nCost: {PlayableGameStore.CompleteRosterSummonCost} Diamond\nHard pity and duplicate Hero Coin conversion are server-authoritative.",
                 ScreenId.Arena => "Arena\n\n5-ninja asynchronous defense/offense foundation is available on the server domain.",
                 ScreenId.ShadowArena => "Shadow Arena\n\n15 ninja • 3 squads • best-of-three foundation.",
@@ -134,12 +160,29 @@ namespace NinjaAssemble.UI
             };
         }
 
+        private static string BuildAdventure(PlayableGameStore store)
+        {
+            CampaignStageListDto campaign = store.Campaign;
+            if (campaign?.stages == null || campaign.stages.Length == 0) return "Adventure\n\nNo campaign catalog loaded.";
+            string lines = string.Join("\n", campaign.stages.Select(stage =>
+            {
+                string gate = stage.unlocked ? (stage.clearCount > 0 ? new string('★', Mathf.Clamp(stage.bestStars, 0, 3)) : "READY") : "LOCKED";
+                return $"{stage.stageId}  C{stage.chapter}-{stage.stageIndex}  {stage.difficulty}  {gate}  E{stage.energyCost}  {stage.nameEn}";
+            }));
+            CampaignStageDto next = store.RecommendedStage;
+            string nextText = next == null ? "No stage currently playable" : $"Next: {next.stageId} • {next.nameEn} • {next.energyCost} Energy";
+            return $"Adventure • Lv.{campaign.playerLevel}\n{campaign.catalogVersion}\n\n{lines}\n\n{nextText}";
+        }
+
         private void ConfigureAction()
         {
             if (primaryAction == null || primaryActionLabel == null) return;
             string label = screenId switch
             {
-                ScreenId.Battle or ScreenId.Adventure => "FIGHT",
+                ScreenId.Battle => "FIGHT c1-s1",
+                ScreenId.Adventure => MobileGameBootstrap.IsReady && MobileGameBootstrap.Store.RecommendedStage != null
+                    ? "FIGHT " + MobileGameBootstrap.Store.RecommendedStage.stageId
+                    : "REFRESH",
                 ScreenId.Summon => "SUMMON",
                 ScreenId.HeroDetail => "TRAIN",
                 _ => "REFRESH"
