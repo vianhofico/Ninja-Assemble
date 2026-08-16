@@ -17,7 +17,7 @@ namespace NinjaAssemble.Presentation
             foreach (HeroArtRuntimeEntry entry in payload.entries)
             {
                 if (entry == null || string.IsNullOrWhiteSpace(entry.characterId)) continue;
-                entries[Key(entry.characterId, entry.variant)] = entry;
+                entries[LegacyKey(entry.characterId, entry.variant)] = entry;
             }
         }
 
@@ -33,14 +33,31 @@ namespace NinjaAssemble.Presentation
             return new HeroArtRuntimeCatalog(payload);
         }
 
+        [Obsolete("Use ResolveHeroVersion for production player Hero Version presentation.")]
         public HeroArtRuntimeEntry Resolve(string characterId, string variant)
         {
             HeroArtRuntimeEntry exact;
-            if (entries.TryGetValue(Key(characterId, variant), out exact)) return exact;
-            return HeroArtRuntimeEntry.Derived(characterId, variant);
+            if (entries.TryGetValue(LegacyKey(characterId, variant), out exact)) return exact;
+            return HeroArtRuntimeEntry.DerivedLegacy(characterId, variant);
         }
 
-        private static string Key(string characterId, string variant)
+        public HeroArtRuntimeEntry ResolveHeroVersion(
+            string heroId,
+            bool awakened,
+            string characterId,
+            string legacyVariant)
+        {
+            // Until production Hero-Version packages are READY, do not lie about art readiness. Legacy READY art may be
+            // used only for non-awakened compatibility; awakened presentation always receives an explicit derived path.
+            if (!awakened)
+            {
+                HeroArtRuntimeEntry exact;
+                if (entries.TryGetValue(LegacyKey(characterId, legacyVariant), out exact) && exact.IsReady) return exact;
+            }
+            return HeroArtRuntimeEntry.DerivedHeroVersion(heroId, awakened, characterId, legacyVariant);
+        }
+
+        private static string LegacyKey(string characterId, string variant)
         {
             return (characterId ?? string.Empty).Trim() + "::" + (variant ?? string.Empty).Trim();
         }
@@ -81,6 +98,9 @@ namespace NinjaAssemble.Presentation
     {
         public string characterId;
         public string variant;
+        public string heroId;
+        public bool awakened;
+        public string presentationKey;
         public string portraitAddress;
         public string iconAddress;
         public string prefabAddress;
@@ -91,7 +111,29 @@ namespace NinjaAssemble.Presentation
 
         public bool IsReady => string.Equals(status, "READY", StringComparison.OrdinalIgnoreCase);
 
-        public static HeroArtRuntimeEntry Derived(string characterId, string variant)
+        public static HeroArtRuntimeEntry DerivedHeroVersion(string heroId, bool awakened, string characterId, string legacyVariant)
+        {
+            string hero = string.IsNullOrWhiteSpace(heroId) ? Slug(characterId) : heroId.Trim();
+            string state = awakened ? "awakened" : "base";
+            string root = "heroes/" + hero + "/" + state;
+            return new HeroArtRuntimeEntry
+            {
+                characterId = characterId ?? string.Empty,
+                variant = legacyVariant ?? string.Empty,
+                heroId = hero,
+                awakened = awakened,
+                presentationKey = "hero/" + hero + "/" + state,
+                portraitAddress = root + "/portrait",
+                iconAddress = root + "/icon",
+                prefabAddress = root + "/prefab",
+                animationSet = "animations/" + hero + "/" + state,
+                vfxSet = "vfx/" + hero + "/" + state,
+                sfxSet = "sfx/" + hero + "/" + state,
+                status = "AWAKENING_PACKAGE_PENDING_PRODUCTION"
+            };
+        }
+
+        public static HeroArtRuntimeEntry DerivedLegacy(string characterId, string variant)
         {
             string character = (characterId ?? string.Empty).Trim();
             string form = HeroArtRuntimeCatalog.Slug(variant);
@@ -100,6 +142,9 @@ namespace NinjaAssemble.Presentation
             {
                 characterId = character,
                 variant = variant ?? string.Empty,
+                heroId = string.Empty,
+                awakened = false,
+                presentationKey = "legacy/" + character + "/" + form,
                 portraitAddress = root + "/portrait",
                 iconAddress = root + "/icon",
                 prefabAddress = root + "/prefab",
@@ -109,5 +154,7 @@ namespace NinjaAssemble.Presentation
                 status = "UNTRACKED"
             };
         }
+
+        private static string Slug(string value) => HeroArtRuntimeCatalog.Slug(value);
     }
 }
