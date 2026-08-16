@@ -1,0 +1,31 @@
+character,variant,evidence,archetype,status,notes
+Naruto,base/community referenced,COMMUNITY_CONFIRMED,HYBRID,DISCOVERED,Guide explicitly classifies Naruto as Hybrid
+Sasuke,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Team/class-7 references
+Sakura,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Community recommends Chakra build for healing
+Sai,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Referenced in exchange roster
+Shikamaru,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Referenced in Chakra formation
+Itachi,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Control/meta references
+Pain,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Support references
+Madara,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Chakra burst references
+Tobirama,base/community referenced,COMMUNITY_CONFIRMED,HYBRID,DISCOVERED,Hybrid reference
+Ay,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Physical/meta references
+Hiruzen,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Support references
+Onoki,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Support/speed references
+Mei Terumi,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Chakra burst reference
+Orochimaru,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Formation/exchange reference
+Tsunade,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Healer reference
+Jiraiya,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Chakra formation reference
+Kushina,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Exchange reference
+Minato/Yondaime,base/community referenced,COMMUNITY_CONFIRMED,HYBRID,DISCOVERED,Hybrid reference
+Temari,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Speed-decrease reference
+Chouji,base/community referenced,COMMUNITY_CONFIRMED,HYBRID,DISCOVERED,Hybrid/tank reference
+Iruka,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Physical/speed buff reference
+Tobi,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Physical buff/immunity reference
+Kisame,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Tank reference
+Karin,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Support/healing reference
+Gai,base/community referenced,COMMUNITY_CONFIRMED,PHYSICAL,DISCOVERED,Physical burst reference
+Zabuza,base/community referenced,COMMUNITY_CONFIRMED,PHYSICAL,DISCOVERED,Physical burst reference
+Rock Lee,base/community referenced,COMMUNITY_CONFIRMED,PHYSICAL,DISCOVERED,Physical burst reference
+Hanzo,base/community referenced,COMMUNITY_CONFIRMED,PHYSICAL,DISCOVERED,Physical burst reference
+Ino,base/community referenced,COMMUNITY_CONFIRMED,CHAKRA,DISCOVERED,Healer/control reference
+Hashirama,base/community referenced,COMMUNITY_CONFIRMED,UNKNOWN,DISCOVERED,Meta/P2W example in community guide

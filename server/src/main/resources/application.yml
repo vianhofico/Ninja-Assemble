@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ninja-assemble-server
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ninja_assemble}
+    username: ${DB_USER:ninja}
+    password: ${DB_PASSWORD:ninja}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+server:
+  port: ${SERVER_PORT:8080}
