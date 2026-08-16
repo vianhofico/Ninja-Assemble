@@ -1,0 +1,25 @@
+name: m47-skill-identity-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-m47-skill-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate all Hero Version skill identities
+        run: python scripts/validate-m47-skill-identity.py
+      - name: Run focused runtime catalog tests
+        working-directory: server
+        run: mvn -B -Dtest=HeroContentCatalogServiceTest test
