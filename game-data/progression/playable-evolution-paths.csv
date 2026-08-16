@@ -1,0 +1,21 @@
+character_id,target_variant,prerequisite_variant,min_level,min_frame,gold_cost,status
+naruto-uzumaki,Sage Mode,BASE,10,CHUNIN,1000,EXPANSION_PLAYABLE_PROFILE
+naruto-uzumaki,KCM1,Sage Mode,20,JONIN,3000,EXPANSION_PLAYABLE_PROFILE
+naruto-uzumaki,KCM2,KCM1,30,KAGE,5000,EXPANSION_PLAYABLE_PROFILE
+naruto-uzumaki,Six Paths Sage Mode,KCM2,50,SIX_PATH,10000,EXPANSION_PLAYABLE_PROFILE
+sasuke-uchiha,Mangekyo Sharingan,BASE,10,CHUNIN,1000,EXPANSION_PLAYABLE_PROFILE
+sasuke-uchiha,Eternal Mangekyo Sharingan,Mangekyo Sharingan,25,JONIN,3500,EXPANSION_PLAYABLE_PROFILE
+sasuke-uchiha,Rinnegan,Eternal Mangekyo Sharingan,45,KAGE,8000,EXPANSION_PLAYABLE_PROFILE
+itachi-uchiha,Susanoo,BASE,25,JONIN,3500,EXPANSION_PLAYABLE_PROFILE
+madara-uchiha,Rinnegan,BASE,30,KAGE,5000,EXPANSION_PLAYABLE_PROFILE
+madara-uchiha,Ten-Tails Jinchuriki,Rinnegan,50,SIX_PATH,12000,EXPANSION_PLAYABLE_PROFILE
+obito-uchiha,Mangekyo,BASE,25,JONIN,3500,EXPANSION_PLAYABLE_PROFILE
+obito-uchiha,White Mask,Mangekyo,35,KAGE,6000,EXPANSION_PLAYABLE_PROFILE
+obito-uchiha,Ten-Tails Jinchuriki,White Mask,50,SIX_PATH,12000,EXPANSION_PLAYABLE_PROFILE
+might-guy,Seventh Gate,BASE,25,JONIN,3000,EXPANSION_PLAYABLE_PROFILE
+might-guy,Eighth Gate,Seventh Gate,45,KAGE,9000,EXPANSION_PLAYABLE_PROFILE
+kabuto-yakushi,Snake Sage,BASE,35,KAGE,6000,EXPANSION_PLAYABLE_PROFILE
+minato-namikaze,KCM,BASE,35,KAGE,6000,EXPANSION_PLAYABLE_PROFILE
+hashirama-senju,Sage Mode,BASE,35,KAGE,6000,EXPANSION_PLAYABLE_PROFILE
+orochimaru,White Snake,BASE,30,KAGE,5000,EXPANSION_PLAYABLE_PROFILE
+kisame-hoshigaki,Samehada Fusion,BASE,30,KAGE,5000,EXPANSION_PLAYABLE_PROFILE
