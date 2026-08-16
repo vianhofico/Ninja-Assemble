@@ -1,0 +1,428 @@
+character_id,old_variant,old_variant_id,classification,new_hero_id,new_awakening_form_id,new_skill_id,new_skin_id,temporary_state_id,migration_action,reason,confidence
+a-fourth-raikage,Lightning Armor,form-a-fourth-raikage-lightning-armor,AWAKENING_FORM,,awakening-fourth-raikage-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of fourth-raikage-base.,HIGH
+a-fourth-raikage,Raikage,form-a-fourth-raikage-raikage,COLLECTIBLE_HERO_VERSION,fourth-raikage-base,,,,,KEEP_AS_HERO,Base form of proposed hero fourth-raikage-base.,HIGH
+ajisai,Animal Path Vessel,form-ajisai-animal-path-vessel,SPECIAL_INDEPENDENT_CHARACTER,,,,,,MERGE,"Corpse/vessel identity for Pain content, not Ajisai's normal Awakening.",HIGH
+ajisai,Rain Kunoichi,form-ajisai-rain-kunoichi,COLLECTIBLE_HERO_VERSION,ajisai-core,,,,,KEEP_AS_HERO,Base form of proposed hero ajisai-core.,HIGH
+akatsuchi,Stone Golem,form-akatsuchi-stone-golem,COLLECTIBLE_HERO_VERSION,akatsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero akatsuchi-core.,HIGH
+akatsuchi,Tsuchikage Guard,form-akatsuchi-tsuchikage-guard,COSMETIC_SKIN,,,,skin-akatsuchi-tsuchikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+ameyuri-ringo,Kiba Wielder,form-ameyuri-ringo-kiba-wielder,COLLECTIBLE_HERO_VERSION,ameyuri-ringo-core,,,,,KEEP_AS_HERO,Base form of proposed hero ameyuri-ringo-core.,HIGH
+ameyuri-ringo,Reanimated,form-ameyuri-ringo-reanimated,COSMETIC_SKIN,,,,skin-ameyuri-ringo-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+anko-mitarashi,Chunin Exams Proctor,form-anko-mitarashi-chunin-exams-proctor,COLLECTIBLE_HERO_VERSION,anko-mitarashi-core,,,,,KEEP_AS_HERO,Base form of proposed hero anko-mitarashi-core.,HIGH
+anko-mitarashi,Cursed Seal Survivor,form-anko-mitarashi-cursed-seal-survivor,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+ao,Byakugan Hunter,form-ao-byakugan-hunter,COLLECTIBLE_HERO_VERSION,ao-core,,,,,KEEP_AS_HERO,Base form of proposed hero ao-core.,HIGH
+ao,Sensor Captain,form-ao-sensor-captain,COSMETIC_SKIN,,,,skin-ao-sensor-captain,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+aoba-yamashiro,Intelligence Corps,form-aoba-yamashiro-intelligence-corps,COSMETIC_SKIN,,,,skin-aoba-yamashiro-intelligence-corps,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+aoba-yamashiro,Jonin,form-aoba-yamashiro-jonin,COLLECTIBLE_HERO_VERSION,aoba-yamashiro-core,,,,,KEEP_AS_HERO,Base form of proposed hero aoba-yamashiro-core.,HIGH
+aoda,Great Snake,form-aoda-great-snake,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+aoda,Sasuke Summon,form-aoda-sasuke-summon,SKILL_OR_ULTIMATE,,,legacy-aoda-sasuke-summon,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+asuma-sarutobi,Edo Tensei,form-asuma-sarutobi-edo-tensei,COSMETIC_SKIN,,,,skin-asuma-sarutobi-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+asuma-sarutobi,Jonin,form-asuma-sarutobi-jonin,COLLECTIBLE_HERO_VERSION,asuma-sarutobi-core,,,,,KEEP_AS_HERO,Base form of proposed hero asuma-sarutobi-core.,HIGH
+asura-otsutsuki,Base,form-asura-otsutsuki-base,COLLECTIBLE_HERO_VERSION,asura-base,,,,,KEEP_AS_HERO,Base form of proposed hero asura-base.,HIGH
+asura-otsutsuki,Six Paths Avatar,form-asura-otsutsuki-six-paths-avatar,AWAKENING_FORM,,awakening-asura-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of asura-base.,HIGH
+atsui,Cloud Ninja,form-atsui-cloud-ninja,COLLECTIBLE_HERO_VERSION,atsui-core,,,,,KEEP_AS_HERO,Base form of proposed hero atsui-core.,HIGH
+atsui,War Arc,form-atsui-war-arc,COSMETIC_SKIN,,,,skin-atsui-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+baiu,Rain Genin,form-baiu-rain-genin,COLLECTIBLE_HERO_VERSION,baiu-core,,,,,KEEP_AS_HERO,Base form of proposed hero baiu-core.,HIGH
+baiu,Senbon Assault,form-baiu-senbon-assault,SKILL_OR_ULTIMATE,,,legacy-baiu-senbon-assault,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+baki,Sand Jonin,form-baki-sand-jonin,COLLECTIBLE_HERO_VERSION,baki-core,,,,,KEEP_AS_HERO,Base form of proposed hero baki-core.,HIGH
+baki,Wind Blade,form-baki-wind-blade,SKILL_OR_ULTIMATE,,,legacy-baki-wind-blade,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+black-zetsu,Akatsuki Spy,form-black-zetsu-akatsuki-spy,COLLECTIBLE_HERO_VERSION,black-zetsu-core,,,,,KEEP_AS_HERO,Base form of proposed hero black-zetsu-core.,HIGH
+black-zetsu,Kaguya Will,form-black-zetsu-kaguya-will,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+blue-b,Eight-Tails Host,form-blue-b-eight-tails-host,COLLECTIBLE_HERO_VERSION,blue-b-core,,,,,KEEP_AS_HERO,Base form of proposed hero blue-b-core.,HIGH
+blue-b,Jinchuriki Cloak,form-blue-b-jinchuriki-cloak,AWAKENING_FORM,,awakening-blue-b-core,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of blue-b-core.,HIGH
+bunpuku,Monk Sage,form-bunpuku-monk-sage,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+bunpuku,Shukaku Host,form-bunpuku-shukaku-host,COLLECTIBLE_HERO_VERSION,bunpuku-core,,,,,KEEP_AS_HERO,Base form of proposed hero bunpuku-core.,HIGH
+byakuren,First Mizukage,form-byakuren-first-mizukage,COLLECTIBLE_HERO_VERSION,byakuren-core,,,,,KEEP_AS_HERO,Base form of proposed hero byakuren-core.,HIGH
+byakuren,Prime,form-byakuren-prime,COSMETIC_SKIN,,,,skin-byakuren-prime,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+c,Raikage Guard,form-c-raikage-guard,COSMETIC_SKIN,,,,skin-c-raikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+c,Sensor,form-c-sensor,COLLECTIBLE_HERO_VERSION,c-core,,,,,KEEP_AS_HERO,Base form of proposed hero c-core.,HIGH
+chiyo,Base,form-chiyo-base,COLLECTIBLE_HERO_VERSION,chiyo-core,,,,,KEEP_AS_HERO,Base form of proposed hero chiyo-core.,HIGH
+chiyo,Ten Puppets,form-chiyo-ten-puppets,SKILL_OR_ULTIMATE,,,legacy-chiyo-ten-puppets,,,MOVE_TO_ULTIMATE,Secret White Move puppet technique.,HIGH
+choji-akimichi,Butterfly Mode,form-choji-akimichi-butterfly-mode,AWAKENING_FORM,,awakening-choji-shippuden,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of choji-shippuden.,HIGH
+choji-akimichi,Genin,form-choji-akimichi-genin,COSMETIC_SKIN,,,,skin-choji-akimichi-genin,,MOVE_TO_SKIN,Age/era appearance; Shippuden is the hero boundary.,HIGH
+choji-akimichi,Shippuden,form-choji-akimichi-shippuden,COLLECTIBLE_HERO_VERSION,choji-shippuden,,,,,KEEP_AS_HERO,Base form of proposed hero choji-shippuden.,HIGH
+choji-akimichi,War Arc,form-choji-akimichi-war-arc,COSMETIC_SKIN,,,,skin-choji-akimichi-war-arc,,MOVE_TO_SKIN,Era appearance.,HIGH
+chojuro,Hiramekarei Master,form-chojuro-hiramekarei-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+chojuro,Seven Swordsman,form-chojuro-seven-swordsman,COLLECTIBLE_HERO_VERSION,chojuro-core,,,,,KEEP_AS_HERO,Base form of proposed hero chojuro-core.,HIGH
+choza-akimichi,Clan Head,form-choza-akimichi-clan-head,COLLECTIBLE_HERO_VERSION,choza-akimichi-core,,,,,KEEP_AS_HERO,Base form of proposed hero choza-akimichi-core.,HIGH
+choza-akimichi,War Arc,form-choza-akimichi-war-arc,COSMETIC_SKIN,,,,skin-choza-akimichi-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+chukichi,Reanimated,form-chukichi-reanimated,COSMETIC_SKIN,,,,skin-chukichi-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+chukichi,Sensor Ninja,form-chukichi-sensor-ninja,COLLECTIBLE_HERO_VERSION,chukichi-core,,,,,KEEP_AS_HERO,Base form of proposed hero chukichi-core.,HIGH
+dan-kato,Jonin,form-dan-kato-jonin,COLLECTIBLE_HERO_VERSION,dan-kato-core,,,,,KEEP_AS_HERO,Base form of proposed hero dan-kato-core.,HIGH
+dan-kato,Spirit Transformation,form-dan-kato-spirit-transformation,AWAKENING_FORM,,awakening-dan-kato-core,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of dan-kato-core.,HIGH
+danzo-shimura,Hokage Candidate,form-danzo-shimura-hokage-candidate,COLLECTIBLE_HERO_VERSION,danzo-candidate,,,,,KEEP_AS_HERO,Base form of proposed hero danzo-candidate.,HIGH
+danzo-shimura,Izanagi Arm,form-danzo-shimura-izanagi-arm,AWAKENING_FORM,,awakening-danzo-candidate,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of danzo-candidate.,HIGH
+darui,Raikage Guard,form-darui-raikage-guard,COSMETIC_SKIN,,,,skin-darui-raikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+darui,Storm Release,form-darui-storm-release,COLLECTIBLE_HERO_VERSION,darui-core,,,,,KEEP_AS_HERO,Base form of proposed hero darui-core.,HIGH
+deidara,Akatsuki,form-deidara-akatsuki,COLLECTIBLE_HERO_VERSION,deidara-core,,,,,KEEP_AS_HERO,Base form of proposed hero deidara-core.,HIGH
+deidara,C2 Dragon,form-deidara-c2-dragon,SKILL_OR_ULTIMATE,,,legacy-deidara-c2-dragon,,,MOVE_TO_SKILL,"Named technique/construct, not a persistent hero form.",HIGH
+deidara,C4,form-deidara-c4,SKILL_OR_ULTIMATE,,,legacy-deidara-c4,,,MOVE_TO_ULTIMATE,"Named ultimate-scale technique, not a hero.",HIGH
+deidara,Edo Tensei,form-deidara-edo-tensei,COSMETIC_SKIN,,,,skin-deidara-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
+dodai,Lava Rubber Style,form-dodai-lava-rubber-style,COLLECTIBLE_HERO_VERSION,dodai-core,,,,,KEEP_AS_HERO,Base form of proposed hero dodai-core.,HIGH
+dodai,Third Raikage Aide,form-dodai-third-raikage-aide,COSMETIC_SKIN,,,,skin-dodai-third-raikage-aide,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+dosu-kinuta,Resonating Echo,form-dosu-kinuta-resonating-echo,SKILL_OR_ULTIMATE,,,legacy-dosu-kinuta-resonating-echo,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+dosu-kinuta,Sound Genin,form-dosu-kinuta-sound-genin,COLLECTIBLE_HERO_VERSION,dosu-kinuta-core,,,,,KEEP_AS_HERO,Base form of proposed hero dosu-kinuta-core.,HIGH
+ebisu,Elite Tutor,form-ebisu-elite-tutor,COLLECTIBLE_HERO_VERSION,ebisu-core,,,,,KEEP_AS_HERO,Base form of proposed hero ebisu-core.,HIGH
+ebisu,Special Jonin,form-ebisu-special-jonin,COSMETIC_SKIN,,,,skin-ebisu-special-jonin,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+ebizo,Puppet Strategist,form-ebizo-puppet-strategist,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+ebizo,Sand Elder,form-ebizo-sand-elder,COLLECTIBLE_HERO_VERSION,ebizo-core,,,,,KEEP_AS_HERO,Base form of proposed hero ebizo-core.,HIGH
+enma,Adamantine Staff,form-enma-adamantine-staff,SKILL_OR_ULTIMATE,,,legacy-enma-adamantine-staff,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+enma,Monkey King,form-enma-monkey-king,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+first-raikage,First Raikage,form-first-raikage-first-raikage,COLLECTIBLE_HERO_VERSION,first-raikage-core,,,,,KEEP_AS_HERO,Base form of proposed hero first-raikage-core.,HIGH
+first-raikage,Prime,form-first-raikage-prime,COSMETIC_SKIN,,,,skin-first-raikage-prime,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+fu,Base,form-fu-base,COLLECTIBLE_HERO_VERSION,fu-base,,,,,KEEP_AS_HERO,Base form of proposed hero fu-base.,HIGH
+fu,Seven-Tails Cloak,form-fu-seven-tails-cloak,AWAKENING_FORM,,awakening-fu-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of fu-base.,HIGH
+fu-yamanaka,Mind Transfer,form-fu-yamanaka-mind-transfer,SKILL_OR_ULTIMATE,,,legacy-fu-yamanaka-mind-transfer,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+fu-yamanaka,Root Operative,form-fu-yamanaka-root-operative,COLLECTIBLE_HERO_VERSION,fu-yamanaka-core,,,,,KEEP_AS_HERO,Base form of proposed hero fu-yamanaka-core.,HIGH
+fudo,Earth Body,form-fudo-earth-body,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+fudo,Four-Man Team,form-fudo-four-man-team,COLLECTIBLE_HERO_VERSION,fudo-core,,,,,KEEP_AS_HERO,Base form of proposed hero fudo-core.,HIGH
+fuen,Barrier Specialist,form-fuen-barrier-specialist,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+fuen,Four-Man Team,form-fuen-four-man-team,COLLECTIBLE_HERO_VERSION,fuen-core,,,,,KEEP_AS_HERO,Base form of proposed hero fuen-core.,HIGH
+fugaku-uchiha,Clan Head,form-fugaku-uchiha-clan-head,COLLECTIBLE_HERO_VERSION,fugaku-uchiha-core,,,,,KEEP_AS_HERO,Base form of proposed hero fugaku-uchiha-core.,HIGH
+fugaku-uchiha,Police Captain,form-fugaku-uchiha-police-captain,COSMETIC_SKIN,,,,skin-fugaku-uchiha-police-captain,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+fuguki-suikazan,Reanimated,form-fuguki-suikazan-reanimated,COSMETIC_SKIN,,,,skin-fuguki-suikazan-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+fuguki-suikazan,Samehada Wielder,form-fuguki-suikazan-samehada-wielder,COLLECTIBLE_HERO_VERSION,fuguki-suikazan-core,,,,,KEEP_AS_HERO,Base form of proposed hero fuguki-suikazan-core.,HIGH
+fuka,Elemental Kiss,form-fuka-elemental-kiss,SKILL_OR_ULTIMATE,,,legacy-fuka-elemental-kiss,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+fuka,Four-Man Team,form-fuka-four-man-team,COLLECTIBLE_HERO_VERSION,fuka-core,,,,,KEEP_AS_HERO,Base form of proposed hero fuka-core.,HIGH
+fukasaku,Sage Training,form-fukasaku-sage-training,SKILL_OR_ULTIMATE,,,legacy-fukasaku-sage-training,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+fukasaku,Toad Sage,form-fukasaku-toad-sage,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+gaara,Genin,form-gaara-genin,COLLECTIBLE_HERO_VERSION,gaara-genin,,,,,KEEP_AS_HERO,Base form of proposed hero gaara-genin.,HIGH
+gaara,Kazekage,form-gaara-kazekage,COLLECTIBLE_HERO_VERSION,gaara-kazekage,,,,,KEEP_AS_HERO,Base form of proposed hero gaara-kazekage.,HIGH
+gaara,Shukaku Cloak,form-gaara-shukaku-cloak,AWAKENING_FORM,,awakening-gaara-genin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of gaara-genin.,HIGH
+gaara,War Arc,form-gaara-war-arc,COSMETIC_SKIN,,,,skin-gaara-war-arc,,MOVE_TO_SKIN,Era presentation of Kazekage Gaara.,HIGH
+gamabunta,Gamabunta Battle,form-gamabunta-gamabunta-battle,SKILL_OR_ULTIMATE,,,legacy-gamabunta-gamabunta-battle,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+gamabunta,Toad Boss,form-gamabunta-toad-boss,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+gamakichi,War Arc Toad,form-gamakichi-war-arc-toad,SKILL_OR_ULTIMATE,,,legacy-gamakichi-war-arc-toad,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+gamakichi,Young Toad,form-gamakichi-young-toad,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+gari,Explosion Release,form-gari-explosion-release,COLLECTIBLE_HERO_VERSION,gari-core,,,,,KEEP_AS_HERO,Base form of proposed hero gari-core.,HIGH
+gari,Reanimated,form-gari-reanimated,COSMETIC_SKIN,,,,skin-gari-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+gengetsu-hozuki,Edo Tensei,form-gengetsu-hozuki-edo-tensei,COSMETIC_SKIN,,,,skin-gengetsu-hozuki-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+gengetsu-hozuki,Second Mizukage,form-gengetsu-hozuki-second-mizukage,COLLECTIBLE_HERO_VERSION,gengetsu-hozuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero gengetsu-hozuki-core.,HIGH
+genma-shiranui,Fourth Hokage Guard,form-genma-shiranui-fourth-hokage-guard,COSMETIC_SKIN,,,,skin-genma-shiranui-fourth-hokage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+genma-shiranui,Special Jonin,form-genma-shiranui-special-jonin,COLLECTIBLE_HERO_VERSION,genma-shiranui-core,,,,,KEEP_AS_HERO,Base form of proposed hero genma-shiranui-core.,HIGH
+ginkaku,Nine-Tails Cloak,form-ginkaku-nine-tails-cloak,AWAKENING_FORM,,awakening-ginkaku-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of ginkaku-base.,HIGH
+ginkaku,Silver Brother,form-ginkaku-silver-brother,COLLECTIBLE_HERO_VERSION,ginkaku-base,,,,,KEEP_AS_HERO,Base form of proposed hero ginkaku-base.,HIGH
+gozu,Chain Gauntlet,form-gozu-chain-gauntlet,SKILL_OR_ULTIMATE,,,legacy-gozu-chain-gauntlet,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+gozu,Demon Brothers,form-gozu-demon-brothers,COLLECTIBLE_HERO_VERSION,gozu-core,,,,,KEEP_AS_HERO,Base form of proposed hero gozu-core.,HIGH
+guren,Crystal Release,form-guren-crystal-release,COLLECTIBLE_HERO_VERSION,guren-core,,,,,KEEP_AS_HERO,Base form of proposed hero guren-core.,HIGH
+guren,Three-Tails Mission,form-guren-three-tails-mission,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+hagoromo-otsutsuki,Sage of Six Paths,form-hagoromo-otsutsuki-sage-of-six-paths,AWAKENING_FORM,,awakening-hagoromo-young,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of hagoromo-young.,HIGH
+hagoromo-otsutsuki,Young,form-hagoromo-otsutsuki-young,COLLECTIBLE_HERO_VERSION,hagoromo-young,,,,,KEEP_AS_HERO,Base form of proposed hero hagoromo-young.,HIGH
+haku,Base,form-haku-base,COLLECTIBLE_HERO_VERSION,haku-core,,,,,KEEP_AS_HERO,Base form of proposed hero haku-core.,HIGH
+haku,Edo Tensei,form-haku-edo-tensei,COSMETIC_SKIN,,,,skin-haku-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+hamura-otsutsuki,Tenseigan Legacy,form-hamura-otsutsuki-tenseigan-legacy,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Legacy/title wording is not a documented persistent Hamura transformation.,HIGH
+hamura-otsutsuki,Young,form-hamura-otsutsuki-young,COLLECTIBLE_HERO_VERSION,hamura-otsutsuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero hamura-otsutsuki-core.,HIGH
+han,Base,form-han-base,COLLECTIBLE_HERO_VERSION,han-base,,,,,KEEP_AS_HERO,Base form of proposed hero han-base.,HIGH
+han,Five-Tails Cloak,form-han-five-tails-cloak,AWAKENING_FORM,,awakening-han-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of han-base.,HIGH
+hanabi-hyuga,Byakugan Master,form-hanabi-hyuga-byakugan-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+hanabi-hyuga,Hyuga Heiress,form-hanabi-hyuga-hyuga-heiress,COLLECTIBLE_HERO_VERSION,hanabi-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero hanabi-hyuga-core.,HIGH
+hanzo,Edo Tensei,form-hanzo-edo-tensei,COSMETIC_SKIN,,,,skin-hanzo-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+hanzo,Prime,form-hanzo-prime,COLLECTIBLE_HERO_VERSION,hanzo-core,,,,,KEEP_AS_HERO,Base form of proposed hero hanzo-core.,HIGH
+hashirama-senju,Edo Tensei,form-hashirama-senju-edo-tensei,COSMETIC_SKIN,,,,skin-hashirama-senju-edo-tensei,,MOVE_TO_SKIN,Reanimation is not used as Awakening.,HIGH
+hashirama-senju,First Hokage,form-hashirama-senju-first-hokage,COLLECTIBLE_HERO_VERSION,hashirama-hokage,,,,,KEEP_AS_HERO,Base form of proposed hero hashirama-hokage.,HIGH
+hashirama-senju,Sage Mode,form-hashirama-senju-sage-mode,AWAKENING_FORM,,awakening-hashirama-hokage,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of hashirama-hokage.,HIGH
+hashirama-senju,Warring States,form-hashirama-senju-warring-states,COSMETIC_SKIN,,,,skin-hashirama-senju-warring-states,,MOVE_TO_SKIN,Era appearance of the same wood-style identity.,HIGH
+hayate-gekko,Chunin Exams Proctor,form-hayate-gekko-chunin-exams-proctor,COLLECTIBLE_HERO_VERSION,hayate-gekko-core,,,,,KEEP_AS_HERO,Base form of proposed hero hayate-gekko-core.,HIGH
+hayate-gekko,Crescent Moon Blade,form-hayate-gekko-crescent-moon-blade,SKILL_OR_ULTIMATE,,,legacy-hayate-gekko-crescent-moon-blade,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+hiashi-hyuga,Clan Head,form-hiashi-hyuga-clan-head,COLLECTIBLE_HERO_VERSION,hiashi-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero hiashi-hyuga-core.,HIGH
+hiashi-hyuga,War Arc,form-hiashi-hyuga-war-arc,COSMETIC_SKIN,,,,skin-hiashi-hyuga-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+hidan,Akatsuki,form-hidan-akatsuki,COLLECTIBLE_HERO_VERSION,hidan-core,,,,,KEEP_AS_HERO,Base form of proposed hero hidan-core.,HIGH
+hidan,Curse Ritual,form-hidan-curse-ritual,SKILL_OR_ULTIMATE,,,legacy-hidan-curse-ritual,,,MOVE_TO_ULTIMATE,"Ritual technique, not a separate hero.",HIGH
+hinata-hyuga,Genin,form-hinata-hyuga-genin,COLLECTIBLE_HERO_VERSION,hinata-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero hinata-hyuga-core.,HIGH
+hinata-hyuga,Shippuden,form-hinata-hyuga-shippuden,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+hinata-hyuga,War Arc,form-hinata-hyuga-war-arc,COSMETIC_SKIN,,,,skin-hinata-hyuga-war-arc,,MOVE_TO_SKIN,Era appearance of the same Shippuden combat identity.,HIGH
+hiruko,Chimera Technique,form-hiruko-chimera-technique,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+hiruko,Missing Nin,form-hiruko-missing-nin,COLLECTIBLE_HERO_VERSION,hiruko-core,,,,,KEEP_AS_HERO,Base form of proposed hero hiruko-core.,HIGH
+hiruzen-sarutobi,Edo Tensei,form-hiruzen-sarutobi-edo-tensei,COSMETIC_SKIN,,,,skin-hiruzen-sarutobi-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
+hiruzen-sarutobi,Prime,form-hiruzen-sarutobi-prime,COLLECTIBLE_HERO_VERSION,hiruzen-prime,,,,,KEEP_AS_HERO,Base form of proposed hero hiruzen-prime.,HIGH
+hiruzen-sarutobi,Third Hokage,form-hiruzen-sarutobi-third-hokage,COSMETIC_SKIN,,,,skin-hiruzen-sarutobi-third-hokage,,MOVE_TO_SKIN,Title/era label; Prime hero carries the full combat identity.,HIGH
+hizashi-hyuga,Branch House,form-hizashi-hyuga-branch-house,COLLECTIBLE_HERO_VERSION,hizashi-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero hizashi-hyuga-core.,HIGH
+hizashi-hyuga,Reanimated,form-hizashi-hyuga-reanimated,COSMETIC_SKIN,,,,skin-hizashi-hyuga-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+ibiki-morino,Interrogation Chief,form-ibiki-morino-interrogation-chief,COLLECTIBLE_HERO_VERSION,ibiki-morino-core,,,,,KEEP_AS_HERO,Base form of proposed hero ibiki-morino-core.,HIGH
+ibiki-morino,War Arc,form-ibiki-morino-war-arc,COSMETIC_SKIN,,,,skin-ibiki-morino-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+idate-morino,Ninja Trainee,form-idate-morino-ninja-trainee,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+idate-morino,Runner,form-idate-morino-runner,COLLECTIBLE_HERO_VERSION,idate-morino-core,,,,,KEEP_AS_HERO,Base form of proposed hero idate-morino-core.,HIGH
+indra-otsutsuki,Base,form-indra-otsutsuki-base,COLLECTIBLE_HERO_VERSION,indra-base,,,,,KEEP_AS_HERO,Base form of proposed hero indra-base.,HIGH
+indra-otsutsuki,Susanoo,form-indra-otsutsuki-susanoo,AWAKENING_FORM,,awakening-indra-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of indra-base.,HIGH
+ino-yamanaka,Genin,form-ino-yamanaka-genin,COLLECTIBLE_HERO_VERSION,ino-yamanaka-core,,,,,KEEP_AS_HERO,Base form of proposed hero ino-yamanaka-core.,HIGH
+ino-yamanaka,Shippuden,form-ino-yamanaka-shippuden,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+ino-yamanaka,War Arc,form-ino-yamanaka-war-arc,COSMETIC_SKIN,,,,skin-ino-yamanaka-war-arc,,MOVE_TO_SKIN,Era appearance.,HIGH
+inoichi-yamanaka,Allied Intelligence Chief,form-inoichi-yamanaka-allied-intelligence-chief,COSMETIC_SKIN,,,,skin-inoichi-yamanaka-allied-intelligence-chief,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+inoichi-yamanaka,Clan Head,form-inoichi-yamanaka-clan-head,COLLECTIBLE_HERO_VERSION,inoichi-yamanaka-core,,,,,KEEP_AS_HERO,Base form of proposed hero inoichi-yamanaka-core.,HIGH
+iruka-umino,Academy Instructor,form-iruka-umino-academy-instructor,COLLECTIBLE_HERO_VERSION,iruka-umino-core,,,,,KEEP_AS_HERO,Base form of proposed hero iruka-umino-core.,HIGH
+iruka-umino,Protective Sensei,form-iruka-umino-protective-sensei,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+ishikawa,First Tsuchikage,form-ishikawa-first-tsuchikage,COLLECTIBLE_HERO_VERSION,ishikawa-core,,,,,KEEP_AS_HERO,Base form of proposed hero ishikawa-core.,HIGH
+ishikawa,Prime,form-ishikawa-prime,COSMETIC_SKIN,,,,skin-ishikawa-prime,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+itachi-uchiha,ANBU,form-itachi-uchiha-anbu,COLLECTIBLE_HERO_VERSION,itachi-anbu,,,,,KEEP_AS_HERO,Base form of proposed hero itachi-anbu.,HIGH
+itachi-uchiha,Akatsuki,form-itachi-uchiha-akatsuki,COLLECTIBLE_HERO_VERSION,itachi-akatsuki,,,,,KEEP_AS_HERO,Base form of proposed hero itachi-akatsuki.,HIGH
+itachi-uchiha,Edo Tensei,form-itachi-uchiha-edo-tensei,COSMETIC_SKIN,,,,skin-itachi-uchiha-edo-tensei,,MOVE_TO_SKIN,Reanimation is not a normal Awakening and does not need a duplicate hero here.,HIGH
+itachi-uchiha,Mangekyo,form-itachi-uchiha-mangekyo,AWAKENING_FORM,,awakening-itachi-anbu,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of itachi-anbu.,HIGH
+itachi-uchiha,Susanoo,form-itachi-uchiha-susanoo,AWAKENING_FORM,,awakening-itachi-akatsuki,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of itachi-akatsuki.,HIGH
+izumo-kamizuki,Gate Guard,form-izumo-kamizuki-gate-guard,COLLECTIBLE_HERO_VERSION,izumo-kamizuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero izumo-kamizuki-core.,HIGH
+izumo-kamizuki,War Arc,form-izumo-kamizuki-war-arc,COSMETIC_SKIN,,,,skin-izumo-kamizuki-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+izuna-uchiha,Mangekyo Sharingan,form-izuna-uchiha-mangekyo-sharingan,AWAKENING_FORM,,awakening-izuna-uchiha-core,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of izuna-uchiha-core.,HIGH
+izuna-uchiha,Warring States,form-izuna-uchiha-warring-states,COLLECTIBLE_HERO_VERSION,izuna-uchiha-core,,,,,KEEP_AS_HERO,Base form of proposed hero izuna-uchiha-core.,HIGH
+jinin-akebino,Kabutowari Wielder,form-jinin-akebino-kabutowari-wielder,COLLECTIBLE_HERO_VERSION,jinin-akebino-core,,,,,KEEP_AS_HERO,Base form of proposed hero jinin-akebino-core.,HIGH
+jinin-akebino,Reanimated,form-jinin-akebino-reanimated,COSMETIC_SKIN,,,,skin-jinin-akebino-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+jinpachi-munashi,Reanimated,form-jinpachi-munashi-reanimated,COSMETIC_SKIN,,,,skin-jinpachi-munashi-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+jinpachi-munashi,Shibuki Wielder,form-jinpachi-munashi-shibuki-wielder,COLLECTIBLE_HERO_VERSION,jinpachi-munashi-core,,,,,KEEP_AS_HERO,Base form of proposed hero jinpachi-munashi-core.,HIGH
+jirobo,Curse Mark Level 2,form-jirobo-curse-mark-level-2,AWAKENING_FORM,,awakening-jirobo-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of jirobo-base.,HIGH
+jirobo,Sound Four,form-jirobo-sound-four,COLLECTIBLE_HERO_VERSION,jirobo-base,,,,,KEEP_AS_HERO,Base form of proposed hero jirobo-base.,HIGH
+jugo,Curse Mark Base,form-jugo-curse-mark-base,COLLECTIBLE_HERO_VERSION,jugo-base,,,,,KEEP_AS_HERO,Base form of proposed hero jugo-base.,HIGH
+jugo,Sage Transformation,form-jugo-sage-transformation,AWAKENING_FORM,,awakening-jugo-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of jugo-base.,HIGH
+kabuto-yakushi,Part I,form-kabuto-yakushi-part-i,COLLECTIBLE_HERO_VERSION,kabuto-part1,,,,,KEEP_AS_HERO,Base form of proposed hero kabuto-part1.,HIGH
+kabuto-yakushi,Shippuden,form-kabuto-yakushi-shippuden,COLLECTIBLE_HERO_VERSION,kabuto-shippuden,,,,,KEEP_AS_HERO,Base form of proposed hero kabuto-shippuden.,HIGH
+kabuto-yakushi,Snake Sage,form-kabuto-yakushi-snake-sage,AWAKENING_FORM,,awakening-kabuto-shippuden,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kabuto-shippuden.,HIGH
+kabuto-yakushi,War Arc,form-kabuto-yakushi-war-arc,COSMETIC_SKIN,,,,skin-kabuto-yakushi-war-arc,,MOVE_TO_SKIN,Snake Sage is the actual transformation; War Arc is an era label.,HIGH
+kagami-uchiha,Sharingan Elite,form-kagami-uchiha-sharingan-elite,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+kagami-uchiha,Tobirama Guard,form-kagami-uchiha-tobirama-guard,COLLECTIBLE_HERO_VERSION,kagami-uchiha-core,,,,,KEEP_AS_HERO,Base form of proposed hero kagami-uchiha-core.,HIGH
+kagari,Mist Ambush,form-kagari-mist-ambush,SKILL_OR_ULTIMATE,,,legacy-kagari-mist-ambush,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+kagari,Rain Genin,form-kagari-rain-genin,COLLECTIBLE_HERO_VERSION,kagari-core,,,,,KEEP_AS_HERO,Base form of proposed hero kagari-core.,HIGH
+kaguya-otsutsuki,Base,form-kaguya-otsutsuki-base,COLLECTIBLE_HERO_VERSION,kaguya-base,,,,,KEEP_AS_HERO,Base form of proposed hero kaguya-base.,HIGH
+kaguya-otsutsuki,Rabbit Goddess,form-kaguya-otsutsuki-rabbit-goddess,AWAKENING_FORM,,awakening-kaguya-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kaguya-base.,HIGH
+kakashi-hatake,ANBU,form-kakashi-hatake-anbu,COLLECTIBLE_HERO_VERSION,kakashi-anbu,,,,,KEEP_AS_HERO,Base form of proposed hero kakashi-anbu.,HIGH
+kakashi-hatake,Double Mangekyo,form-kakashi-hatake-double-mangekyo,AWAKENING_FORM,,awakening-kakashi-war,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kakashi-war.,HIGH
+kakashi-hatake,Mangekyo Sharingan,form-kakashi-hatake-mangekyo-sharingan,COLLECTIBLE_HERO_VERSION,kakashi-war,,,,,KEEP_AS_HERO,Base form of proposed hero kakashi-war.,HIGH
+kakashi-hatake,Sharingan,form-kakashi-hatake-sharingan,AWAKENING_FORM,,awakening-kakashi-young,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kakashi-young.,HIGH
+kakashi-hatake,Young,form-kakashi-hatake-young,COLLECTIBLE_HERO_VERSION,kakashi-young,,,,,KEEP_AS_HERO,Base form of proposed hero kakashi-young.,HIGH
+kakko,Kannabi Bridge,form-kakko-kannabi-bridge,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+kakko,Stone Jonin,form-kakko-stone-jonin,COLLECTIBLE_HERO_VERSION,kakko-core,,,,,KEEP_AS_HERO,Base form of proposed hero kakko-core.,HIGH
+kakuzu,Akatsuki,form-kakuzu-akatsuki,COLLECTIBLE_HERO_VERSION,kakuzu-akatsuki,,,,,KEEP_AS_HERO,Base form of proposed hero kakuzu-akatsuki.,HIGH
+kakuzu,Earth Grudge Fear,form-kakuzu-earth-grudge-fear,AWAKENING_FORM,,awakening-kakuzu-akatsuki,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kakuzu-akatsuki.,HIGH
+kankuro,Chunin Exams,form-kankuro-chunin-exams,COLLECTIBLE_HERO_VERSION,kankuro-core,,,,,KEEP_AS_HERO,Base form of proposed hero kankuro-core.,HIGH
+kankuro,Master Puppeteer,form-kankuro-master-puppeteer,COSMETIC_SKIN,,,,skin-kankuro-master-puppeteer,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+karin,Hebi Sensor,form-karin-hebi-sensor,COLLECTIBLE_HERO_VERSION,karin-core,,,,,KEEP_AS_HERO,Base form of proposed hero karin-core.,HIGH
+karin,Taka Healer,form-karin-taka-healer,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+karui,Cloud Kunoichi,form-karui-cloud-kunoichi,COLLECTIBLE_HERO_VERSION,karui-core,,,,,KEEP_AS_HERO,Base form of proposed hero karui-core.,HIGH
+karui,War Arc,form-karui-war-arc,COSMETIC_SKIN,,,,skin-karui-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+katsuyu,Hundred Healings Support,form-katsuyu-hundred-healings-support,SKILL_OR_ULTIMATE,,,legacy-katsuyu-hundred-healings-support,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+katsuyu,Slug Queen,form-katsuyu-slug-queen,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+kiba-inuzuka,Chunin Exams,form-kiba-inuzuka-chunin-exams,COLLECTIBLE_HERO_VERSION,kiba-inuzuka-core,,,,,KEEP_AS_HERO,Base form of proposed hero kiba-inuzuka-core.,HIGH
+kiba-inuzuka,Two-Headed Wolf,form-kiba-inuzuka-two-headed-wolf,COOPERATION_FORM_OR_TECHNIQUE,,,,,,MOVE_TO_COOP,"Fusion/cooperation technique with Akamaru, not a solo persistent hero form.",HIGH
+kidomaru,Curse Mark Level 2,form-kidomaru-curse-mark-level-2,AWAKENING_FORM,,awakening-kidomaru-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kidomaru-base.,HIGH
+kidomaru,Sound Four,form-kidomaru-sound-four,COLLECTIBLE_HERO_VERSION,kidomaru-base,,,,,KEEP_AS_HERO,Base form of proposed hero kidomaru-base.,HIGH
+killer-b,Base,form-killer-b-base,COLLECTIBLE_HERO_VERSION,killer-b-base,,,,,KEEP_AS_HERO,Base form of proposed hero killer-b-base.,HIGH
+killer-b,Eight-Tails Cloak,form-killer-b-eight-tails-cloak,AWAKENING_FORM,,awakening-killer-b-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of killer-b-base.,HIGH
+killer-b,Full Gyuki,form-killer-b-full-gyuki,TEMPORARY_COMBAT_FORM,,,,,temp-killer-b-full-gyuki,MOVE_TO_TEMP_FORM,"Full tailed-beast manifestation is Ultimate-scale, not another persistent hero.",HIGH
+kimimaro,Base,form-kimimaro-base,COLLECTIBLE_HERO_VERSION,kimimaro-base,,,,,KEEP_AS_HERO,Base form of proposed hero kimimaro-base.,HIGH
+kimimaro,Curse Mark Level 2,form-kimimaro-curse-mark-level-2,AWAKENING_FORM,,awakening-kimimaro-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kimimaro-base.,HIGH
+kimimaro,Edo Tensei,form-kimimaro-edo-tensei,COSMETIC_SKIN,,,,skin-kimimaro-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+kin-tsuchi,Bell Genjutsu,form-kin-tsuchi-bell-genjutsu,SKILL_OR_ULTIMATE,,,legacy-kin-tsuchi-bell-genjutsu,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+kin-tsuchi,Sound Genin,form-kin-tsuchi-sound-genin,COLLECTIBLE_HERO_VERSION,kin-tsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kin-tsuchi-core.,HIGH
+kinkaku,Gold Brother,form-kinkaku-gold-brother,COLLECTIBLE_HERO_VERSION,kinkaku-base,,,,,KEEP_AS_HERO,Base form of proposed hero kinkaku-base.,HIGH
+kinkaku,Nine-Tails Cloak,form-kinkaku-nine-tails-cloak,AWAKENING_FORM,,awakening-kinkaku-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kinkaku-base.,HIGH
+kisame-hoshigaki,Akatsuki,form-kisame-hoshigaki-akatsuki,COLLECTIBLE_HERO_VERSION,kisame-akatsuki,,,,,KEEP_AS_HERO,Base form of proposed hero kisame-akatsuki.,HIGH
+kisame-hoshigaki,Samehada Fusion,form-kisame-hoshigaki-samehada-fusion,AWAKENING_FORM,,awakening-kisame-akatsuki,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of kisame-akatsuki.,HIGH
+kitsuchi,Earth Commander,form-kitsuchi-earth-commander,COLLECTIBLE_HERO_VERSION,kitsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kitsuchi-core.,HIGH
+kitsuchi,Mountain Jutsu,form-kitsuchi-mountain-jutsu,SKILL_OR_ULTIMATE,,,legacy-kitsuchi-mountain-jutsu,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+konan,Akatsuki,form-konan-akatsuki,COLLECTIBLE_HERO_VERSION,konan-akatsuki,,,,,KEEP_AS_HERO,Base form of proposed hero konan-akatsuki.,HIGH
+konan,Paper Angel,form-konan-paper-angel,AWAKENING_FORM,,awakening-konan-akatsuki,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of konan-akatsuki.,HIGH
+konohamaru-sarutobi,Academy Prodigy,form-konohamaru-sarutobi-academy-prodigy,COLLECTIBLE_HERO_VERSION,konohamaru-sarutobi-core,,,,,KEEP_AS_HERO,Base form of proposed hero konohamaru-sarutobi-core.,HIGH
+konohamaru-sarutobi,Rasengan Disciple,form-konohamaru-sarutobi-rasengan-disciple,COSMETIC_SKIN,,,,skin-konohamaru-sarutobi-rasengan-disciple,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+kosuke-maruboshi,Eternal Genin,form-kosuke-maruboshi-eternal-genin,COLLECTIBLE_HERO_VERSION,kosuke-maruboshi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kosuke-maruboshi-core.,HIGH
+kosuke-maruboshi,Water Style Veteran,form-kosuke-maruboshi-water-style-veteran,SKILL_OR_ULTIMATE,,,legacy-kosuke-maruboshi-water-style-veteran,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+kotetsu-hagane,Gate Guard,form-kotetsu-hagane-gate-guard,COLLECTIBLE_HERO_VERSION,kotetsu-hagane-core,,,,,KEEP_AS_HERO,Base form of proposed hero kotetsu-hagane-core.,HIGH
+kotetsu-hagane,War Arc,form-kotetsu-hagane-war-arc,COSMETIC_SKIN,,,,skin-kotetsu-hagane-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+kurenai-yuhi,Genjutsu Jonin,form-kurenai-yuhi-genjutsu-jonin,COLLECTIBLE_HERO_VERSION,kurenai-yuhi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kurenai-yuhi-core.,HIGH
+kurenai-yuhi,Team 8 Leader,form-kurenai-yuhi-team-8-leader,COSMETIC_SKIN,,,,skin-kurenai-yuhi-team-8-leader,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+kurotsuchi,Lava Release,form-kurotsuchi-lava-release,COLLECTIBLE_HERO_VERSION,kurotsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kurotsuchi-core.,HIGH
+kurotsuchi,Tsuchikage Guard,form-kurotsuchi-tsuchikage-guard,COSMETIC_SKIN,,,,skin-kurotsuchi-tsuchikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+kushimaru-kuriarare,Nuibari Wielder,form-kushimaru-kuriarare-nuibari-wielder,COLLECTIBLE_HERO_VERSION,kushimaru-kuriarare-core,,,,,KEEP_AS_HERO,Base form of proposed hero kushimaru-kuriarare-core.,HIGH
+kushimaru-kuriarare,Reanimated,form-kushimaru-kuriarare-reanimated,COSMETIC_SKIN,,,,skin-kushimaru-kuriarare-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+mabui,Heavenly Transfer,form-mabui-heavenly-transfer,SKILL_OR_ULTIMATE,,,legacy-mabui-heavenly-transfer,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+mabui,Raikage Secretary,form-mabui-raikage-secretary,COLLECTIBLE_HERO_VERSION,mabui-core,,,,,KEEP_AS_HERO,Base form of proposed hero mabui-core.,HIGH
+madara-uchiha,Edo Tensei,form-madara-uchiha-edo-tensei,COSMETIC_SKIN,,,,skin-madara-uchiha-edo-tensei,,MOVE_TO_SKIN,Edo is not an Awakening; Rinnegan combat identity is represented directly.,HIGH
+madara-uchiha,Eternal Mangekyo,form-madara-uchiha-eternal-mangekyo,COLLECTIBLE_HERO_VERSION,madara-ems,,,,,KEEP_AS_HERO,Base form of proposed hero madara-ems.,HIGH
+madara-uchiha,Rinnegan,form-madara-uchiha-rinnegan,COLLECTIBLE_HERO_VERSION,madara-rinnegan,,,,,KEEP_AS_HERO,Base form of proposed hero madara-rinnegan.,HIGH
+madara-uchiha,Six Paths,form-madara-uchiha-six-paths,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Ten-Tails jinchuriki row already represents the persistent Six Paths transformation.,HIGH
+madara-uchiha,Ten-Tails Jinchuriki,form-madara-uchiha-ten-tails-jinchuriki,AWAKENING_FORM,,awakening-madara-rinnegan,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of madara-rinnegan.,HIGH
+madara-uchiha,Warring States,form-madara-uchiha-warring-states,COSMETIC_SKIN,,,,skin-madara-uchiha-warring-states,,MOVE_TO_SKIN,Era appearance around the EMS identity.,HIGH
+mahiru,Shadow Clone,form-mahiru-shadow-clone,SKILL_OR_ULTIMATE,,,legacy-mahiru-shadow-clone,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+mahiru,Stone Jonin,form-mahiru-stone-jonin,COLLECTIBLE_HERO_VERSION,mahiru-core,,,,,KEEP_AS_HERO,Base form of proposed hero mahiru-core.,HIGH
+maki,Sealing Corps,form-maki-sealing-corps,COLLECTIBLE_HERO_VERSION,maki-core,,,,,KEEP_AS_HERO,Base form of proposed hero maki-core.,HIGH
+maki,War Arc,form-maki-war-arc,COSMETIC_SKIN,,,,skin-maki-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+manda,Great Snake,form-manda-great-snake,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+manda,Orochimaru Summon,form-manda-orochimaru-summon,SKILL_OR_ULTIMATE,,,legacy-manda-orochimaru-summon,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
+mangetsu-hozuki,Reanimated,form-mangetsu-hozuki-reanimated,COSMETIC_SKIN,,,,skin-mangetsu-hozuki-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+mangetsu-hozuki,Seven Swordsman,form-mangetsu-hozuki-seven-swordsman,COLLECTIBLE_HERO_VERSION,mangetsu-hozuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero mangetsu-hozuki-core.,HIGH
+matsuri,Gaara Disciple,form-matsuri-gaara-disciple,COLLECTIBLE_HERO_VERSION,matsuri-core,,,,,KEEP_AS_HERO,Base form of proposed hero matsuri-core.,HIGH
+matsuri,Sand Chunin,form-matsuri-sand-chunin,COSMETIC_SKIN,,,,skin-matsuri-sand-chunin,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+meizu,Chain Gauntlet,form-meizu-chain-gauntlet,SKILL_OR_ULTIMATE,,,legacy-meizu-chain-gauntlet,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+meizu,Demon Brothers,form-meizu-demon-brothers,COLLECTIBLE_HERO_VERSION,meizu-core,,,,,KEEP_AS_HERO,Base form of proposed hero meizu-core.,HIGH
+menma-uzumaki,Masked Menma,form-menma-uzumaki-masked-menma,COLLECTIBLE_HERO_VERSION,menma-base,,,,,KEEP_AS_HERO,Base form of proposed hero menma-base.,HIGH
+menma-uzumaki,Nine-Tails Menma,form-menma-uzumaki-nine-tails-menma,AWAKENING_FORM,,awakening-menma-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of menma-base.,HIGH
+midare,Rain Genin,form-midare-rain-genin,COLLECTIBLE_HERO_VERSION,midare-core,,,,,KEEP_AS_HERO,Base form of proposed hero midare-core.,HIGH
+midare,Umbrella Barrage,form-midare-umbrella-barrage,SKILL_OR_ULTIMATE,,,legacy-midare-umbrella-barrage,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+mifune,Iaido Master,form-mifune-iaido-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+mifune,Samurai General,form-mifune-samurai-general,COLLECTIBLE_HERO_VERSION,mifune-core,,,,,KEEP_AS_HERO,Base form of proposed hero mifune-core.,HIGH
+might-duy,Eight Gates,form-might-duy-eight-gates,AWAKENING_FORM,,awakening-might-duy-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of might-duy-base.,HIGH
+might-duy,Eternal Genin,form-might-duy-eternal-genin,COLLECTIBLE_HERO_VERSION,might-duy-base,,,,,KEEP_AS_HERO,Base form of proposed hero might-duy-base.,HIGH
+might-guy,Base,form-might-guy-base,COLLECTIBLE_HERO_VERSION,might-guy-base,,,,,KEEP_AS_HERO,Base form of proposed hero might-guy-base.,HIGH
+might-guy,Eighth Gate,form-might-guy-eighth-gate,AWAKENING_FORM,,awakening-might-guy-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of might-guy-base.,HIGH
+might-guy,Seventh Gate,form-might-guy-seventh-gate,TEMPORARY_COMBAT_FORM,,,,,temp-might-guy-seventh-gate,MOVE_TO_TEMP_FORM,Lower Gate reserved for skill/passive state.,HIGH
+might-guy,Sixth Gate,form-might-guy-sixth-gate,TEMPORARY_COMBAT_FORM,,,,,temp-might-guy-sixth-gate,MOVE_TO_TEMP_FORM,Lower Gate reserved for skill/passive state.,HIGH
+minato-namikaze,Edo Tensei,form-minato-namikaze-edo-tensei,COLLECTIBLE_HERO_VERSION,minato-edo,,,,,KEEP_AS_HERO,Base form of proposed hero minato-edo.,HIGH
+minato-namikaze,Fourth Hokage,form-minato-namikaze-fourth-hokage,COSMETIC_SKIN,,,,skin-minato-namikaze-fourth-hokage,,MOVE_TO_SKIN,Rank/title does not by itself create a new combat form.,HIGH
+minato-namikaze,Jonin,form-minato-namikaze-jonin,COLLECTIBLE_HERO_VERSION,minato-jonin,,,,,KEEP_AS_HERO,Base form of proposed hero minato-jonin.,HIGH
+minato-namikaze,KCM,form-minato-namikaze-kcm,AWAKENING_FORM,,awakening-minato-edo,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of minato-edo.,HIGH
+misumi-tsurugi,Kabuto Squad,form-misumi-tsurugi-kabuto-squad,COSMETIC_SKIN,,,,skin-misumi-tsurugi-kabuto-squad,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+misumi-tsurugi,Soft Physique,form-misumi-tsurugi-soft-physique,COLLECTIBLE_HERO_VERSION,misumi-tsurugi-core,,,,,KEEP_AS_HERO,Base form of proposed hero misumi-tsurugi-core.,HIGH
+mito-uzumaki,First Jinchuriki,form-mito-uzumaki-first-jinchuriki,COLLECTIBLE_HERO_VERSION,mito-uzumaki-core,,,,,KEEP_AS_HERO,Base form of proposed hero mito-uzumaki-core.,HIGH
+mito-uzumaki,Uzumaki Seal Master,form-mito-uzumaki-uzumaki-seal-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+mizuki,Academy Instructor,form-mizuki-academy-instructor,COLLECTIBLE_HERO_VERSION,mizuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero mizuki-core.,HIGH
+mizuki,Cursed Power,form-mizuki-cursed-power,AWAKENING_FORM,,awakening-mizuki-core,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of mizuki-core.,HIGH
+moegi-kazamatsuri,Academy Squad,form-moegi-kazamatsuri-academy-squad,COLLECTIBLE_HERO_VERSION,moegi-kazamatsuri-core,,,,,KEEP_AS_HERO,Base form of proposed hero moegi-kazamatsuri-core.,HIGH
+moegi-kazamatsuri,Chunin Leader,form-moegi-kazamatsuri-chunin-leader,COSMETIC_SKIN,,,,skin-moegi-kazamatsuri-chunin-leader,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+motoi,Cloud Jonin,form-motoi-cloud-jonin,COLLECTIBLE_HERO_VERSION,motoi-core,,,,,KEEP_AS_HERO,Base form of proposed hero motoi-core.,HIGH
+motoi,Jinchuriki Handler,form-motoi-jinchuriki-handler,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+mu,Edo Tensei,form-mu-edo-tensei,COSMETIC_SKIN,,,,skin-mu-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+mu,Second Tsuchikage,form-mu-second-tsuchikage,COLLECTIBLE_HERO_VERSION,mu-core,,,,,KEEP_AS_HERO,Base form of proposed hero mu-core.,HIGH
+mubi,Earth Ambush,form-mubi-earth-ambush,SKILL_OR_ULTIMATE,,,legacy-mubi-earth-ambush,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+mubi,Rain Genin,form-mubi-rain-genin,COLLECTIBLE_HERO_VERSION,mubi-core,,,,,KEEP_AS_HERO,Base form of proposed hero mubi-core.,HIGH
+mukade,Ryumyaku Empowered,form-mukade-ryumyaku-empowered,AWAKENING_FORM,,awakening-mukade-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of mukade-base.,HIGH
+mukade,Suna Missing Nin,form-mukade-suna-missing-nin,COLLECTIBLE_HERO_VERSION,mukade-base,,,,,KEEP_AS_HERO,Base form of proposed hero mukade-base.,HIGH
+nagato,Edo Tensei,form-nagato-edo-tensei,COSMETIC_SKIN,,,,skin-nagato-edo-tensei,,MOVE_TO_SKIN,Reanimation is not a normal Awakening.,HIGH
+nagato,Pain Controller,form-nagato-pain-controller,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+nagato,Young,form-nagato-young,COLLECTIBLE_HERO_VERSION,nagato-core,,,,,KEEP_AS_HERO,Base form of proposed hero nagato-core.,HIGH
+naruto-uzumaki,Academy,form-naruto-uzumaki-academy,COSMETIC_SKIN,,,,skin-naruto-uzumaki-academy,,MOVE_TO_SKIN,Early appearance; insufficient standalone combat identity.,HIGH
+naruto-uzumaki,Bijuu Mode,form-naruto-uzumaki-bijuu-mode,TEMPORARY_COMBAT_FORM,,,,,temp-naruto-uzumaki-bijuu-mode,MOVE_TO_TEMP_FORM,Large avatar manifestation is better used by Ultimate/Awakening skill presentation.,HIGH
+naruto-uzumaki,Four-Tails Cloak,form-naruto-uzumaki-four-tails-cloak,TEMPORARY_COMBAT_FORM,,,,,temp-naruto-uzumaki-four-tails-cloak,MOVE_TO_TEMP_FORM,Berserk temporary state; not a second persistent Awakening.,HIGH
+naruto-uzumaki,Genin,form-naruto-uzumaki-genin,COLLECTIBLE_HERO_VERSION,naruto-genin,,,,,KEEP_AS_HERO,Base form of proposed hero naruto-genin.,HIGH
+naruto-uzumaki,Hokage,form-naruto-uzumaki-hokage,COLLECTIBLE_HERO_VERSION,naruto-hokage,,,,,KEEP_AS_HERO,Base form of proposed hero naruto-hokage.,HIGH
+naruto-uzumaki,KCM1,form-naruto-uzumaki-kcm1,TEMPORARY_COMBAT_FORM,,,,,temp-naruto-uzumaki-kcm1,MOVE_TO_TEMP_FORM,Intermediate Kurama state reserved inside Sage-era progression/skill visuals.,HIGH
+naruto-uzumaki,KCM2,form-naruto-uzumaki-kcm2,AWAKENING_FORM,,awakening-naruto-sage,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of naruto-sage.,HIGH
+naruto-uzumaki,One-Tail Cloak,form-naruto-uzumaki-one-tail-cloak,AWAKENING_FORM,,awakening-naruto-genin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of naruto-genin.,HIGH
+naruto-uzumaki,Sage Mode,form-naruto-uzumaki-sage-mode,COLLECTIBLE_HERO_VERSION,naruto-sage,,,,,KEEP_AS_HERO,Base form of proposed hero naruto-sage.,HIGH
+naruto-uzumaki,Six Paths Sage Mode,form-naruto-uzumaki-six-paths-sage-mode,COLLECTIBLE_HERO_VERSION,naruto-six-paths,,,,,KEEP_AS_HERO,Base form of proposed hero naruto-six-paths.,HIGH
+neji-hyuga,Genin,form-neji-hyuga-genin,COLLECTIBLE_HERO_VERSION,neji-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero neji-hyuga-core.,HIGH
+neji-hyuga,Shippuden,form-neji-hyuga-shippuden,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+nono-yakushi,Orphanage Director,form-nono-yakushi-orphanage-director,COLLECTIBLE_HERO_VERSION,nono-yakushi-core,,,,,KEEP_AS_HERO,Base form of proposed hero nono-yakushi-core.,HIGH
+nono-yakushi,Root Spy,form-nono-yakushi-root-spy,COSMETIC_SKIN,,,,skin-nono-yakushi-root-spy,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+obito-uchiha,Mangekyo,form-obito-uchiha-mangekyo,AWAKENING_FORM,,awakening-obito-young,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of obito-young.,HIGH
+obito-uchiha,Masked Man,form-obito-uchiha-masked-man,COLLECTIBLE_HERO_VERSION,obito-masked,,,,,KEEP_AS_HERO,Base form of proposed hero obito-masked.,HIGH
+obito-uchiha,Ten-Tails Jinchuriki,form-obito-uchiha-ten-tails-jinchuriki,AWAKENING_FORM,,awakening-obito-white-mask,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of obito-white-mask.,HIGH
+obito-uchiha,Tobi,form-obito-uchiha-tobi,COSMETIC_SKIN,,,,skin-obito-uchiha-tobi,,MOVE_TO_SKIN,"Alias/costume presentation of the masked identity, not a separate kit.",HIGH
+obito-uchiha,White Mask,form-obito-uchiha-white-mask,COLLECTIBLE_HERO_VERSION,obito-white-mask,,,,,KEEP_AS_HERO,Base form of proposed hero obito-white-mask.,HIGH
+obito-uchiha,Young,form-obito-uchiha-young,COLLECTIBLE_HERO_VERSION,obito-young,,,,,KEEP_AS_HERO,Base form of proposed hero obito-young.,HIGH
+oboro,Clone Ambush,form-oboro-clone-ambush,SKILL_OR_ULTIMATE,,,legacy-oboro-clone-ambush,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+oboro,Rain Genin,form-oboro-rain-genin,COLLECTIBLE_HERO_VERSION,oboro-core,,,,,KEEP_AS_HERO,Base form of proposed hero oboro-core.,HIGH
+okisuke,Samurai Captain,form-okisuke-samurai-captain,COLLECTIBLE_HERO_VERSION,okisuke-core,,,,,KEEP_AS_HERO,Base form of proposed hero okisuke-core.,HIGH
+okisuke,War Arc,form-okisuke-war-arc,COSMETIC_SKIN,,,,skin-okisuke-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+omoi,Cloud Swordsman,form-omoi-cloud-swordsman,COLLECTIBLE_HERO_VERSION,omoi-core,,,,,KEEP_AS_HERO,Base form of proposed hero omoi-core.,HIGH
+omoi,War Arc,form-omoi-war-arc,COSMETIC_SKIN,,,,skin-omoi-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+onoki,Particle Style,form-onoki-particle-style,SKILL_OR_ULTIMATE,,,legacy-onoki-particle-style,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+onoki,Tsuchikage,form-onoki-tsuchikage,COLLECTIBLE_HERO_VERSION,onoki-core,,,,,KEEP_AS_HERO,Base form of proposed hero onoki-core.,HIGH
+orochimaru,Akatsuki Era,form-orochimaru-akatsuki-era,COSMETIC_SKIN,,,,skin-orochimaru-akatsuki-era,,MOVE_TO_SKIN,Era/costume variation.,HIGH
+orochimaru,Sannin,form-orochimaru-sannin,COLLECTIBLE_HERO_VERSION,orochimaru-sannin,,,,,KEEP_AS_HERO,Base form of proposed hero orochimaru-sannin.,HIGH
+orochimaru,Shippuden,form-orochimaru-shippuden,COSMETIC_SKIN,,,,skin-orochimaru-shippuden,,MOVE_TO_SKIN,Era label of Sannin identity.,HIGH
+orochimaru,White Snake,form-orochimaru-white-snake,AWAKENING_FORM,,awakening-orochimaru-sannin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of orochimaru-sannin.,HIGH
+pakura,Reanimated,form-pakura-reanimated,COSMETIC_SKIN,,,,skin-pakura-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+pakura,Scorch Release,form-pakura-scorch-release,COLLECTIBLE_HERO_VERSION,pakura-core,,,,,KEEP_AS_HERO,Base form of proposed hero pakura-core.,HIGH
+raido-namiashi,Fourth Hokage Guard,form-raido-namiashi-fourth-hokage-guard,COSMETIC_SKIN,,,,skin-raido-namiashi-fourth-hokage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+raido-namiashi,Special Jonin,form-raido-namiashi-special-jonin,COLLECTIBLE_HERO_VERSION,raido-namiashi-core,,,,,KEEP_AS_HERO,Base form of proposed hero raido-namiashi-core.,HIGH
+raiga-kurosuki,Kiba Wielder,form-raiga-kurosuki-kiba-wielder,COLLECTIBLE_HERO_VERSION,raiga-kurosuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero raiga-kurosuki-core.,HIGH
+raiga-kurosuki,Lightning Burial,form-raiga-kurosuki-lightning-burial,SKILL_OR_ULTIMATE,,,legacy-raiga-kurosuki-lightning-burial,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+rasa,Edo Tensei,form-rasa-edo-tensei,COSMETIC_SKIN,,,,skin-rasa-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+rasa,Fourth Kazekage,form-rasa-fourth-kazekage,COLLECTIBLE_HERO_VERSION,rasa-core,,,,,KEEP_AS_HERO,Base form of proposed hero rasa-core.,HIGH
+rin-nohara,Team Minato,form-rin-nohara-team-minato,COLLECTIBLE_HERO_VERSION,rin-nohara-core,,,,,KEEP_AS_HERO,Base form of proposed hero rin-nohara-core.,HIGH
+rin-nohara,Three-Tails Vessel,form-rin-nohara-three-tails-vessel,TEMPORARY_COMBAT_FORM,,,,,temp-rin-nohara-three-tails-vessel,MOVE_TO_TEMP_FORM,Rin was a vessel; no controlled persistent combat transformation is fabricated.,HIGH
+rock-lee,Fifth Gate,form-rock-lee-fifth-gate,AWAKENING_FORM,,awakening-rock-lee-genin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of rock-lee-genin.,HIGH
+rock-lee,Genin,form-rock-lee-genin,COLLECTIBLE_HERO_VERSION,rock-lee-genin,,,,,KEEP_AS_HERO,Base form of proposed hero rock-lee-genin.,HIGH
+rock-lee,Shippuden,form-rock-lee-shippuden,COLLECTIBLE_HERO_VERSION,rock-lee-shippuden,,,,,KEEP_AS_HERO,Base form of proposed hero rock-lee-shippuden.,HIGH
+rock-lee,Sixth Gate,form-rock-lee-sixth-gate,AWAKENING_FORM,,awakening-rock-lee-shippuden,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of rock-lee-shippuden.,HIGH
+roshi,Base,form-roshi-base,COLLECTIBLE_HERO_VERSION,roshi-base,,,,,KEEP_AS_HERO,Base form of proposed hero roshi-base.,HIGH
+roshi,Four-Tails Cloak,form-roshi-four-tails-cloak,AWAKENING_FORM,,awakening-roshi-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of roshi-base.,HIGH
+sai,Root Operative,form-sai-root-operative,COLLECTIBLE_HERO_VERSION,sai-core,,,,,KEEP_AS_HERO,Base form of proposed hero sai-core.,HIGH
+sai,Team 7,form-sai-team-7,COSMETIC_SKIN,,,,skin-sai-team-7,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+sakon,Curse Mark Level 2,form-sakon-curse-mark-level-2,AWAKENING_FORM,,awakening-sakon-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sakon-base.,HIGH
+sakon,Sound Four,form-sakon-sound-four,COLLECTIBLE_HERO_VERSION,sakon-base,,,,,KEEP_AS_HERO,Base form of proposed hero sakon-base.,HIGH
+sakumo-hatake,Prime,form-sakumo-hatake-prime,COSMETIC_SKIN,,,,skin-sakumo-hatake-prime,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+sakumo-hatake,White Fang,form-sakumo-hatake-white-fang,COLLECTIBLE_HERO_VERSION,sakumo-hatake-core,,,,,KEEP_AS_HERO,Base form of proposed hero sakumo-hatake-core.,HIGH
+sakura-haruno,Byakugo,form-sakura-haruno-byakugo,AWAKENING_FORM,,awakening-sakura-shippuden,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sakura-shippuden.,HIGH
+sakura-haruno,Genin,form-sakura-haruno-genin,COLLECTIBLE_HERO_VERSION,sakura-genin,,,,,KEEP_AS_HERO,Base form of proposed hero sakura-genin.,HIGH
+sakura-haruno,Shippuden,form-sakura-haruno-shippuden,COLLECTIBLE_HERO_VERSION,sakura-shippuden,,,,,KEEP_AS_HERO,Base form of proposed hero sakura-shippuden.,HIGH
+samui,Cloud Jonin,form-samui-cloud-jonin,COLLECTIBLE_HERO_VERSION,samui-core,,,,,KEEP_AS_HERO,Base form of proposed hero samui-core.,HIGH
+samui,War Arc,form-samui-war-arc,COSMETIC_SKIN,,,,skin-samui-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+sari,Kazekage Guard,form-sari-kazekage-guard,COSMETIC_SKIN,,,,skin-sari-kazekage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+sari,Sand Kunoichi,form-sari-sand-kunoichi,COLLECTIBLE_HERO_VERSION,sari-core,,,,,KEEP_AS_HERO,Base form of proposed hero sari-core.,HIGH
+sasori,Edo Tensei,form-sasori-edo-tensei,COSMETIC_SKIN,,,,skin-sasori-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
+sasori,Hiruko Puppet,form-sasori-hiruko-puppet,COLLECTIBLE_HERO_VERSION,sasori-hiruko,,,,,KEEP_AS_HERO,Base form of proposed hero sasori-hiruko.,HIGH
+sasori,Hundred Puppets,form-sasori-hundred-puppets,SKILL_OR_ULTIMATE,,,legacy-sasori-hundred-puppets,,,MOVE_TO_ULTIMATE,Technique/army manifestation rather than persistent form.,HIGH
+sasori,True Body,form-sasori-true-body,AWAKENING_FORM,,awakening-sasori-hiruko,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sasori-hiruko.,HIGH
+sasuke-uchiha,Adult,form-sasuke-uchiha-adult,COLLECTIBLE_HERO_VERSION,sasuke-adult,,,,,KEEP_AS_HERO,Base form of proposed hero sasuke-adult.,HIGH
+sasuke-uchiha,Curse Mark Level 2,form-sasuke-uchiha-curse-mark-level-2,AWAKENING_FORM,,awakening-sasuke-genin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sasuke-genin.,HIGH
+sasuke-uchiha,Eternal Mangekyo Sharingan,form-sasuke-uchiha-eternal-mangekyo-sharingan,COLLECTIBLE_HERO_VERSION,sasuke-ems,,,,,KEEP_AS_HERO,Base form of proposed hero sasuke-ems.,HIGH
+sasuke-uchiha,Genin,form-sasuke-uchiha-genin,COLLECTIBLE_HERO_VERSION,sasuke-genin,,,,,KEEP_AS_HERO,Base form of proposed hero sasuke-genin.,HIGH
+sasuke-uchiha,Hebi,form-sasuke-uchiha-hebi,COLLECTIBLE_HERO_VERSION,sasuke-hebi,,,,,KEEP_AS_HERO,Base form of proposed hero sasuke-hebi.,HIGH
+sasuke-uchiha,Mangekyo Sharingan,form-sasuke-uchiha-mangekyo-sharingan,AWAKENING_FORM,,awakening-sasuke-hebi,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sasuke-hebi.,HIGH
+sasuke-uchiha,Rinnegan,form-sasuke-uchiha-rinnegan,AWAKENING_FORM,,awakening-sasuke-ems,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sasuke-ems.,HIGH
+sasuke-uchiha,Six Paths,form-sasuke-uchiha-six-paths,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,"Six Paths power is represented by the Rinnegan hero/Awakening identity, not a duplicate summonable form.",HIGH
+second-raikage,Prime,form-second-raikage-prime,COSMETIC_SKIN,,,,skin-second-raikage-prime,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+second-raikage,Second Raikage,form-second-raikage-second-raikage,COLLECTIBLE_HERO_VERSION,second-raikage-core,,,,,KEEP_AS_HERO,Base form of proposed hero second-raikage-core.,HIGH
+shigure,Rain Genin,form-shigure-rain-genin,COLLECTIBLE_HERO_VERSION,shigure-core,,,,,KEEP_AS_HERO,Base form of proposed hero shigure-core.,HIGH
+shigure,Umbrella Needles,form-shigure-umbrella-needles,SKILL_OR_ULTIMATE,,,legacy-shigure-umbrella-needles,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+shikaku-nara,Allied Strategy Chief,form-shikaku-nara-allied-strategy-chief,COSMETIC_SKIN,,,,skin-shikaku-nara-allied-strategy-chief,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+shikaku-nara,Clan Head,form-shikaku-nara-clan-head,COLLECTIBLE_HERO_VERSION,shikaku-nara-core,,,,,KEEP_AS_HERO,Base form of proposed hero shikaku-nara-core.,HIGH
+shikamaru-nara,Chunin,form-shikamaru-nara-chunin,COSMETIC_SKIN,,,,skin-shikamaru-nara-chunin,,MOVE_TO_SKIN,Rank change alone is not a transformation.,HIGH
+shikamaru-nara,Genin,form-shikamaru-nara-genin,COLLECTIBLE_HERO_VERSION,shikamaru-nara-core,,,,,KEEP_AS_HERO,Base form of proposed hero shikamaru-nara-core.,HIGH
+shikamaru-nara,Shippuden,form-shikamaru-nara-shippuden,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+shikamaru-nara,War Arc,form-shikamaru-nara-war-arc,COSMETIC_SKIN,,,,skin-shikamaru-nara-war-arc,,MOVE_TO_SKIN,Era appearance; Shippuden hero retains the kit.,HIGH
+shima,Genjutsu Chorus,form-shima-genjutsu-chorus,COOPERATION_FORM_OR_TECHNIQUE,,,,,,MOVE_TO_COOP,Cooperation technique with Fukasaku.,HIGH
+shima,Toad Sage,form-shima-toad-sage,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
+shinno,Doctor,form-shinno-doctor,COLLECTIBLE_HERO_VERSION,shinno-base,,,,,KEEP_AS_HERO,Base form of proposed hero shinno-base.,HIGH
+shinno,Eight Gates Body,form-shinno-eight-gates-body,AWAKENING_FORM,,awakening-shinno-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of shinno-base.,HIGH
+shino-aburame,Chunin Exams,form-shino-aburame-chunin-exams,COLLECTIBLE_HERO_VERSION,shino-aburame-core,,,,,KEEP_AS_HERO,Base form of proposed hero shino-aburame-core.,HIGH
+shino-aburame,Insect Master,form-shino-aburame-insect-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+shisui-uchiha,ANBU,form-shisui-uchiha-anbu,COLLECTIBLE_HERO_VERSION,shisui-anbu,,,,,KEEP_AS_HERO,Base form of proposed hero shisui-anbu.,HIGH
+shisui-uchiha,Mangekyo Sharingan,form-shisui-uchiha-mangekyo-sharingan,AWAKENING_FORM,,awakening-shisui-anbu,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of shisui-anbu.,HIGH
+shizune,Medical Corps,form-shizune-medical-corps,COSMETIC_SKIN,,,,skin-shizune-medical-corps,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+shizune,Sannin Attendant,form-shizune-sannin-attendant,COLLECTIBLE_HERO_VERSION,shizune-core,,,,,KEEP_AS_HERO,Base form of proposed hero shizune-core.,HIGH
+sora,Pseudo Jinchuriki,form-sora-pseudo-jinchuriki,AWAKENING_FORM,,awakening-sora-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of sora-base.,HIGH
+sora,Temple Monk,form-sora-temple-monk,COLLECTIBLE_HERO_VERSION,sora-base,,,,,KEEP_AS_HERO,Base form of proposed hero sora-base.,HIGH
+suigetsu-hozuki,Hebi,form-suigetsu-hozuki-hebi,COLLECTIBLE_HERO_VERSION,suigetsu-hozuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero suigetsu-hozuki-core.,HIGH
+suigetsu-hozuki,Taka,form-suigetsu-hozuki-taka,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+taiseki,Camouflage,form-taiseki-camouflage,SKILL_OR_ULTIMATE,,,legacy-taiseki-camouflage,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+taiseki,Stone Jonin,form-taiseki-stone-jonin,COLLECTIBLE_HERO_VERSION,taiseki-core,,,,,KEEP_AS_HERO,Base form of proposed hero taiseki-core.,HIGH
+tayuya,Curse Mark Level 2,form-tayuya-curse-mark-level-2,AWAKENING_FORM,,awakening-tayuya-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of tayuya-base.,HIGH
+tayuya,Sound Four,form-tayuya-sound-four,COLLECTIBLE_HERO_VERSION,tayuya-base,,,,,KEEP_AS_HERO,Base form of proposed hero tayuya-base.,HIGH
+temari,Chunin Exams,form-temari-chunin-exams,COLLECTIBLE_HERO_VERSION,temari-core,,,,,KEEP_AS_HERO,Base form of proposed hero temari-core.,HIGH
+temari,War Fan Master,form-temari-war-fan-master,COSMETIC_SKIN,,,,skin-temari-war-fan-master,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+tenten,Bashosen Wielder,form-tenten-bashosen-wielder,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+tenten,Chunin Exams,form-tenten-chunin-exams,COLLECTIBLE_HERO_VERSION,tenten-core,,,,,KEEP_AS_HERO,Base form of proposed hero tenten-core.,HIGH
+third-raikage,Edo Tensei,form-third-raikage-edo-tensei,COSMETIC_SKIN,,,,skin-third-raikage-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+third-raikage,Third Raikage,form-third-raikage-third-raikage,COLLECTIBLE_HERO_VERSION,third-raikage-core,,,,,KEEP_AS_HERO,Base form of proposed hero third-raikage-core.,HIGH
+tobirama-senju,Edo Tensei,form-tobirama-senju-edo-tensei,COSMETIC_SKIN,,,,skin-tobirama-senju-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
+tobirama-senju,Second Hokage,form-tobirama-senju-second-hokage,COLLECTIBLE_HERO_VERSION,tobirama-hokage,,,,,KEEP_AS_HERO,Base form of proposed hero tobirama-hokage.,HIGH
+toneri-otsutsuki,Base,form-toneri-otsutsuki-base,COLLECTIBLE_HERO_VERSION,toneri-base,,,,,KEEP_AS_HERO,Base form of proposed hero toneri-base.,HIGH
+toneri-otsutsuki,Tenseigan Chakra Mode,form-toneri-otsutsuki-tenseigan-chakra-mode,AWAKENING_FORM,,awakening-toneri-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of toneri-base.,HIGH
+torifu-akimichi,Akimichi Veteran,form-torifu-akimichi-akimichi-veteran,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+torifu-akimichi,Tobirama Guard,form-torifu-akimichi-tobirama-guard,COLLECTIBLE_HERO_VERSION,torifu-akimichi-core,,,,,KEEP_AS_HERO,Base form of proposed hero torifu-akimichi-core.,HIGH
+toroi,Magnet Release,form-toroi-magnet-release,COLLECTIBLE_HERO_VERSION,toroi-core,,,,,KEEP_AS_HERO,Base form of proposed hero toroi-core.,HIGH
+toroi,Reanimated,form-toroi-reanimated,COSMETIC_SKIN,,,,skin-toroi-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+torune-aburame,Nano Insects,form-torune-aburame-nano-insects,SKILL_OR_ULTIMATE,,,legacy-torune-aburame-nano-insects,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+torune-aburame,Root Operative,form-torune-aburame-root-operative,COLLECTIBLE_HERO_VERSION,torune-aburame-core,,,,,KEEP_AS_HERO,Base form of proposed hero torune-aburame-core.,HIGH
+udon-ise,Academy Squad,form-udon-ise-academy-squad,COLLECTIBLE_HERO_VERSION,udon-ise-core,,,,,KEEP_AS_HERO,Base form of proposed hero udon-ise-core.,HIGH
+udon-ise,Tactical Chunin,form-udon-ise-tactical-chunin,COSMETIC_SKIN,,,,skin-udon-ise-tactical-chunin,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+ukon,Curse Mark Level 2,form-ukon-curse-mark-level-2,AWAKENING_FORM,,awakening-ukon-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of ukon-base.,HIGH
+ukon,Sound Four,form-ukon-sound-four,COLLECTIBLE_HERO_VERSION,ukon-base,,,,,KEEP_AS_HERO,Base form of proposed hero ukon-base.,HIGH
+utakata,Base,form-utakata-base,COLLECTIBLE_HERO_VERSION,utakata-base,,,,,KEEP_AS_HERO,Base form of proposed hero utakata-base.,HIGH
+utakata,Six-Tails Cloak,form-utakata-six-tails-cloak,AWAKENING_FORM,,awakening-utakata-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of utakata-base.,HIGH
+white-zetsu,Akatsuki Scout,form-white-zetsu-akatsuki-scout,COLLECTIBLE_HERO_VERSION,white-zetsu-core,,,,,KEEP_AS_HERO,Base form of proposed hero white-zetsu-core.,HIGH
+white-zetsu,Spore Clone,form-white-zetsu-spore-clone,SKILL_OR_ULTIMATE,,,legacy-white-zetsu-spore-clone,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+yagura-karatachi,Mizukage,form-yagura-karatachi-mizukage,COLLECTIBLE_HERO_VERSION,yagura-base,,,,,KEEP_AS_HERO,Base form of proposed hero yagura-base.,HIGH
+yagura-karatachi,Three-Tails Cloak,form-yagura-karatachi-three-tails-cloak,AWAKENING_FORM,,awakening-yagura-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of yagura-base.,HIGH
+yahiko,Akatsuki Founder,form-yahiko-akatsuki-founder,COLLECTIBLE_HERO_VERSION,yahiko-core,,,,,KEEP_AS_HERO,Base form of proposed hero yahiko-core.,HIGH
+yahiko,Amegakure Leader,form-yahiko-amegakure-leader,COSMETIC_SKIN,,,,skin-yahiko-amegakure-leader,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+yamato,ANBU Wood Style,form-yamato-anbu-wood-style,COLLECTIBLE_HERO_VERSION,yamato-core,,,,,KEEP_AS_HERO,Base form of proposed hero yamato-core.,HIGH
+yamato,Team Captain,form-yamato-team-captain,COSMETIC_SKIN,,,,skin-yamato-team-captain,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+yashamaru,Assassin,form-yashamaru-assassin,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+yashamaru,Sand Medic,form-yashamaru-sand-medic,COLLECTIBLE_HERO_VERSION,yashamaru-core,,,,,KEEP_AS_HERO,Base form of proposed hero yashamaru-core.,HIGH
+yoroi-akado,Chakra Absorption,form-yoroi-akado-chakra-absorption,COLLECTIBLE_HERO_VERSION,yoroi-akado-core,,,,,KEEP_AS_HERO,Base form of proposed hero yoroi-akado-core.,HIGH
+yoroi-akado,Kabuto Squad,form-yoroi-akado-kabuto-squad,COSMETIC_SKIN,,,,skin-yoroi-akado-kabuto-squad,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
+yugao-uzuki,ANBU,form-yugao-uzuki-anbu,COLLECTIBLE_HERO_VERSION,yugao-uzuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero yugao-uzuki-core.,HIGH
+yugao-uzuki,Crescent Moon Blade,form-yugao-uzuki-crescent-moon-blade,SKILL_OR_ULTIMATE,,,legacy-yugao-uzuki-crescent-moon-blade,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+yugito-nii,Base,form-yugito-nii-base,COLLECTIBLE_HERO_VERSION,yugito-base,,,,,KEEP_AS_HERO,Base form of proposed hero yugito-base.,HIGH
+yugito-nii,Two-Tails Cloak,form-yugito-nii-two-tails-cloak,AWAKENING_FORM,,awakening-yugito-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of yugito-base.,HIGH
+zabuza-momochi,Base,form-zabuza-momochi-base,COLLECTIBLE_HERO_VERSION,zabuza-momochi-core,,,,,KEEP_AS_HERO,Base form of proposed hero zabuza-momochi-core.,HIGH
+zabuza-momochi,Edo Tensei,form-zabuza-momochi-edo-tensei,COSMETIC_SKIN,,,,skin-zabuza-momochi-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
+zaku-abumi,Air Pressure Arms,form-zaku-abumi-air-pressure-arms,SKILL_OR_ULTIMATE,,,legacy-zaku-abumi-air-pressure-arms,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
+zaku-abumi,Sound Genin,form-zaku-abumi-sound-genin,COLLECTIBLE_HERO_VERSION,zaku-abumi-core,,,,,KEEP_AS_HERO,Base form of proposed hero zaku-abumi-core.,HIGH
