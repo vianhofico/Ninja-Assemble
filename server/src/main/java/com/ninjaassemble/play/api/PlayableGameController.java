@@ -3,6 +3,7 @@ package com.ninjaassemble.play.api;
 import com.ninjaassemble.campaign.application.CampaignStageFlowService;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
+import com.ninjaassemble.inventory.application.InventoryService;
 import com.ninjaassemble.play.application.FormationService;
 import com.ninjaassemble.play.application.HeroUpgradeService;
 import com.ninjaassemble.play.application.PlayableBattleService;
@@ -26,17 +27,19 @@ public class PlayableGameController {
     private final FormationService formations;
     private final PlayableBattleService battles;
     private final CampaignStageFlowService campaign;
+    private final InventoryService inventory;
     private final SummonApplicationService summons;
     private final HeroUpgradeService upgrades;
 
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
-                                  PlayableBattleService battles, CampaignStageFlowService campaign,
+                                  PlayableBattleService battles, CampaignStageFlowService campaign, InventoryService inventory,
                                   SummonApplicationService summons, HeroUpgradeService upgrades) {
         this.bootstrap = bootstrap;
         this.ownership = ownership;
         this.formations = formations;
         this.battles = battles;
         this.campaign = campaign;
+        this.inventory = inventory;
         this.summons = summons;
         this.upgrades = upgrades;
     }
@@ -62,6 +65,9 @@ public class PlayableGameController {
     public PlayableBattleService.PlayBattleResult campaignBattle(@PathVariable UUID playerId, @PathVariable String stageId) {
         return battles.play(playerId, stageId);
     }
+
+    @GetMapping("/inventory")
+    public InventoryService.InventoryView inventory(@PathVariable UUID playerId) { return inventory.view(playerId); }
 
     @PostMapping("/battle")
     public PlayableBattleService.PlayBattleResult battle(@PathVariable UUID playerId) { return battles.play(playerId); }

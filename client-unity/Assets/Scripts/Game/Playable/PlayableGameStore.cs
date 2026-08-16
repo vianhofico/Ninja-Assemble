@@ -12,6 +12,7 @@ namespace NinjaAssemble.Playable
         public OwnedHeroDto[] Heroes { get; private set; } = Array.Empty<OwnedHeroDto>();
         public FormationDto Formation { get; private set; }
         public CampaignStageListDto Campaign { get; private set; }
+        public InventoryViewDto Inventory { get; private set; }
         public long Gold { get; private set; }
         public long Diamond { get; private set; }
         public int Energy { get; private set; }
@@ -39,7 +40,7 @@ namespace NinjaAssemble.Playable
             Energy = bootstrap.energy;
             if (Heroes.Length >= 5)
                 Formation = await api.SaveFormationAsync(PlayerId, Heroes.Take(5).Select(h => h.id).ToArray());
-            await RefreshCampaignAsync();
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync());
         }
 
         public Task<PlayBattleDto> BattleAsync() => BattleCampaignAsync("c1-s1");
@@ -51,7 +52,7 @@ namespace NinjaAssemble.Playable
             Gold += result.goldReward;
             Diamond += result.diamondReward;
             Energy = Math.Max(0, Energy - result.energyCost);
-            await RefreshCampaignAsync();
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync());
             return result;
         }
 
@@ -59,6 +60,11 @@ namespace NinjaAssemble.Playable
         {
             Campaign = await api.GetCampaignStagesAsync(PlayerId);
             if (Campaign != null) Energy = Campaign.energy;
+        }
+
+        public async Task RefreshInventoryAsync()
+        {
+            Inventory = await api.GetInventoryAsync(PlayerId);
         }
 
         public async Task<SummonResultDto> SummonAsync()

@@ -1,0 +1,6 @@
+item_id,item_type,name_en,name_vi,status
+training-scroll,SCROLL,Training Scroll,Cuộn Huấn Luyện,DESIGN_BASELINE
+chakra-crystal,MATERIAL,Chakra Crystal,Tinh Thể Chakra,DESIGN_BASELINE
+elite-seal,MATERIAL,Elite Seal,Ấn Tinh Anh,DESIGN_BASELINE
+heroic-token,MATERIAL,Heroic Token,Huy Hiệu Anh Hùng,DESIGN_BASELINE
+summon-ticket,SUMMON_TICKET,Summon Ticket,Vé Triệu Hồi,DESIGN_BASELINE

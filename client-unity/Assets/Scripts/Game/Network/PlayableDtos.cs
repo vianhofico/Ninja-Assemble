@@ -21,23 +21,31 @@ namespace NinjaAssemble.Network
         public string effectType; public string statusId; public int durationTurns; public string triggerId;
     }
     [Serializable] public sealed class BattleResultDto { public long seed; public string rulesetVersion; public string outcome; public int rounds; public BattleEventDto[] events; }
-    [Serializable] public sealed class CampaignRewardDto { public long playerExp; public long gold; public long diamond; }
+    [Serializable] public sealed class CampaignItemRewardDto { public string itemId; public string nameEn; public string nameVi; public long quantity; }
+    [Serializable] public sealed class CampaignRewardDto { public long playerExp; public long gold; public long diamond; public CampaignItemRewardDto[] items; }
     [Serializable] public sealed class CampaignStageDto
     {
         public string stageId; public int chapter; public int stageIndex; public string difficulty; public string nameEn; public string nameVi;
-        public int energyCost; public int minPlayerLevel; public string[] prerequisiteStageIds; public bool unlocked; public string[] gateMissing;
+        public int energyCost; public int minPlayerLevel; public string[] prerequisiteStageIds; public int waveCount; public bool unlocked; public string[] gateMissing;
         public int clearCount; public int bestStars; public CampaignRewardDto firstClearReward; public CampaignRewardDto repeatReward;
     }
     [Serializable] public sealed class CampaignStageListDto
     {
         public string catalogVersion; public int playerLevel; public int energy; public int energyCap; public CampaignStageDto[] stages;
     }
+    [Serializable] public sealed class CampaignWaveDto
+    {
+        public int waveIndex; public long waveSeed; public BattleParticipantDto[] participants; public BattleResultDto battle;
+    }
+    [Serializable] public sealed class InventoryRewardItemDto { public string itemId; public long quantity; public long balanceAfter; }
+    [Serializable] public sealed class InventoryItemDto { public string itemId; public string itemType; public string nameEn; public string nameVi; public long quantity; }
+    [Serializable] public sealed class InventoryViewDto { public string catalogVersion; public InventoryItemDto[] items; }
     [Serializable] public sealed class PlayBattleDto
     {
-        public string battleId; public string stageId; public string campaignCatalogVersion; public int energyCost; public int stars; public bool firstClear;
-        public long playerExpReward; public long goldReward; public long diamondReward; public int accountLevelAfter;
+        public string battleId; public string stageId; public string campaignCatalogVersion; public string waveRulesVersion; public int energyCost; public int stars; public bool firstClear;
+        public long playerExpReward; public long goldReward; public long diamondReward; public int accountLevelAfter; public InventoryRewardItemDto[] itemRewards;
         public string combatStatsVersion; public string abilityProfileVersion; public string techniqueMappingVersion; public string passiveProfileVersion;
-        public BattleParticipantDto[] participants; public BattleResultDto battle;
+        public CampaignWaveDto[] waves; public BattleParticipantDto[] participants; public BattleResultDto battle;
     }
     [Serializable] public sealed class SummonResultDto
     {

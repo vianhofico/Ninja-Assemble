@@ -14,6 +14,7 @@ import com.ninjaassemble.campaign.application.CampaignStageCatalogService;
 import com.ninjaassemble.campaign.application.CampaignStageFlowService;
 import com.ninjaassemble.campaign.domain.RewardBundle;
 import com.ninjaassemble.campaign.domain.StageDefinition;
+import com.ninjaassemble.campaign.domain.WaveDefinition;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.player.application.EnergyService;
 import com.ninjaassemble.player.application.PlayerService;
@@ -26,6 +27,7 @@ import java.security.SecureRandom;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PlayableBattleService {
     public static final String DEFAULT_STAGE_ID = "c1-s1";
+    public static final String WAVE_RULES_VERSION = "full-recovery-between-waves-v1";
     private final PlayerService players;
     private final FormationService formations;
     private final EnergyService energy;
@@ -77,37 +80,40 @@ public class PlayableBattleService {
         StageDefinition stage = stageEntry.stage();
         energy.spend(playerId, stage.energyCost());
 
-        List<BattleUnitSeed> units = new ArrayList<>();
-        List<BattleParticipant> participants = new ArrayList<>();
-        for (int slot = 0; slot < formation.heroes().size(); slot++) {
-            OwnedHeroView hero = formation.heroes().get(slot);
-            BattleUnitSeed unit = stats.resolve(
-                    hero.id().toString(), hero.characterId(), hero.currentVariant(), hero.level(), TeamSide.A, slot);
-            units.add(unit);
-            participants.add(new BattleParticipant(
-                    unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(),
-                    unit.side(), unit.slot(), unit.maxHp()));
-        }
-
-        for (CampaignEnemyTeamService.EnemyBattleEntry enemy : campaignEnemies.battleEntries(stage)) {
-            BattleUnitSeed unit = enemy.unit();
-            units.add(unit);
-            participants.add(new BattleParticipant(
-                    unit.id(), enemy.characterId(), enemy.displayName(), enemy.variant(), enemy.level(),
-                    unit.side(), unit.slot(), unit.maxHp()));
-        }
-
-        long seed = secureRandom.nextLong();
+        long masterSeed = secureRandom.nextLong();
+        SplittableRandom waveSeedSource = new SplittableRandom(masterSeed);
         BattleRuleset ruleset = BattleRuleset.experimentalV1();
-        BattleResult result = engine.simulate(new BattleRequest(seed, ruleset, units));
+        List<CampaignWaveResult> waveResults = new ArrayList<>();
+        int totalRounds = 0;
+
+        for (WaveDefinition wave : stage.waves()) {
+            long waveSeed = waveSeedSource.nextLong();
+            List<BattleUnitSeed> units = new ArrayList<>();
+            List<BattleParticipant> participants = new ArrayList<>();
+            addPlayerFormation(formation, units, participants);
+            for (CampaignEnemyTeamService.EnemyBattleEntry enemy : campaignEnemies.battleEntries(stage, wave)) {
+                BattleUnitSeed unit = enemy.unit();
+                units.add(unit);
+                participants.add(new BattleParticipant(
+                        unit.id(), enemy.characterId(), enemy.displayName(), enemy.variant(), enemy.level(),
+                        unit.side(), unit.slot(), unit.maxHp()));
+            }
+            BattleResult waveBattle = engine.simulate(new BattleRequest(waveSeed, ruleset, units));
+            totalRounds += waveBattle.rounds();
+            waveResults.add(new CampaignWaveResult(wave.index(), waveSeed, List.copyOf(participants), waveBattle));
+            if (waveBattle.outcome() != BattleOutcome.TEAM_A) break;
+        }
+
+        CampaignWaveResult lastWave = waveResults.get(waveResults.size() - 1);
+        boolean won = waveResults.size() == stage.waves().size() && lastWave.battle().outcome() == BattleOutcome.TEAM_A;
         UUID battleId = UUID.randomUUID();
-        boolean won = result.outcome() == BattleOutcome.TEAM_A;
-        int stars = won ? stars(result) : 0;
+        int stars = won ? stars(totalRounds, stage.waves().size()) : 0;
         boolean firstClear = false;
         long playerExpReward = 0;
         long goldReward = 0;
         long diamondReward = 0;
         int accountLevelAfter = players.require(playerId).getAccountLevel();
+        List<CampaignRewardService.ItemGrant> itemRewards = List.of();
         String rewardKey = null;
 
         if (won) {
@@ -119,18 +125,21 @@ public class PlayableBattleService {
             goldReward = grant.gold();
             diamondReward = grant.diamond();
             accountLevelAfter = grant.accountLevelAfter();
+            itemRewards = grant.items();
             rewardKey = "campaign:" + battleId;
         }
 
         jdbc.update("""
                 insert into campaign_runs(id, player_id, stage_id, battle_seed, ruleset_version, result, reward_grant_key, started_at, completed_at)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, battleId, playerId, stage.id(), seed, ruleset.version(), result.outcome().name(), rewardKey, clock.instant(), clock.instant());
+                """, battleId, playerId, stage.id(), masterSeed, ruleset.version(), won ? BattleOutcome.TEAM_A.name() : lastWave.battle().outcome().name(),
+                rewardKey, clock.instant(), clock.instant());
 
         return new PlayBattleResult(
                 battleId,
                 stage.id(),
                 CampaignStageCatalogService.VERSION,
+                WAVE_RULES_VERSION,
                 stage.energyCost(),
                 stars,
                 firstClear,
@@ -138,24 +147,41 @@ public class PlayableBattleService {
                 goldReward,
                 diamondReward,
                 accountLevelAfter,
+                List.copyOf(itemRewards),
                 ExperimentalCombatStatsResolver.VERSION,
                 ExperimentalAbilityProfile.VERSION,
                 TechniqueEffectResolver.VERSION,
                 PassiveEffectResolver.VERSION,
-                List.copyOf(participants),
-                result);
+                List.copyOf(waveResults),
+                lastWave.participants(),
+                lastWave.battle());
     }
 
-    private static int stars(BattleResult result) {
-        if (result.rounds() <= 5) return 3;
-        if (result.rounds() <= 10) return 2;
+    private void addPlayerFormation(FormationService.FormationView formation, List<BattleUnitSeed> units, List<BattleParticipant> participants) {
+        for (int slot = 0; slot < formation.heroes().size(); slot++) {
+            OwnedHeroView hero = formation.heroes().get(slot);
+            BattleUnitSeed unit = stats.resolve(
+                    hero.id().toString(), hero.characterId(), hero.currentVariant(), hero.level(), TeamSide.A, slot);
+            units.add(unit);
+            participants.add(new BattleParticipant(
+                    unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(),
+                    unit.side(), unit.slot(), unit.maxHp()));
+        }
+    }
+
+    private static int stars(int totalRounds, int waveCount) {
+        if (totalRounds <= 5 * waveCount) return 3;
+        if (totalRounds <= 10 * waveCount) return 2;
         return 1;
     }
+
+    public record CampaignWaveResult(int waveIndex, long waveSeed, List<BattleParticipant> participants, BattleResult battle) {}
 
     public record PlayBattleResult(
             UUID battleId,
             String stageId,
             String campaignCatalogVersion,
+            String waveRulesVersion,
             int energyCost,
             int stars,
             boolean firstClear,
@@ -163,10 +189,12 @@ public class PlayableBattleService {
             long goldReward,
             long diamondReward,
             int accountLevelAfter,
+            List<CampaignRewardService.ItemGrant> itemRewards,
             String combatStatsVersion,
             String abilityProfileVersion,
             String techniqueMappingVersion,
             String passiveProfileVersion,
+            List<CampaignWaveResult> waves,
             List<BattleParticipant> participants,
             BattleResult battle
     ) {}

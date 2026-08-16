@@ -22,9 +22,8 @@ public final class CampaignEnemyTeamService {
         this.stats = stats;
     }
 
-    public List<EnemyBattleEntry> battleEntries(StageDefinition stage) {
-        if (stage.waves().size() != 1) throw new IllegalStateException("M27 single-wave battle endpoint requires exactly one wave: " + stage.id());
-        WaveDefinition wave = stage.waves().get(0);
+    public List<EnemyBattleEntry> battleEntries(StageDefinition stage, WaveDefinition wave) {
+        if (stage == null || wave == null || !stage.waves().contains(wave)) throw new IllegalArgumentException("wave must belong to stage");
         List<EnemyBattleEntry> result = new ArrayList<>();
         for (EnemySlotDefinition enemy : wave.enemies()) {
             HeroCatalogEntry hero = heroes.require(enemy.enemyDefinitionId());
@@ -34,7 +33,7 @@ public final class CampaignEnemyTeamService {
                     enemy.enemyDefinitionId(), variant, enemy.level(), TeamSide.B, enemy.slot());
             result.add(new EnemyBattleEntry(unit, enemy.enemyDefinitionId(), hero.character(), variant, enemy.level()));
         }
-        if (result.size() != 5) throw new IllegalStateException("playable campaign stage currently requires five enemies: " + stage.id());
+        if (result.size() != 5) throw new IllegalStateException("playable campaign wave requires five enemies: " + stage.id() + ":w" + wave.index());
         return List.copyOf(result);
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using NinjaAssemble.Bootstrap;
 using NinjaAssemble.Network;
 using NinjaAssemble.Playable;
@@ -70,7 +71,7 @@ namespace NinjaAssemble.UI
                             SetStatus("No campaign stage is currently unlocked. Check level or energy requirements.");
                             break;
                         }
-                        SetStatus($"{stage.stageId} • {stage.nameEn} • battle in progress...");
+                        SetStatus($"{stage.stageId} • {stage.nameEn} • {stage.waveCount} wave(s) • battle in progress...");
                         PlayBattleDto result = await store.BattleCampaignAsync(stage.stageId);
                         await PresentBattle(result);
                         SetStatus(BattleStatus(result));
@@ -92,6 +93,13 @@ namespace NinjaAssemble.UI
                         SetStatus($"{result.hero.displayName} → Lv.{result.hero.level} • -{result.goldCost} Gold");
                         break;
                     }
+                    case ScreenId.Inventory:
+                    {
+                        SetStatus("Refreshing inventory...");
+                        await store.RefreshInventoryAsync();
+                        SetStatus($"Inventory synced • {store.Inventory?.items?.Length ?? 0} stack(s)");
+                        break;
+                    }
                     default:
                         SetStatus("This screen is connected to the shared game state; feature-specific interaction is added by its dedicated controller.");
                         break;
@@ -105,17 +113,58 @@ namespace NinjaAssemble.UI
             }
         }
 
-        private async System.Threading.Tasks.Task PresentBattle(PlayBattleDto result)
+        private async Task PresentBattle(PlayBattleDto result)
         {
+            if (result == null) throw new ArgumentNullException(nameof(result));
             if (battleVisualStage == null) battleVisualStage = gameObject.AddComponent<BattleVisualStage>();
-            await battleVisualStage.PresentAsync(result);
+            CampaignWaveDto[] waves = result.waves ?? Array.Empty<CampaignWaveDto>();
+            if (waves.Length == 0)
+            {
+                await battleVisualStage.PresentAsync(result);
+                await WaitForReplayAsync();
+                return;
+            }
+
+            foreach (CampaignWaveDto wave in waves.OrderBy(wave => wave.waveIndex))
+            {
+                SetStatus($"{result.stageId} • Wave {wave.waveIndex}/{waves.Length} • replay running...");
+                var waveResult = new PlayBattleDto
+                {
+                    battleId = result.battleId,
+                    stageId = result.stageId,
+                    campaignCatalogVersion = result.campaignCatalogVersion,
+                    waveRulesVersion = result.waveRulesVersion,
+                    combatStatsVersion = result.combatStatsVersion,
+                    abilityProfileVersion = result.abilityProfileVersion,
+                    techniqueMappingVersion = result.techniqueMappingVersion,
+                    passiveProfileVersion = result.passiveProfileVersion,
+                    participants = wave.participants,
+                    battle = wave.battle
+                };
+                await battleVisualStage.PresentAsync(waveResult);
+                await WaitForReplayAsync();
+            }
+        }
+
+        private async Task WaitForReplayAsync()
+        {
+            while (GetComponentsInChildren<BattleTimelinePlayer>(true).Any(player => player != null && player.IsPlaying))
+                await Task.Yield();
         }
 
         private static string BattleStatus(PlayBattleDto result)
         {
             string clear = result.firstClear ? " • FIRST CLEAR" : string.Empty;
-            return $"{result.stageId} • {result.battle.outcome} • {result.stars}★ • {result.battle.rounds} rounds" +
-                   $" • +{result.goldReward} Gold • +{result.diamondReward} Diamond • +{result.playerExpReward} EXP{clear}";
+            CampaignWaveDto[] waves = result.waves ?? Array.Empty<CampaignWaveDto>();
+            int waveCount = waves.Length == 0 ? 1 : waves.Length;
+            int rounds = waves.Length == 0
+                ? result.battle?.rounds ?? 0
+                : waves.Sum(wave => wave.battle?.rounds ?? 0);
+            string itemText = result.itemRewards == null || result.itemRewards.Length == 0
+                ? string.Empty
+                : " • " + string.Join(", ", result.itemRewards.Select(item => $"+{item.quantity} {item.itemId}"));
+            return $"{result.stageId} • {result.battle?.outcome} • {result.stars}★ • {waveCount} wave(s) • {rounds} rounds" +
+                   $" • +{result.goldReward} Gold • +{result.diamondReward} Diamond • +{result.playerExpReward} EXP{itemText}{clear}";
         }
 
         private void Render()
@@ -140,18 +189,18 @@ namespace NinjaAssemble.UI
         {
             return screenId switch
             {
-                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\nCampaign: {store.Campaign?.stages?.Count(s => s.clearCount > 0) ?? 0}/{store.Campaign?.stages?.Length ?? 0} cleared\n\nChoose a destination from the navigation below.",
+                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\nCampaign: {store.Campaign?.stages?.Count(s => s.clearCount > 0) ?? 0}/{store.Campaign?.stages?.Length ?? 0} cleared\nInventory stacks: {store.Inventory?.items?.Length ?? 0}\n\nChoose a destination from the navigation below.",
                 ScreenId.NinjaRoster => "Ninja Roster\n\n" + string.Join("\n", store.Heroes.Take(18).Select(h => $"• {h.displayName}  Lv.{h.level}  [{h.currentVariant ?? "BASE"}]")),
                 ScreenId.HeroDetail => store.Heroes.FirstOrDefault() is { } h ? $"{h.displayName}\nLv.{h.level} • {h.frameTier}\nVariant: {h.currentVariant ?? "BASE"}\nAwakening: {h.awakeningLevel}\n\nUse TRAIN to exercise the live progression endpoint." : "No owned ninja yet.",
                 ScreenId.Formation => "Formation 5\n\n" + string.Join("\n", (store.Formation?.heroes ?? Array.Empty<OwnedHeroDto>()).Select((h, i) => $"{i + 1}. {h.displayName}  Lv.{h.level}")),
                 ScreenId.Adventure => BuildAdventure(store),
-                ScreenId.Battle => "Battle Debug\n\n5 vs 5 deterministic simulation\nDefault stage: c1-s1\nServer seed • structured skills/passives • authoritative rewards\n\nUse Adventure for campaign progression.",
+                ScreenId.Battle => "Battle Debug\n\n5 vs 5 deterministic simulation\nDefault stage: c1-s1\nServer seed • structured skills/passives • authoritative rewards\n\nUse Adventure for campaign progression and boss multi-wave battles.",
                 ScreenId.Summon => $"Complete Roster+ Summon\n\nCost: {PlayableGameStore.CompleteRosterSummonCost} Diamond\nHard pity and duplicate Hero Coin conversion are server-authoritative.",
                 ScreenId.Arena => "Arena\n\n5-ninja asynchronous defense/offense foundation is available on the server domain.",
                 ScreenId.ShadowArena => "Shadow Arena\n\n15 ninja • 3 squads • best-of-three foundation.",
                 ScreenId.Guild => "Guild\n\nMembership • contribution • mission • boss foundations.",
                 ScreenId.Shop => "Shops\n\nGold / Diamond / Arena / Hero / Guild / Shadow economy foundations.",
-                ScreenId.Inventory => "Inventory & Equipment\n\nItems, equipment instances and loadouts are modeled server-side.",
+                ScreenId.Inventory => BuildInventory(store),
                 ScreenId.Quest => "Quests\n\nDaily objectives and reset cadence foundations.",
                 ScreenId.Events => "Events\n\nVersioned event/objective definitions with server clock boundaries.",
                 ScreenId.Mail => "Mail\n\nPlayer mail and attachment domain foundations.",
@@ -167,11 +216,20 @@ namespace NinjaAssemble.UI
             string lines = string.Join("\n", campaign.stages.Select(stage =>
             {
                 string gate = stage.unlocked ? (stage.clearCount > 0 ? new string('★', Mathf.Clamp(stage.bestStars, 0, 3)) : "READY") : "LOCKED";
-                return $"{stage.stageId}  C{stage.chapter}-{stage.stageIndex}  {stage.difficulty}  {gate}  E{stage.energyCost}  {stage.nameEn}";
+                return $"{stage.stageId}  C{stage.chapter}-{stage.stageIndex}  {stage.difficulty}  {gate}  E{stage.energyCost}  W{stage.waveCount}  {stage.nameEn}";
             }));
             CampaignStageDto next = store.RecommendedStage;
-            string nextText = next == null ? "No stage currently playable" : $"Next: {next.stageId} • {next.nameEn} • {next.energyCost} Energy";
+            string nextText = next == null ? "No stage currently playable" : $"Next: {next.stageId} • {next.nameEn} • {next.waveCount} wave(s) • {next.energyCost} Energy";
             return $"Adventure • Lv.{campaign.playerLevel}\n{campaign.catalogVersion}\n\n{lines}\n\n{nextText}";
+        }
+
+        private static string BuildInventory(PlayableGameStore store)
+        {
+            InventoryViewDto inventory = store.Inventory;
+            InventoryItemDto[] items = inventory?.items ?? Array.Empty<InventoryItemDto>();
+            if (items.Length == 0) return $"Inventory\n{inventory?.catalogVersion ?? "item-catalog-v1"}\n\nNo stack items yet. Clear campaign stages to earn materials and summon tickets.";
+            string lines = string.Join("\n", items.Take(24).Select(item => $"• {item.nameEn}  x{item.quantity:N0}  [{item.itemType}]"));
+            return $"Inventory\n{inventory.catalogVersion}\n\n{lines}";
         }
 
         private void ConfigureAction()
@@ -185,6 +243,7 @@ namespace NinjaAssemble.UI
                     : "REFRESH",
                 ScreenId.Summon => "SUMMON",
                 ScreenId.HeroDetail => "TRAIN",
+                ScreenId.Inventory => "REFRESH INVENTORY",
                 _ => "REFRESH"
             };
             primaryActionLabel.text = label;
