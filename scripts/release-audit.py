@@ -10,6 +10,7 @@ COMPONENT_FIELDS = (
     "portrait_status", "icon_status", "chibi_prefab_status", "animation_status",
     "vfx_status", "sfx_status", "regression_capture_status", "review_status"
 )
+TRUTHY = {"true", "1", "yes"}
 
 
 def rows(path):
@@ -35,6 +36,8 @@ def audit():
     components = rows(ROOT / "art/manifests/hero-art-component-status.csv")
     localizations = many("game-data/localization/*.csv")
     reference_profiles = rows(ROOT / "game-data/reference/balance-profiles.csv")
+    mobile_evidence = rows(ROOT / "game-data/release/mobile-device-evidence.csv")
+
     ready_art = [row for row in art if row.get("status", "").strip() == "READY"]
     concept_art = [row for row in art if row.get("status", "").strip() == "CONCEPT"]
     complete_packages = [
@@ -43,12 +46,22 @@ def audit():
     ]
     verified_profiles = [row for row in reference_profiles if row.get("status", "").strip().upper() == "VERIFIED"]
     all_reference_verified = bool(reference_profiles) and len(verified_profiles) == len(reference_profiles)
+
+    passing_devices = [
+        row for row in mobile_evidence
+        if row.get("smoke_pass", "").strip().lower() in TRUTHY
+        and row.get("performance_pass", "").strip().lower() in TRUTHY
+    ]
+    distinct_models = {row.get("device_model", "").strip() for row in passing_devices if row.get("device_model", "").strip()}
+    distinct_classes = {row.get("device_class", "").strip().upper() for row in passing_devices if row.get("device_class", "").strip()}
+    mobile_device_gate = len(passing_devices) >= 2 and len(distinct_models) >= 2 and len(distinct_classes) >= 2
+
     release_ready = (
         len(roster) >= 180 and len(variants) >= 300 and len(techniques) >= 100
         and len(kits) >= 35 and len({row["character_id"] for row in maps}) == len(roster)
         and len(art) == len(variants) and len(ready_art) == len(variants)
         and len(components) == len(variants) and len(complete_packages) == len(variants)
-        and all_reference_verified
+        and all_reference_verified and mobile_device_gate
     )
     return {
         "baseCharacters": len(roster),
@@ -68,6 +81,11 @@ def audit():
         "referenceProfiles": len(reference_profiles),
         "referenceProfilesVerified": len(verified_profiles),
         "referenceProfilesAllVerified": all_reference_verified,
+        "mobileDeviceEvidenceRows": len(mobile_evidence),
+        "mobileDevicePassing": len(passing_devices),
+        "mobileDistinctDeviceModels": len(distinct_models),
+        "mobileDistinctDeviceClasses": len(distinct_classes),
+        "mobileDeviceGatePass": mobile_device_gate,
         "releaseReady": release_ready,
     }
 
@@ -87,9 +105,12 @@ def markdown(data):
         f"| Component packages tracked | {data['artComponentPackagesTracked']} | {data['variants']} | {'PASS' if data['artComponentPackagesTracked'] == data['variants'] else 'BLOCKED'} |",
         f"| Component packages complete | {data['artComponentPackagesComplete']} | {data['variants']} | {'PASS' if data['artComponentPackagesComplete'] == data['variants'] else 'BLOCKED'} |",
         f"| Reference/balance profiles VERIFIED | {data['referenceProfilesVerified']} | {data['referenceProfiles']} | {'PASS' if data['referenceProfilesAllVerified'] else 'BLOCKED'} |",
+        f"| Passing Android device runs | {data['mobileDevicePassing']} | >= 2 | {'PASS' if data['mobileDeviceGatePass'] else 'BLOCKED'} |",
+        f"| Distinct Android device models | {data['mobileDistinctDeviceModels']} | >= 2 | {'PASS' if data['mobileDeviceGatePass'] else 'BLOCKED'} |",
+        f"| Distinct device classes | {data['mobileDistinctDeviceClasses']} | >= 2 | {'PASS' if data['mobileDeviceGatePass'] else 'BLOCKED'} |",
         "",
-        "A hero art package is complete only when portrait, icon, chibi prefab, animation, VFX, SFX, regression capture and final review are all READY.",
-        "Reference/balance profiles remain blocked until measurement datasets satisfy their declared sample/context/evidence thresholds."
+        "A hero art package is complete only when portrait, icon, chibi prefab, animation, VFX, SFX, regression capture and final review are all READY and backed by production files.",
+        "Reference/balance profiles require measured evidence; mobile device evidence requires passing smoke + performance runs on at least two distinct models/classes."
     ]
     return "\n".join(lines) + "\n"
 

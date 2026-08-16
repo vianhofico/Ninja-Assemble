@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.ninja-assemble/schema/hero-art-package.json",
+  "title": "HeroArtPackage",
+  "type": "object",
+  "required": ["characterId", "variant", "paths", "reviewEvidence"],
+  "properties": {
+    "characterId": {"type": "string", "minLength": 1},
+    "variant": {"type": "string", "minLength": 1},
+    "paths": {
+      "type": "object",
+      "required": ["portrait", "icon", "chibiPrefab", "animationSet", "vfxSet", "sfxSet", "regressionCapture"],
+      "properties": {
+        "portrait": {"type": "string", "minLength": 1},
+        "icon": {"type": "string", "minLength": 1},
+        "chibiPrefab": {"type": "string", "minLength": 1},
+        "animationSet": {"type": "string", "minLength": 1},
+        "vfxSet": {"type": "string", "minLength": 1},
+        "sfxSet": {"type": "string", "minLength": 1},
+        "regressionCapture": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "reviewEvidence": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}
