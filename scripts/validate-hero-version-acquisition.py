@@ -51,13 +51,13 @@ def main() -> int:
 
         entry = text("server/src/main/java/com/ninjaassemble/summon/domain/SummonPoolEntry.java")
         require("String heroId" in entry, "SummonPoolEntry must use heroId")
-        require("heroId.contains(\"::\")" in entry, "SummonPoolEntry must reject legacy character::variant identity")
+        require('heroId.contains("::")' in entry, "SummonPoolEntry must reject legacy character::variant identity")
         require("heroVariantId" not in entry, "legacy heroVariantId field remains in SummonPoolEntry")
 
         service = text("server/src/main/java/com/ninjaassemble/play/application/SummonApplicationService.java")
         for token in ("grantHeroVersion", "hero_version_id", "pulled.entry().heroId()"):
             require(token in service, f"summon service missing Hero Version token: {token}")
-        for forbidden in ("unlockVariant(", "heroVariantId()", "split(\"::\""):
+        for forbidden in ("unlockVariant(", "heroVariantId()", 'split("::"'):
             require(forbidden not in service, f"summon service still contains legacy acquisition path: {forbidden}")
 
         migration = text("server/src/main/resources/db/migration/V12__hero_version_acquisition.sql")
