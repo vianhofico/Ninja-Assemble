@@ -36,7 +36,7 @@ namespace NinjaAssemble.Bootstrap
             try
             {
                 if (apiConfig == null) throw new InvalidOperationException("GameApiConfig is not assigned");
-                var client = new GameApiClient(apiConfig.BaseUrl);
+                var client = new GameApiClient(apiConfig);
                 Store = new PlayableGameStore(client);
                 string guestKey = LoadOrCreateGuestKey();
                 await Store.LoginAndBootstrapAsync(guestKey, guestDisplayName);
