@@ -1,6 +1,7 @@
 package com.ninjaassemble.play.api;
 
 import com.ninjaassemble.campaign.application.CampaignStageFlowService;
+import com.ninjaassemble.equipment.application.EquipmentApplicationService;
 import com.ninjaassemble.guild.application.GuildApplicationService;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
@@ -34,6 +35,7 @@ public class PlayableGameController {
     private final PlayableBattleService battles;
     private final CampaignStageFlowService campaign;
     private final InventoryService inventory;
+    private final EquipmentApplicationService equipment;
     private final ArenaApplicationService arena;
     private final ShadowArenaApplicationService shadowArena;
     private final GuildApplicationService guild;
@@ -45,11 +47,11 @@ public class PlayableGameController {
 
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
                                   PlayableBattleService battles, CampaignStageFlowService campaign, InventoryService inventory,
-                                  ArenaApplicationService arena, ShadowArenaApplicationService shadowArena,
+                                  EquipmentApplicationService equipment, ArenaApplicationService arena, ShadowArenaApplicationService shadowArena,
                                   GuildApplicationService guild, ShopApplicationService shop, DailyQuestService quests,
                                   MailApplicationService mail, SummonApplicationService summons, HeroUpgradeService upgrades) {
         this.bootstrap = bootstrap; this.ownership = ownership; this.formations = formations; this.battles = battles;
-        this.campaign = campaign; this.inventory = inventory; this.arena = arena; this.shadowArena = shadowArena;
+        this.campaign = campaign; this.inventory = inventory; this.equipment = equipment; this.arena = arena; this.shadowArena = shadowArena;
         this.guild = guild; this.shop = shop; this.quests = quests; this.mail = mail; this.summons = summons; this.upgrades = upgrades;
     }
 
@@ -60,6 +62,19 @@ public class PlayableGameController {
     @GetMapping("/campaign/stages") public CampaignStageFlowService.CampaignStageList campaignStages(@PathVariable UUID playerId) { return campaign.list(playerId); }
     @PostMapping("/campaign/stages/{stageId}/battle") public PlayableBattleService.PlayBattleResult campaignBattle(@PathVariable UUID playerId, @PathVariable String stageId) { return battles.play(playerId, stageId); }
     @GetMapping("/inventory") public InventoryService.InventoryView inventory(@PathVariable UUID playerId) { return inventory.view(playerId); }
+
+    @GetMapping("/equipment") public EquipmentApplicationService.EquipmentView equipment(@PathVariable UUID playerId) { return equipment.view(playerId); }
+    @PostMapping("/equipment/{equipmentId}/equip/{playerHeroId}") public EquipmentApplicationService.EquipmentView equip(
+            @PathVariable UUID playerId, @PathVariable UUID equipmentId, @PathVariable UUID playerHeroId) {
+        return equipment.equip(playerId, equipmentId, playerHeroId);
+    }
+    @PostMapping("/equipment/{equipmentId}/unequip") public EquipmentApplicationService.EquipmentView unequip(
+            @PathVariable UUID playerId, @PathVariable UUID equipmentId) { return equipment.unequip(playerId, equipmentId); }
+    @PostMapping("/equipment/{equipmentId}/enhance") public EquipmentApplicationService.EnhanceResult enhanceEquipment(
+            @PathVariable UUID playerId, @PathVariable UUID equipmentId, @RequestBody ActionRequest request) {
+        return equipment.enhance(playerId, equipmentId, requireRequestId(request));
+    }
+
     @GetMapping("/arena") public ArenaApplicationService.ArenaState arena(@PathVariable UUID playerId) { return arena.state(playerId); }
     @PostMapping("/arena/{opponentPlayerId}/battle") public ArenaApplicationService.ArenaBattleView arenaBattle(@PathVariable UUID playerId, @PathVariable UUID opponentPlayerId) { return arena.fight(playerId, opponentPlayerId); }
     @GetMapping("/shadow-arena") public ShadowArenaApplicationService.ShadowArenaState shadowArena(@PathVariable UUID playerId) { return shadowArena.state(playerId); }
