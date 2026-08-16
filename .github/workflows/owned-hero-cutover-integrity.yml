@@ -1,0 +1,108 @@
+name: owned-hero-cutover-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  owned-hero-cutover:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ninja_assemble_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d ninja_assemble_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate 427-row ownership bridge
+        run: python scripts/generate-owned-hero-cutover.py
+      - name: Regenerate cutover artifacts deterministically
+        run: python scripts/generate-owned-hero-cutover.py --write
+      - name: Require committed mapping and V11 to be reproducible
+        run: |
+          git diff --exit-code -- \
+            game-data/migration/legacy-hero-version-map.csv \
+            server/src/main/resources/db/migration/V11__owned_hero_version_cutover.sql
+      - name: Apply Flyway SQL V1 through V10
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for migration in $(find server/src/main/resources/db/migration -maxdepth 1 -type f -name 'V*.sql' ! -name 'V11__*.sql' | sort -V); do
+            echo "Applying $migration"
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f "$migration"
+          done
+      - name: Seed representative legacy save
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
+          insert into players(id, display_name) values ('00000000-0000-0000-0000-000000000001', 'M43 Fixture');
+          insert into hero_definitions(id, display_name, archetype) values
+            ('naruto-uzumaki', 'Naruto Uzumaki', 'HYBRID'),
+            ('sasuke-uchiha', 'Sasuke Uchiha', 'HYBRID');
+
+          insert into player_heroes(id, player_id, hero_definition_id, level, frame_tier, current_variant_id)
+          values
+            ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'naruto-uzumaki', 80, 'KAGE', 'Sage Mode'),
+            ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'sasuke-uchiha', 50, 'JONIN', null);
+
+          insert into hero_variant_unlocks(player_hero_id, variant_id, source) values
+            ('10000000-0000-0000-0000-000000000001', 'KCM2', 'FIXTURE'),
+            ('10000000-0000-0000-0000-000000000001', 'Six Paths Sage Mode', 'FIXTURE');
+          SQL
+      - name: Apply V11 ownership cutover
+        env:
+          PGPASSWORD: postgres
+        run: psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 -f server/src/main/resources/db/migration/V11__owned_hero_version_cutover.sql
+      - name: Assert legacy save preservation and new invariants
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          declare
+            c integer;
+            b boolean;
+          begin
+            select count(*) into c from legacy_variant_hero_version_map
+              where legacy_variant_id not in ('__BASE__','BASE');
+            if c <> 427 then raise exception 'expected 427 source bridge rows, got %', c; end if;
+
+            select count(*) into c from player_heroes where hero_version_id is null;
+            if c <> 0 then raise exception 'hero_version_id null count %', c; end if;
+
+            select awakened into b from player_heroes
+              where player_id='00000000-0000-0000-0000-000000000001' and hero_version_id='naruto-sage';
+            if b is distinct from true then raise exception 'naruto-sage KCM2 Awakening was not preserved'; end if;
+
+            select count(*) into c from player_heroes
+              where player_id='00000000-0000-0000-0000-000000000001' and hero_version_id='naruto-six-paths';
+            if c <> 1 then raise exception 'independently collectible Six Paths Naruto was not materialized'; end if;
+
+            select count(*) into c from player_heroes
+              where player_id='00000000-0000-0000-0000-000000000001' and hero_version_id='sasuke-genin';
+            if c <> 1 then raise exception 'legacy Sasuke BASE did not resolve to primary Hero Version'; end if;
+
+            select count(*) into c from (
+              select player_id, hero_version_id, count(*)
+              from player_heroes group by player_id, hero_version_id having count(*) > 1
+            ) dup;
+            if c <> 0 then raise exception 'duplicate player Hero Version ownership rows detected'; end if;
+
+            select count(*) into c from player_heroes where awakening_level not in (0,1);
+            if c <> 0 then raise exception 'multi-stage awakening_level survived M43'; end if;
+          end $$;
+          SQL
