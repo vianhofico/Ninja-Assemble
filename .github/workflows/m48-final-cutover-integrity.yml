@@ -1,0 +1,37 @@
+name: m48-final-cutover-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-final-cutover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate final 427-row Hero/Awakening cutover
+        shell: bash
+        run: |
+          set +e
+          output=$(python scripts/validate-m48-final-cutover.py 2>&1)
+          code=$?
+          printf '%s\n' "$output"
+          if [ "$code" -ne 0 ]; then
+            compact=$(printf '%s' "$output" | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')
+            echo "::error title=M48 Final Cutover::$compact"
+            exit "$code"
+          fi
+      - name: Validate progression has no linear Evolution fallback
+        run: python scripts/validate-hero-progression.py
+      - name: Compile and run progression + Hero catalog tests
+        working-directory: server
+        run: mvn -B -Dtest=FrameAdvancePolicyTest,HeroContentCatalogServiceTest test
