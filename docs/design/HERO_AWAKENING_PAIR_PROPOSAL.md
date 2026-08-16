@@ -47,20 +47,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## akatsuchi
 
-### akatsuchi [Core]
+### Akatsuchi
 - **Hero ID:** `akatsuchi-core`
-- **Base form:** Stone Golem
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the earth seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=earth
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=earth
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Stone Golem** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Earth Release: Golem Technique is a jutsu used by Akatsuchi, not a persistent body/form transformation.
 - **Tsuchikage Guard** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## ameyuri-ringo
@@ -410,14 +411,18 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 ### dan-kato [Core]
 - **Hero ID:** `dan-kato-core`
 - **Base form:** Jonin
-- **Awakening:** Spirit Transformation
+- **Awakening:** None — no persistent canonical transformation reserved
 - **5-skill identity:** rebuild five explicit slots from the genjutsu seed without generic fallback
 - **Awakening Skill concept:** Spirit Transformation signature technique
 - **Hero version score:** 72/100
-- **Pair score:** 76/100
+- **Pair score:** N/A
 - **Canon confidence:** DESIGN_INTERPRETATION
 - **Source:** current variant census; current kit seed=genjutsu
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
+
+### Reclassified / unused source forms
+
+- **Spirit Transformation** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Spirit Transformation Technique is a jutsu that projects Dan's spirit; it is not a persistent transformed body.
 
 ## danzo-shimura
 
@@ -435,20 +440,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## darui
 
-### darui [Core]
+### Darui
 - **Hero ID:** `darui-core`
-- **Base form:** Storm Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the storm seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=storm
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=storm
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Storm Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Storm Release is Darui's kekkei genkai/nature transformation, not a separate persistent hero form.
 - **Raikage Guard** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## deidara
@@ -473,20 +479,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## dodai
 
-### dodai [Core]
+### Dodai
 - **Hero ID:** `dodai-core`
-- **Base form:** Lava Rubber Style
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the earth seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=earth
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=earth
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Lava Rubber Style** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Dodai's vulcanised-rubber Lava Release is expressed through ninjutsu such as Rubber Rope/Defence, not a persistent form.
 - **Third Raikage Aide** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## dosu-kinuta
@@ -743,20 +750,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## gari
 
-### gari [Core]
+### Gari
 - **Hero ID:** `gari-core`
-- **Base form:** Explosion Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the earth seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=earth
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=earth
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Explosion Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Explosion Release is Gari's kekkei genkai/ninjutsu style, not a persistent transformation.
 - **Reanimated** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Reanimation is explicitly not treated as a normal Awakening.
 
 ## gengetsu-hozuki
@@ -829,20 +837,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## guren
 
-### guren [Core]
+### Guren
 - **Hero ID:** `guren-core`
-- **Base form:** Crystal Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the earth seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=earth
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=earth
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Crystal Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Crystal Release is Guren's ninjutsu identity and should feed her five-skill kit rather than become a collectible form label.
 - **Three-Tails Mission** → `MERGED_OR_REMOVED_DUPLICATE` / `MERGE` — Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.
 
 ## hagoromo-otsutsuki
@@ -1772,20 +1781,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## kurotsuchi
 
-### kurotsuchi [Core]
+### Kurotsuchi
 - **Hero ID:** `kurotsuchi-core`
-- **Base form:** Lava Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the earth seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=earth
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=earth
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Lava Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Lava Release is a nature transformation used through Kurotsuchi's jutsu, not a separate form.
 - **Tsuchikage Guard** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## kushimaru-kuriarare
@@ -2068,20 +2078,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## misumi-tsurugi
 
-### misumi-tsurugi [Core]
+### Misumi Tsurugi
 - **Hero ID:** `misumi-tsurugi-core`
-- **Base form:** Soft Physique
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the sound seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=sound
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=sound
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Soft Physique** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Soft Physique Modification is Misumi's combat technique/body ability, not an Awakening or collectible form.
 - **Kabuto Squad** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## mito-uzumaki
@@ -2449,20 +2460,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## pakura
 
-### pakura [Core]
+### Pakura
 - **Hero ID:** `pakura-core`
-- **Base form:** Scorch Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the wind seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=wind
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=wind
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Scorch Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Scorch Release is Pakura's kekkei genkai/nature transformation and should define her kit rather than become her body/form identity.
 - **Reanimated** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Reanimation is explicitly not treated as a normal Awakening.
 
 ## raido-namiashi
@@ -3077,20 +3089,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## toroi
 
-### toroi [Core]
+### Toroi
 - **Hero ID:** `toroi-core`
-- **Base form:** Magnet Release
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the gaara seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=gaara
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=gaara
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Magnet Release** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Magnet Release is Toroi's kekkei genkai applied to weapons, not a persistent form.
 - **Reanimated** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Reanimation is explicitly not treated as a normal Awakening.
 
 ## torune-aburame
@@ -3245,20 +3258,21 @@ Major pairs use explicit canon-reference links and confidence labels. Generic/mi
 
 ## yoroi-akado
 
-### yoroi-akado [Core]
+### Yoroi Akado
 - **Hero ID:** `yoroi-akado-core`
-- **Base form:** Chakra Absorption
+- **Base form:** Base
 - **Awakening:** None — no canonical/valuable stronger persistent form reserved
 - **5-skill identity:** rebuild five explicit slots from the medical seed without generic fallback
 - **Awakening Skill concept:** N/A
 - **Hero version score:** 68/100
 - **Pair score:** N/A
-- **Canon confidence:** DESIGN_INTERPRETATION
-- **Source:** current variant census; current kit seed=medical
+- **Canon confidence:** MANGA_CANON
+- **Source:** character canon page + current variant census; current kit seed=medical
 - **Reason:** Minor/support character keeps one differentiated collectible identity; a transformation is only reserved when the census label is visibly form-like.
 
 ### Reclassified / unused source forms
 
+- **Chakra Absorption** → `SKILL_OR_ULTIMATE` / `MOVE_TO_SKILL` — Chakra absorption is Yoroi's combat ability, not a persistent transformation.
 - **Kabuto Squad** → `COSMETIC_SKIN` / `MOVE_TO_SKIN` — Era/rank/title difference alone does not justify another collectible hero.
 
 ## yugao-uzuki

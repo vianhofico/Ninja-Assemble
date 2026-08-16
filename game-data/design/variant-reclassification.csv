@@ -3,7 +3,7 @@ a-fourth-raikage,Lightning Armor,form-a-fourth-raikage-lightning-armor,AWAKENING
 a-fourth-raikage,Raikage,form-a-fourth-raikage-raikage,COLLECTIBLE_HERO_VERSION,fourth-raikage-base,,,,,KEEP_AS_HERO,Base form of proposed hero fourth-raikage-base.,HIGH
 ajisai,Animal Path Vessel,form-ajisai-animal-path-vessel,SPECIAL_INDEPENDENT_CHARACTER,,,,,,MERGE,"Corpse/vessel identity for Pain content, not Ajisai's normal Awakening.",HIGH
 ajisai,Rain Kunoichi,form-ajisai-rain-kunoichi,COLLECTIBLE_HERO_VERSION,ajisai-core,,,,,KEEP_AS_HERO,Base form of proposed hero ajisai-core.,HIGH
-akatsuchi,Stone Golem,form-akatsuchi-stone-golem,COLLECTIBLE_HERO_VERSION,akatsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero akatsuchi-core.,HIGH
+akatsuchi,Stone Golem,form-akatsuchi-stone-golem,SKILL_OR_ULTIMATE,,,legacy-akatsuchi-stone-golem,,,MOVE_TO_SKILL,"Earth Release: Golem Technique is a jutsu used by Akatsuchi, not a persistent body/form transformation.",HIGH
 akatsuchi,Tsuchikage Guard,form-akatsuchi-tsuchikage-guard,COSMETIC_SKIN,,,,skin-akatsuchi-tsuchikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 ameyuri-ringo,Kiba Wielder,form-ameyuri-ringo-kiba-wielder,COLLECTIBLE_HERO_VERSION,ameyuri-ringo-core,,,,,KEEP_AS_HERO,Base form of proposed hero ameyuri-ringo-core.,HIGH
 ameyuri-ringo,Reanimated,form-ameyuri-ringo-reanimated,COSMETIC_SKIN,,,,skin-ameyuri-ringo-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
@@ -48,16 +48,16 @@ choza-akimichi,War Arc,form-choza-akimichi-war-arc,COSMETIC_SKIN,,,,skin-choza-a
 chukichi,Reanimated,form-chukichi-reanimated,COSMETIC_SKIN,,,,skin-chukichi-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
 chukichi,Sensor Ninja,form-chukichi-sensor-ninja,COLLECTIBLE_HERO_VERSION,chukichi-core,,,,,KEEP_AS_HERO,Base form of proposed hero chukichi-core.,HIGH
 dan-kato,Jonin,form-dan-kato-jonin,COLLECTIBLE_HERO_VERSION,dan-kato-core,,,,,KEEP_AS_HERO,Base form of proposed hero dan-kato-core.,HIGH
-dan-kato,Spirit Transformation,form-dan-kato-spirit-transformation,AWAKENING_FORM,,awakening-dan-kato-core,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of dan-kato-core.,HIGH
+dan-kato,Spirit Transformation,form-dan-kato-spirit-transformation,SKILL_OR_ULTIMATE,,,legacy-dan-kato-spirit-transformation,,,MOVE_TO_SKILL,Spirit Transformation Technique is a jutsu that projects Dan's spirit; it is not a persistent transformed body.,HIGH
 danzo-shimura,Hokage Candidate,form-danzo-shimura-hokage-candidate,COLLECTIBLE_HERO_VERSION,danzo-candidate,,,,,KEEP_AS_HERO,Base form of proposed hero danzo-candidate.,HIGH
 danzo-shimura,Izanagi Arm,form-danzo-shimura-izanagi-arm,AWAKENING_FORM,,awakening-danzo-candidate,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of danzo-candidate.,HIGH
 darui,Raikage Guard,form-darui-raikage-guard,COSMETIC_SKIN,,,,skin-darui-raikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
-darui,Storm Release,form-darui-storm-release,COLLECTIBLE_HERO_VERSION,darui-core,,,,,KEEP_AS_HERO,Base form of proposed hero darui-core.,HIGH
+darui,Storm Release,form-darui-storm-release,SKILL_OR_ULTIMATE,,,legacy-darui-storm-release,,,MOVE_TO_SKILL,"Storm Release is Darui's kekkei genkai/nature transformation, not a separate persistent hero form.",HIGH
 deidara,Akatsuki,form-deidara-akatsuki,COLLECTIBLE_HERO_VERSION,deidara-core,,,,,KEEP_AS_HERO,Base form of proposed hero deidara-core.,HIGH
 deidara,C2 Dragon,form-deidara-c2-dragon,SKILL_OR_ULTIMATE,,,legacy-deidara-c2-dragon,,,MOVE_TO_SKILL,"Named technique/construct, not a persistent hero form.",HIGH
 deidara,C4,form-deidara-c4,SKILL_OR_ULTIMATE,,,legacy-deidara-c4,,,MOVE_TO_ULTIMATE,"Named ultimate-scale technique, not a hero.",HIGH
 deidara,Edo Tensei,form-deidara-edo-tensei,COSMETIC_SKIN,,,,skin-deidara-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
-dodai,Lava Rubber Style,form-dodai-lava-rubber-style,COLLECTIBLE_HERO_VERSION,dodai-core,,,,,KEEP_AS_HERO,Base form of proposed hero dodai-core.,HIGH
+dodai,Lava Rubber Style,form-dodai-lava-rubber-style,SKILL_OR_ULTIMATE,,,legacy-dodai-lava-rubber-style,,,MOVE_TO_SKILL,"Dodai's vulcanised-rubber Lava Release is expressed through ninjutsu such as Rubber Rope/Defence, not a persistent form.",HIGH
 dodai,Third Raikage Aide,form-dodai-third-raikage-aide,COSMETIC_SKIN,,,,skin-dodai-third-raikage-aide,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 dosu-kinuta,Resonating Echo,form-dosu-kinuta-resonating-echo,SKILL_OR_ULTIMATE,,,legacy-dosu-kinuta-resonating-echo,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
 dosu-kinuta,Sound Genin,form-dosu-kinuta-sound-genin,COLLECTIBLE_HERO_VERSION,dosu-kinuta-core,,,,,KEEP_AS_HERO,Base form of proposed hero dosu-kinuta-core.,HIGH
@@ -93,7 +93,7 @@ gamabunta,Gamabunta Battle,form-gamabunta-gamabunta-battle,SKILL_OR_ULTIMATE,,,l
 gamabunta,Toad Boss,form-gamabunta-toad-boss,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
 gamakichi,War Arc Toad,form-gamakichi-war-arc-toad,SKILL_OR_ULTIMATE,,,legacy-gamakichi-war-arc-toad,,,MOVE_TO_SKILL,Summon-specific action/state belongs to technique presentation rather than another summonable unit.,MEDIUM
 gamakichi,Young Toad,form-gamakichi-young-toad,SPECIAL_INDEPENDENT_CHARACTER,,,,,,KEEP_AS_HERO,"Summon creature is retained as special independent combat content, not a normal ninja hero version.",MEDIUM
-gari,Explosion Release,form-gari-explosion-release,COLLECTIBLE_HERO_VERSION,gari-core,,,,,KEEP_AS_HERO,Base form of proposed hero gari-core.,HIGH
+gari,Explosion Release,form-gari-explosion-release,SKILL_OR_ULTIMATE,,,legacy-gari-explosion-release,,,MOVE_TO_SKILL,"Explosion Release is Gari's kekkei genkai/ninjutsu style, not a persistent transformation.",HIGH
 gari,Reanimated,form-gari-reanimated,COSMETIC_SKIN,,,,skin-gari-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
 gengetsu-hozuki,Edo Tensei,form-gengetsu-hozuki-edo-tensei,COSMETIC_SKIN,,,,skin-gengetsu-hozuki-edo-tensei,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
 gengetsu-hozuki,Second Mizukage,form-gengetsu-hozuki-second-mizukage,COLLECTIBLE_HERO_VERSION,gengetsu-hozuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero gengetsu-hozuki-core.,HIGH
@@ -103,7 +103,7 @@ ginkaku,Nine-Tails Cloak,form-ginkaku-nine-tails-cloak,AWAKENING_FORM,,awakening
 ginkaku,Silver Brother,form-ginkaku-silver-brother,COLLECTIBLE_HERO_VERSION,ginkaku-base,,,,,KEEP_AS_HERO,Base form of proposed hero ginkaku-base.,HIGH
 gozu,Chain Gauntlet,form-gozu-chain-gauntlet,SKILL_OR_ULTIMATE,,,legacy-gozu-chain-gauntlet,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
 gozu,Demon Brothers,form-gozu-demon-brothers,COLLECTIBLE_HERO_VERSION,gozu-core,,,,,KEEP_AS_HERO,Base form of proposed hero gozu-core.,HIGH
-guren,Crystal Release,form-guren-crystal-release,COLLECTIBLE_HERO_VERSION,guren-core,,,,,KEEP_AS_HERO,Base form of proposed hero guren-core.,HIGH
+guren,Crystal Release,form-guren-crystal-release,SKILL_OR_ULTIMATE,,,legacy-guren-crystal-release,,,MOVE_TO_SKILL,Crystal Release is Guren's ninjutsu identity and should feed her five-skill kit rather than become a collectible form label.,HIGH
 guren,Three-Tails Mission,form-guren-three-tails-mission,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
 hagoromo-otsutsuki,Sage of Six Paths,form-hagoromo-otsutsuki-sage-of-six-paths,AWAKENING_FORM,,awakening-hagoromo-young,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of hagoromo-young.,HIGH
 hagoromo-otsutsuki,Young,form-hagoromo-otsutsuki-young,COLLECTIBLE_HERO_VERSION,hagoromo-young,,,,,KEEP_AS_HERO,Base form of proposed hero hagoromo-young.,HIGH
@@ -130,7 +130,7 @@ hidan,Curse Ritual,form-hidan-curse-ritual,SKILL_OR_ULTIMATE,,,legacy-hidan-curs
 hinata-hyuga,Genin,form-hinata-hyuga-genin,COLLECTIBLE_HERO_VERSION,hinata-hyuga-core,,,,,KEEP_AS_HERO,Base form of proposed hero hinata-hyuga-core.,HIGH
 hinata-hyuga,Shippuden,form-hinata-hyuga-shippuden,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
 hinata-hyuga,War Arc,form-hinata-hyuga-war-arc,COSMETIC_SKIN,,,,skin-hinata-hyuga-war-arc,,MOVE_TO_SKIN,Era appearance of the same Shippuden combat identity.,HIGH
-hiruko,Chimera Technique,form-hiruko-chimera-technique,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
+hiruko,Chimera Technique,form-hiruko-chimera-technique,SKILL_OR_ULTIMATE,,,legacy-hiruko-chimera-technique,,,MOVE_TO_SKILL,"Chimera Technique is a technique/power system, not a second persistent Hiruko form label.",HIGH
 hiruko,Missing Nin,form-hiruko-missing-nin,COLLECTIBLE_HERO_VERSION,hiruko-core,,,,,KEEP_AS_HERO,Base form of proposed hero hiruko-core.,HIGH
 hiruzen-sarutobi,Edo Tensei,form-hiruzen-sarutobi-edo-tensei,COSMETIC_SKIN,,,,skin-hiruzen-sarutobi-edo-tensei,,MOVE_TO_SKIN,Reanimation skin/state.,HIGH
 hiruzen-sarutobi,Prime,form-hiruzen-sarutobi-prime,COLLECTIBLE_HERO_VERSION,hiruzen-prime,,,,,KEEP_AS_HERO,Base form of proposed hero hiruzen-prime.,HIGH
@@ -224,7 +224,7 @@ kotetsu-hagane,Gate Guard,form-kotetsu-hagane-gate-guard,COLLECTIBLE_HERO_VERSIO
 kotetsu-hagane,War Arc,form-kotetsu-hagane-war-arc,COSMETIC_SKIN,,,,skin-kotetsu-hagane-war-arc,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 kurenai-yuhi,Genjutsu Jonin,form-kurenai-yuhi-genjutsu-jonin,COLLECTIBLE_HERO_VERSION,kurenai-yuhi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kurenai-yuhi-core.,HIGH
 kurenai-yuhi,Team 8 Leader,form-kurenai-yuhi-team-8-leader,COSMETIC_SKIN,,,,skin-kurenai-yuhi-team-8-leader,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
-kurotsuchi,Lava Release,form-kurotsuchi-lava-release,COLLECTIBLE_HERO_VERSION,kurotsuchi-core,,,,,KEEP_AS_HERO,Base form of proposed hero kurotsuchi-core.,HIGH
+kurotsuchi,Lava Release,form-kurotsuchi-lava-release,SKILL_OR_ULTIMATE,,,legacy-kurotsuchi-lava-release,,,MOVE_TO_SKILL,"Lava Release is a nature transformation used through Kurotsuchi's jutsu, not a separate form.",HIGH
 kurotsuchi,Tsuchikage Guard,form-kurotsuchi-tsuchikage-guard,COSMETIC_SKIN,,,,skin-kurotsuchi-tsuchikage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 kushimaru-kuriarare,Nuibari Wielder,form-kushimaru-kuriarare-nuibari-wielder,COLLECTIBLE_HERO_VERSION,kushimaru-kuriarare-core,,,,,KEEP_AS_HERO,Base form of proposed hero kushimaru-kuriarare-core.,HIGH
 kushimaru-kuriarare,Reanimated,form-kushimaru-kuriarare-reanimated,COSMETIC_SKIN,,,,skin-kushimaru-kuriarare-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
@@ -265,7 +265,7 @@ minato-namikaze,Fourth Hokage,form-minato-namikaze-fourth-hokage,COSMETIC_SKIN,,
 minato-namikaze,Jonin,form-minato-namikaze-jonin,COLLECTIBLE_HERO_VERSION,minato-jonin,,,,,KEEP_AS_HERO,Base form of proposed hero minato-jonin.,HIGH
 minato-namikaze,KCM,form-minato-namikaze-kcm,AWAKENING_FORM,,awakening-minato-edo,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of minato-edo.,HIGH
 misumi-tsurugi,Kabuto Squad,form-misumi-tsurugi-kabuto-squad,COSMETIC_SKIN,,,,skin-misumi-tsurugi-kabuto-squad,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
-misumi-tsurugi,Soft Physique,form-misumi-tsurugi-soft-physique,COLLECTIBLE_HERO_VERSION,misumi-tsurugi-core,,,,,KEEP_AS_HERO,Base form of proposed hero misumi-tsurugi-core.,HIGH
+misumi-tsurugi,Soft Physique,form-misumi-tsurugi-soft-physique,SKILL_OR_ULTIMATE,,,legacy-misumi-tsurugi-soft-physique,,,MOVE_TO_SKILL,"Soft Physique Modification is Misumi's combat technique/body ability, not an Awakening or collectible form.",HIGH
 mito-uzumaki,First Jinchuriki,form-mito-uzumaki-first-jinchuriki,COLLECTIBLE_HERO_VERSION,mito-uzumaki-core,,,,,KEEP_AS_HERO,Base form of proposed hero mito-uzumaki-core.,HIGH
 mito-uzumaki,Uzumaki Seal Master,form-mito-uzumaki-uzumaki-seal-master,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
 mizuki,Academy Instructor,form-mizuki-academy-instructor,COLLECTIBLE_HERO_VERSION,mizuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero mizuki-core.,HIGH
@@ -316,7 +316,7 @@ orochimaru,Sannin,form-orochimaru-sannin,COLLECTIBLE_HERO_VERSION,orochimaru-san
 orochimaru,Shippuden,form-orochimaru-shippuden,COSMETIC_SKIN,,,,skin-orochimaru-shippuden,,MOVE_TO_SKIN,Era label of Sannin identity.,HIGH
 orochimaru,White Snake,form-orochimaru-white-snake,AWAKENING_FORM,,awakening-orochimaru-sannin,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of orochimaru-sannin.,HIGH
 pakura,Reanimated,form-pakura-reanimated,COSMETIC_SKIN,,,,skin-pakura-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
-pakura,Scorch Release,form-pakura-scorch-release,COLLECTIBLE_HERO_VERSION,pakura-core,,,,,KEEP_AS_HERO,Base form of proposed hero pakura-core.,HIGH
+pakura,Scorch Release,form-pakura-scorch-release,SKILL_OR_ULTIMATE,,,legacy-pakura-scorch-release,,,MOVE_TO_SKILL,Scorch Release is Pakura's kekkei genkai/nature transformation and should define her kit rather than become her body/form identity.,HIGH
 raido-namiashi,Fourth Hokage Guard,form-raido-namiashi-fourth-hokage-guard,COSMETIC_SKIN,,,,skin-raido-namiashi-fourth-hokage-guard,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 raido-namiashi,Special Jonin,form-raido-namiashi-special-jonin,COLLECTIBLE_HERO_VERSION,raido-namiashi-core,,,,,KEEP_AS_HERO,Base form of proposed hero raido-namiashi-core.,HIGH
 raiga-kurosuki,Kiba Wielder,form-raiga-kurosuki-kiba-wielder,COLLECTIBLE_HERO_VERSION,raiga-kurosuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero raiga-kurosuki-core.,HIGH
@@ -396,7 +396,7 @@ toneri-otsutsuki,Base,form-toneri-otsutsuki-base,COLLECTIBLE_HERO_VERSION,toneri
 toneri-otsutsuki,Tenseigan Chakra Mode,form-toneri-otsutsuki-tenseigan-chakra-mode,AWAKENING_FORM,,awakening-toneri-base,,,,MOVE_TO_AWAKENING,Reserved exclusively as Awakening of toneri-base.,HIGH
 torifu-akimichi,Akimichi Veteran,form-torifu-akimichi-akimichi-veteran,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
 torifu-akimichi,Tobirama Guard,form-torifu-akimichi-tobirama-guard,COLLECTIBLE_HERO_VERSION,torifu-akimichi-core,,,,,KEEP_AS_HERO,Base form of proposed hero torifu-akimichi-core.,HIGH
-toroi,Magnet Release,form-toroi-magnet-release,COLLECTIBLE_HERO_VERSION,toroi-core,,,,,KEEP_AS_HERO,Base form of proposed hero toroi-core.,HIGH
+toroi,Magnet Release,form-toroi-magnet-release,SKILL_OR_ULTIMATE,,,legacy-toroi-magnet-release,,,MOVE_TO_SKILL,"Magnet Release is Toroi's kekkei genkai applied to weapons, not a persistent form.",HIGH
 toroi,Reanimated,form-toroi-reanimated,COSMETIC_SKIN,,,,skin-toroi-reanimated,,MOVE_TO_SKIN,Reanimation is explicitly not treated as a normal Awakening.,MEDIUM
 torune-aburame,Nano Insects,form-torune-aburame-nano-insects,SKILL_OR_ULTIMATE,,,legacy-torune-aburame-nano-insects,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
 torune-aburame,Root Operative,form-torune-aburame-root-operative,COLLECTIBLE_HERO_VERSION,torune-aburame-core,,,,,KEEP_AS_HERO,Base form of proposed hero torune-aburame-core.,HIGH
@@ -416,7 +416,7 @@ yamato,ANBU Wood Style,form-yamato-anbu-wood-style,COLLECTIBLE_HERO_VERSION,yama
 yamato,Team Captain,form-yamato-team-captain,COSMETIC_SKIN,,,,skin-yamato-team-captain,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 yashamaru,Assassin,form-yashamaru-assassin,MERGED_OR_REMOVED_DUPLICATE,,,,,,MERGE,Secondary label does not currently clear the standalone-hero threshold and is merged into the character's primary kit/presentation.,MEDIUM
 yashamaru,Sand Medic,form-yashamaru-sand-medic,COLLECTIBLE_HERO_VERSION,yashamaru-core,,,,,KEEP_AS_HERO,Base form of proposed hero yashamaru-core.,HIGH
-yoroi-akado,Chakra Absorption,form-yoroi-akado-chakra-absorption,COLLECTIBLE_HERO_VERSION,yoroi-akado-core,,,,,KEEP_AS_HERO,Base form of proposed hero yoroi-akado-core.,HIGH
+yoroi-akado,Chakra Absorption,form-yoroi-akado-chakra-absorption,SKILL_OR_ULTIMATE,,,legacy-yoroi-akado-chakra-absorption,,,MOVE_TO_SKILL,"Chakra absorption is Yoroi's combat ability, not a persistent transformation.",HIGH
 yoroi-akado,Kabuto Squad,form-yoroi-akado-kabuto-squad,COSMETIC_SKIN,,,,skin-yoroi-akado-kabuto-squad,,MOVE_TO_SKIN,Era/rank/title difference alone does not justify another collectible hero.,MEDIUM
 yugao-uzuki,ANBU,form-yugao-uzuki-anbu,COLLECTIBLE_HERO_VERSION,yugao-uzuki-core,,,,,KEEP_AS_HERO,Base form of proposed hero yugao-uzuki-core.,HIGH
 yugao-uzuki,Crescent Moon Blade,form-yugao-uzuki-crescent-moon-blade,SKILL_OR_ULTIMATE,,,legacy-yugao-uzuki-crescent-moon-blade,,,MOVE_TO_SKILL,Label describes a technique/weapon action rather than a persistent hero form.,MEDIUM
