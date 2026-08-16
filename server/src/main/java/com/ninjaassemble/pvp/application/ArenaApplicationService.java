@@ -160,20 +160,21 @@ public final class ArenaApplicationService {
                               List<BattleUnitSeed> units, List<BattleParticipant> participants) {
         for (int slot = 0; slot < formation.heroes().size(); slot++) {
             OwnedHeroView hero = formation.heroes().get(slot);
-            BattleUnitSeed unit = stats.resolve(prefix + hero.id(), hero.characterId(), hero.currentVariant(), hero.level(), side, slot);
+            BattleUnitSeed unit = stats.resolve(prefix + hero.id(), hero.heroId(), hero.awakened(), hero.level(), side, slot);
             units.add(unit);
-            participants.add(new BattleParticipant(unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(),
+            participants.add(new BattleParticipant(unit.id(), hero.characterId(), hero.displayName(),
+                    hero.awakened() ? hero.awakeningName() : hero.heroId(), hero.level(),
                     unit.side(), unit.slot(), unit.maxHp()));
         }
     }
 
     private static long power(FormationService.FormationView formation) {
-        return formation.heroes().stream().mapToLong(hero -> hero.level() * 1_000L + hero.awakeningLevel() * 250L + 500L).sum();
+        return formation.heroes().stream().mapToLong(hero -> hero.level() * 1_000L + (hero.awakened() ? 250L : 0L) + 500L).sum();
     }
 
     private static String rosterString(FormationService.FormationView formation) {
         return String.join("|", formation.heroes().stream().map(hero ->
-                hero.id() + ":" + hero.characterId() + ":" + (hero.currentVariant() == null ? "BASE" : hero.currentVariant()) + ":" + hero.level()).toList());
+                hero.id() + ":" + hero.heroId() + ":" + (hero.awakened() ? "AWAKENED" : "NORMAL") + ":" + hero.level()).toList());
     }
 
     private record OpponentRow(UUID playerId, String displayName, long rating) {}
