@@ -13,3 +13,21 @@ jobs:
           python-version: '3.12'
       - name: Validate roster, variants, localization and art manifest
         run: python scripts/validate-content.py
+      - name: Validate mobile scene source shell
+        run: python scripts/validate-unity-shell.py
+      - name: Generate full 427-variant art manifest candidate
+        run: python scripts/generate-full-art-manifest.py --output /tmp/hero-art-manifest-full.csv
+      - name: Verify generated manifest covers every variant census row
+        run: |
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+          p = Path('/tmp/hero-art-manifest-full.csv')
+          rows = list(csv.DictReader(p.open(encoding='utf-8')))
+          keys = {(r['character_id'], r['variant']) for r in rows}
+          if len(rows) != len(keys):
+              raise SystemExit('duplicate generated art manifest keys')
+          if len(rows) < 400:
+              raise SystemExit(f'expected full expanded manifest, got {len(rows)} rows')
+          print(f'FULL_ART_MANIFEST_OK rows={len(rows)}')
+          PY
