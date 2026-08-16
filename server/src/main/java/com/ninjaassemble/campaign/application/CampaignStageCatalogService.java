@@ -6,6 +6,7 @@ import com.ninjaassemble.campaign.domain.RewardBundle;
 import com.ninjaassemble.campaign.domain.StageDefinition;
 import com.ninjaassemble.campaign.domain.WaveDefinition;
 import com.ninjaassemble.hero.catalog.HeroCatalogService;
+import com.ninjaassemble.inventory.application.ItemCatalogService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +24,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public final class CampaignStageCatalogService {
-    public static final String VERSION = "campaign-stage-catalog-v1";
+    public static final String VERSION = "campaign-stage-catalog-v2";
     private static final String STAGES = "/game-data/campaign/stages.csv";
     private static final String ENEMIES = "/game-data/campaign/stage-enemies.csv";
+    private static final String ITEM_REWARDS = "/game-data/campaign/stage-item-rewards.csv";
 
     private final List<CampaignStageEntry> entries;
     private final Map<String, CampaignStageEntry> byId;
 
-    public CampaignStageCatalogService(HeroCatalogService heroes) {
+    public CampaignStageCatalogService(HeroCatalogService heroes, ItemCatalogService items) {
         Map<String, Metadata> metadata = loadMetadata();
         Map<String, Map<Integer, List<EnemySlotDefinition>>> enemyGroups = loadEnemies(heroes, metadata.keySet());
+        RewardItems rewardItems = loadItemRewards(items, metadata.keySet());
         List<CampaignStageEntry> loaded = new ArrayList<>();
         Set<String> chapterIndexes = new HashSet<>();
 
@@ -45,6 +48,7 @@ public final class CampaignStageCatalogService {
                     .sorted(Map.Entry.comparingByKey())
                     .map(entry -> new WaveDefinition(entry.getKey(), entry.getValue()))
                     .toList();
+            validateWaveIndexes(row.stageId, waves);
             StageDefinition stage = new StageDefinition(
                     row.stageId,
                     row.chapter,
@@ -54,8 +58,8 @@ public final class CampaignStageCatalogService {
                     row.minPlayerLevel,
                     row.prerequisiteStageId.isBlank() ? Set.of() : Set.of(row.prerequisiteStageId),
                     waves,
-                    reward(row.firstPlayerExp, row.firstGold, row.firstDiamond),
-                    reward(row.repeatPlayerExp, row.repeatGold, row.repeatDiamond));
+                    reward(row.firstPlayerExp, row.firstGold, row.firstDiamond, rewardItems.first.getOrDefault(row.stageId, Map.of())),
+                    reward(row.repeatPlayerExp, row.repeatGold, row.repeatDiamond, rewardItems.repeat.getOrDefault(row.stageId, Map.of())));
             loaded.add(new CampaignStageEntry(stage, row.nameEn, row.nameVi));
         }
 
@@ -84,11 +88,17 @@ public final class CampaignStageCatalogService {
 
     public int size() { return entries.size(); }
 
-    private static RewardBundle reward(long playerExp, long gold, long diamond) {
+    private static RewardBundle reward(long playerExp, long gold, long diamond, Map<String, Long> items) {
         Map<String, Long> currencies = new LinkedHashMap<>();
         if (gold > 0) currencies.put("GOLD", gold);
         if (diamond > 0) currencies.put("DIAMOND", diamond);
-        return new RewardBundle(playerExp, currencies, Map.of());
+        return new RewardBundle(playerExp, currencies, items);
+    }
+
+    private static void validateWaveIndexes(String stageId, List<WaveDefinition> waves) {
+        for (int i = 0; i < waves.size(); i++) {
+            if (waves.get(i).index() != i + 1) throw new IllegalStateException("campaign wave indexes must be contiguous from 1: " + stageId);
+        }
     }
 
     private static Map<String, Metadata> loadMetadata() {
@@ -120,6 +130,35 @@ public final class CampaignStageCatalogService {
         return result;
     }
 
+    private static RewardItems loadItemRewards(ItemCatalogService items, Set<String> stageIds) {
+        Map<String, Map<String, Long>> first = new LinkedHashMap<>();
+        Map<String, Map<String, Long>> repeat = new LinkedHashMap<>();
+        forEachRow(ITEM_REWARDS, cells -> {
+            if (cells.length != 4) throw new IllegalStateException("invalid campaign item reward row");
+            String stageId = cells[0];
+            String scope = cells[1];
+            String itemId = cells[2];
+            long quantity = longValue(cells[3]);
+            if (!stageIds.contains(stageId)) throw new IllegalStateException("campaign item reward references unknown stage: " + stageId);
+            items.require(itemId);
+            if (quantity <= 0) throw new IllegalStateException("campaign item reward quantity must be positive: " + stageId + ":" + itemId);
+            Map<String, Map<String, Long>> target = switch (scope) {
+                case "FIRST" -> first;
+                case "REPEAT" -> repeat;
+                default -> throw new IllegalStateException("unknown campaign reward scope: " + scope);
+            };
+            Map<String, Long> stageRewards = target.computeIfAbsent(stageId, ignored -> new LinkedHashMap<>());
+            if (stageRewards.putIfAbsent(itemId, quantity) != null) throw new IllegalStateException("duplicate campaign item reward: " + stageId + ":" + scope + ":" + itemId);
+        });
+        return new RewardItems(freeze(first), freeze(repeat));
+    }
+
+    private static Map<String, Map<String, Long>> freeze(Map<String, Map<String, Long>> source) {
+        Map<String, Map<String, Long>> result = new LinkedHashMap<>();
+        source.forEach((key, value) -> result.put(key, Map.copyOf(value)));
+        return Map.copyOf(result);
+    }
+
     private static void forEachRow(String resource, RowConsumer consumer) {
         try (InputStream input = CampaignStageCatalogService.class.getResourceAsStream(resource)) {
             if (input == null) throw new IllegalStateException("missing campaign resource: " + resource);
@@ -147,6 +186,7 @@ public final class CampaignStageCatalogService {
             String prerequisiteStageId, String nameEn, String nameVi,
             long firstPlayerExp, long firstGold, long firstDiamond,
             long repeatPlayerExp, long repeatGold, long repeatDiamond) {}
+    private record RewardItems(Map<String, Map<String, Long>> first, Map<String, Map<String, Long>> repeat) {}
 
     public record CampaignStageEntry(StageDefinition stage, String nameEn, String nameVi) {}
 }

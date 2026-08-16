@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate M27 data-driven campaign stage flow across server and Unity client."""
+"""Validate data-driven campaign stage flow across server and Unity client."""
 from __future__ import annotations
 
 import csv
@@ -34,29 +34,33 @@ def main() -> int:
     if {row["difficulty"] for row in stages} != {"NORMAL", "ELITE", "HEROIC"}:
         raise SystemExit("campaign must cover NORMAL ELITE HEROIC")
 
-    counts = Counter(row["stage_id"] for row in enemies)
-    if len(enemies) != 60 or any(counts.get(stage_id) != 5 for stage_id in ids):
-        raise SystemExit(f"expected exactly five enemies for each of 12 stages, counts={dict(counts)}")
-    unknown = sorted(set(counts) - set(ids))
+    unknown = sorted({row["stage_id"] for row in enemies} - set(ids))
     if unknown:
         raise SystemExit(f"enemy rows reference unknown stages: {unknown}")
+    wave_counts = Counter((row["stage_id"], row["wave_index"]) for row in enemies)
+    if any(count != 5 for count in wave_counts.values()):
+        raise SystemExit(f"every playable wave must have five enemies: {dict(wave_counts)}")
+    for stage_id in ids:
+        indexes = sorted(int(wave) for (sid, wave), count in wave_counts.items() if sid == stage_id)
+        if not indexes or indexes != list(range(1, len(indexes) + 1)):
+            raise SystemExit(f"campaign stage wave indexes must be contiguous from 1: {stage_id} -> {indexes}")
 
     require("server/src/main/java/com/ninjaassemble/campaign/application/CampaignStageCatalogService.java",
-            "campaign-stage-catalog-v1", "HeroCatalogService", "new WaveDefinition", "new StageDefinition")
+            "campaign-stage-catalog-v2", "HeroCatalogService", "new WaveDefinition", "new StageDefinition")
     require("server/src/main/java/com/ninjaassemble/campaign/application/CampaignProgressService.java",
             "campaign_stage_progress", "on conflict (player_id, stage_id) do nothing", "firstClear")
     require("server/src/main/java/com/ninjaassemble/campaign/application/CampaignStageFlowService.java",
-            "CampaignGate.evaluate", "gate.missing()", "bestStars", "firstClearReward")
+            "CampaignGate.evaluate", "gate.missing()", "bestStars", "firstClearReward", "waveCount")
     require("server/src/main/java/com/ninjaassemble/play/application/PlayableBattleService.java",
             "DEFAULT_STAGE_ID = \"c1-s1\"", "stageFlow.requirePlayable", "stage.energyCost()", "progress.recordClear",
-            "stage.firstClearReward()", "stage.repeatReward()", "campaignCatalogVersion")
+            "stage.firstClearReward()", "stage.repeatReward()", "campaignCatalogVersion", "CampaignWaveResult")
     battle_source = (ROOT / "server/src/main/java/com/ninjaassemble/play/application/PlayableBattleService.java").read_text(encoding="utf-8")
     if "VerticalEnemyTeamService" in battle_source or "vertical-1" in battle_source:
         raise SystemExit("playable campaign battle must no longer depend on the vertical-1 hard-coded enemy/reward path")
     require("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java",
             '"/campaign/stages"', '"/campaign/stages/{stageId}/battle"')
     require("server/src/test/java/com/ninjaassemble/campaign/application/CampaignStageCatalogServiceTest.java",
-            "catalogContainsTwelveOrderedPlayableStagesAcrossThreeChapters", "prerequisiteChainAndRewardsAreDataDriven")
+            "catalogContainsTwelveOrderedPlayableStagesAcrossThreeChapters", "prerequisiteChainCurrencyAndItemRewardsAreDataDriven")
     require("client-unity/Assets/Scripts/Game/Network/GameApiClient.cs",
             "GetCampaignStagesAsync", "PlayCampaignStageAsync")
     require("client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs",
@@ -64,7 +68,7 @@ def main() -> int:
     require("client-unity/Assets/Scripts/Game/UI/MobileVerticalSliceController.cs",
             "BuildAdventure", "store.RecommendedStage", "BattleCampaignAsync(stage.stageId)")
 
-    print("CAMPAIGN_FLOW_OK stages=12 enemies=60 difficulties=3 progress=first-clear+stars client=connected")
+    print(f"CAMPAIGN_FLOW_OK stages=12 enemy_rows={len(enemies)} waves={len(wave_counts)} difficulties=3 progress=first-clear+stars client=connected")
     return 0
 
 

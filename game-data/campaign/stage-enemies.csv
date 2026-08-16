@@ -19,6 +19,11 @@ c1-s4,1,1,temari,,4
 c1-s4,1,2,kankuro,,4
 c1-s4,1,3,baki,,4
 c1-s4,1,4,chiyo,,4
+c1-s4,2,0,gaara,,6
+c1-s4,2,1,temari,,6
+c1-s4,2,2,kankuro,,6
+c1-s4,2,3,rasa,,6
+c1-s4,2,4,chiyo,,6
 c2-s1,1,0,kakashi-hatake,,6
 c2-s1,1,1,yamato,,6
 c2-s1,1,2,sai,,6
@@ -39,6 +44,11 @@ c2-s4,1,1,tobirama-senju,,12
 c2-s4,1,2,danzo-shimura,,12
 c2-s4,1,3,shisui-uchiha,,12
 c2-s4,1,4,madara-uchiha,,12
+c2-s4,2,0,hashirama-senju,,15
+c2-s4,2,1,tobirama-senju,,15
+c2-s4,2,2,madara-uchiha,,15
+c2-s4,2,3,minato-namikaze,,15
+c2-s4,2,4,hiruzen-sarutobi,,15
 c3-s1,1,0,gaara,,14
 c3-s1,1,1,temari,,14
 c3-s1,1,2,kankuro,,14
@@ -59,3 +69,8 @@ c3-s4,1,1,madara-uchiha,,22
 c3-s4,1,2,obito-uchiha,,22
 c3-s4,1,3,minato-namikaze,,22
 c3-s4,1,4,might-guy,,22
+c3-s4,2,0,hashirama-senju,,28
+c3-s4,2,1,madara-uchiha,,28
+c3-s4,2,2,obito-uchiha,,28
+c3-s4,2,3,minato-namikaze,,28
+c3-s4,2,4,might-guy,,28

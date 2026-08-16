@@ -3,10 +3,12 @@ package com.ninjaassemble.campaign.application;
 import com.ninjaassemble.campaign.domain.CampaignGate;
 import com.ninjaassemble.campaign.domain.RewardBundle;
 import com.ninjaassemble.campaign.domain.StageDefinition;
+import com.ninjaassemble.inventory.application.ItemCatalogService;
 import com.ninjaassemble.player.application.EnergyService;
 import com.ninjaassemble.player.application.PlayerService;
 import com.ninjaassemble.player.domain.PlayerEntity;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,13 +22,15 @@ public final class CampaignStageFlowService {
     private final CampaignProgressService progress;
     private final PlayerService players;
     private final EnergyService energy;
+    private final ItemCatalogService items;
 
     public CampaignStageFlowService(CampaignStageCatalogService catalog, CampaignProgressService progress,
-                                    PlayerService players, EnergyService energy) {
+                                    PlayerService players, EnergyService energy, ItemCatalogService items) {
         this.catalog = catalog;
         this.progress = progress;
         this.players = players;
         this.energy = energy;
+        this.items = items;
     }
 
     @Transactional
@@ -43,7 +47,7 @@ public final class CampaignStageFlowService {
             CampaignProgressService.StageProgress state = progressByStage.get(stage.id());
             result.add(new CampaignStageView(
                     stage.id(), stage.chapter(), stage.index(), stage.difficulty().name(), entry.nameEn(), entry.nameVi(),
-                    stage.energyCost(), stage.minPlayerLevel(), List.copyOf(stage.prerequisiteStageIds()),
+                    stage.energyCost(), stage.minPlayerLevel(), List.copyOf(stage.prerequisiteStageIds()), stage.waves().size(),
                     gate.allowed(), gate.missing(),
                     state == null ? 0 : state.clearCount(), state == null ? 0 : state.bestStars(),
                     reward(stage.firstClearReward()), reward(stage.repeatReward())));
@@ -62,16 +66,24 @@ public final class CampaignStageFlowService {
         return entry;
     }
 
-    private static CampaignRewardView reward(RewardBundle bundle) {
+    private CampaignRewardView reward(RewardBundle bundle) {
+        List<CampaignItemRewardView> itemViews = bundle.items().entrySet().stream()
+                .map(entry -> {
+                    ItemCatalogService.ItemDefinition definition = items.require(entry.getKey());
+                    return new CampaignItemRewardView(definition.id(), definition.nameEn(), definition.nameVi(), entry.getValue());
+                })
+                .sorted(Comparator.comparing(CampaignItemRewardView::itemId))
+                .toList();
         return new CampaignRewardView(
-                bundle.playerExp(), bundle.currencies().getOrDefault("GOLD", 0L), bundle.currencies().getOrDefault("DIAMOND", 0L));
+                bundle.playerExp(), bundle.currencies().getOrDefault("GOLD", 0L), bundle.currencies().getOrDefault("DIAMOND", 0L), itemViews);
     }
 
     public record CampaignStageList(String catalogVersion, int playerLevel, int energy, int energyCap, List<CampaignStageView> stages) {}
     public record CampaignStageView(
             String stageId, int chapter, int stageIndex, String difficulty, String nameEn, String nameVi,
-            int energyCost, int minPlayerLevel, List<String> prerequisiteStageIds,
+            int energyCost, int minPlayerLevel, List<String> prerequisiteStageIds, int waveCount,
             boolean unlocked, List<String> gateMissing, int clearCount, int bestStars,
             CampaignRewardView firstClearReward, CampaignRewardView repeatReward) {}
-    public record CampaignRewardView(long playerExp, long gold, long diamond) {}
+    public record CampaignRewardView(long playerExp, long gold, long diamond, List<CampaignItemRewardView> items) {}
+    public record CampaignItemRewardView(String itemId, String nameEn, String nameVi, long quantity) {}
 }
