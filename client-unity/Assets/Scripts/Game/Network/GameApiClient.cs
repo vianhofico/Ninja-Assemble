@@ -40,6 +40,13 @@ namespace NinjaAssemble.Network
         public Task<UpgradeResultDto> LevelUpAsync(string playerId, string playerHeroId, string requestId) => PostJsonAsync<UpgradeResultDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/level-up", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<OwnedHeroDto> SelectVariantAsync(string playerId, string playerHeroId, string variant) => PutJsonAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/variant", JsonUtility.ToJson(new VariantRequestDto { variant = variant }));
 
+        public Task<DevStateDto> GrantDevStandardPackAsync(string playerId) =>
+            PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/grant-standard-pack", "{}");
+        public Task<DevRosterResultDto> UnlockAllHeroesDevAsync(string playerId) =>
+            PostJsonAsync<DevRosterResultDto>($"/api/v1/dev/{Escape(playerId)}/unlock-all-heroes", "{}");
+        public Task<DevStateDto> RefillEnergyDevAsync(string playerId) =>
+            PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/refill-energy", "{}");
+
         private async Task<T> GetAsync<T>(string path)
         {
             using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path);
