@@ -21,9 +21,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Generate explicit Hero Version and Awakening catalogs
-        run: python scripts/generate-awakening-production-data.py --write
+        run: python scripts/generate-awakening-production-data-v2.py --write
       - name: Re-validate generation inputs
-        run: python scripts/generate-awakening-production-data.py
+        run: python scripts/generate-awakening-production-data-v2.py
       - name: Commit generated production-model artifacts
         run: |
           git config user.name "github-actions[bot]"
@@ -37,6 +37,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Generated M42 data is already up to date"
           else
-            git commit -m "M42: generate explicit hero version and awakening catalogs"
+            git commit -m "M42: regenerate empty-string-safe awakening SQL seed"
             git push origin HEAD:agent/m42-awakening-data-model
           fi
