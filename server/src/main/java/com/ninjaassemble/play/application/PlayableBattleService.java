@@ -11,6 +11,7 @@ import com.ninjaassemble.economy.domain.Currency;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.player.application.EnergyService;
 import com.ninjaassemble.player.application.PlayerService;
+import com.ninjaassemble.play.domain.BattleParticipant;
 import com.ninjaassemble.play.domain.ExperimentalCombatStatsResolver;
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -48,12 +49,27 @@ public class PlayableBattleService {
         FormationService.FormationView formation = formations.load(playerId);
         if (formation.heroes().size() != 5) throw new IllegalStateException("save a five-ninja campaign formation before battle");
         energy.spend(playerId, ENERGY_COST);
+
         List<BattleUnitSeed> units = new ArrayList<>();
+        List<BattleParticipant> participants = new ArrayList<>();
         for (int slot = 0; slot < formation.heroes().size(); slot++) {
             OwnedHeroView hero = formation.heroes().get(slot);
-            units.add(stats.resolve(hero.id().toString(), hero.characterId(), hero.currentVariant(), hero.level(), TeamSide.A, slot));
+            BattleUnitSeed unit = stats.resolve(
+                    hero.id().toString(), hero.characterId(), hero.currentVariant(), hero.level(), TeamSide.A, slot);
+            units.add(unit);
+            participants.add(new BattleParticipant(
+                    unit.id(), hero.characterId(), hero.displayName(), hero.currentVariant(), hero.level(),
+                    unit.side(), unit.slot(), unit.maxHp()));
         }
-        units.addAll(enemies.battleUnits());
+
+        for (VerticalEnemyTeamService.EnemyBattleEntry enemy : enemies.battleEntries()) {
+            BattleUnitSeed unit = enemy.unit();
+            units.add(unit);
+            participants.add(new BattleParticipant(
+                    unit.id(), enemy.characterId(), enemy.displayName(), enemy.variant(), enemy.level(),
+                    unit.side(), unit.slot(), unit.maxHp()));
+        }
+
         long seed = secureRandom.nextLong();
         BattleRuleset ruleset = BattleRuleset.experimentalV1();
         BattleResult result = engine.simulate(new BattleRequest(seed, ruleset, units));
@@ -65,8 +81,21 @@ public class PlayableBattleService {
                 insert into campaign_runs(id, player_id, stage_id, battle_seed, ruleset_version, result, reward_grant_key, started_at, completed_at)
                 values (?, ?, 'vertical-1', ?, ?, ?, ?, ?, ?)
                 """, battleId, playerId, seed, ruleset.version(), result.outcome().name(), rewardKey, clock.instant(), clock.instant());
-        return new PlayBattleResult(battleId, ENERGY_COST, gold, ExperimentalCombatStatsResolver.VERSION, result);
+        return new PlayBattleResult(
+                battleId,
+                ENERGY_COST,
+                gold,
+                ExperimentalCombatStatsResolver.VERSION,
+                List.copyOf(participants),
+                result);
     }
 
-    public record PlayBattleResult(UUID battleId, int energyCost, long goldReward, String combatStatsVersion, BattleResult battle) {}
+    public record PlayBattleResult(
+            UUID battleId,
+            int energyCost,
+            long goldReward,
+            String combatStatsVersion,
+            List<BattleParticipant> participants,
+            BattleResult battle
+    ) {}
 }

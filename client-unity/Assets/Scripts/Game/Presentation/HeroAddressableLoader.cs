@@ -17,6 +17,19 @@ namespace NinjaAssemble.Presentation
             return await Load<GameObject>(address);
         }
 
+        public async Task<GameObject> TryLoadPrefabAsync(string address)
+        {
+            if (string.IsNullOrWhiteSpace(address)) return null;
+            AsyncOperationHandle<GameObject> handle = Addressables.LoadAssetAsync<GameObject>(address);
+            await handle.Task;
+            if (handle.Status != AsyncOperationStatus.Succeeded || handle.Result == null)
+            {
+                if (handle.IsValid()) Addressables.Release(handle);
+                return null;
+            }
+            return handle.Result;
+        }
+
         private static async Task<T> Load<T>(string address) where T : Object
         {
             if (string.IsNullOrWhiteSpace(address)) throw new System.ArgumentException("Address is required", nameof(address));

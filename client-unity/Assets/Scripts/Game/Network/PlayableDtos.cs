@@ -9,9 +9,18 @@ namespace NinjaAssemble.Network
     }
     [Serializable] public sealed class BootstrapDto { public OwnedHeroDto[] heroes; public long gold; public long diamond; public int energy; public int energyCap; }
     [Serializable] public sealed class FormationDto { public OwnedHeroDto[] heroes; }
+    [Serializable] public sealed class BattleParticipantDto
+    {
+        public string battleUnitId; public string characterId; public string displayName; public string variant;
+        public int level; public string side; public int slot; public long maxHp;
+    }
     [Serializable] public sealed class BattleEventDto { public long sequence; public string type; public int round; public string actorId; public string targetId; public long amount; public bool critical; }
     [Serializable] public sealed class BattleResultDto { public long seed; public string rulesetVersion; public string outcome; public int rounds; public BattleEventDto[] events; }
-    [Serializable] public sealed class PlayBattleDto { public string battleId; public int energyCost; public long goldReward; public string combatStatsVersion; public BattleResultDto battle; }
+    [Serializable] public sealed class PlayBattleDto
+    {
+        public string battleId; public int energyCost; public long goldReward; public string combatStatsVersion;
+        public BattleParticipantDto[] participants; public BattleResultDto battle;
+    }
     [Serializable] public sealed class SummonResultDto
     {
         public string characterId; public string variant; public string rarity; public bool pityTriggered; public bool duplicate;

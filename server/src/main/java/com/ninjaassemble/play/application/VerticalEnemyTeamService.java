@@ -2,6 +2,7 @@ package com.ninjaassemble.play.application;
 
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
 import com.ninjaassemble.battle.sim.TeamSide;
+import com.ninjaassemble.hero.catalog.HeroCatalogEntry;
 import com.ninjaassemble.hero.catalog.HeroCatalogService;
 import com.ninjaassemble.play.domain.ExperimentalCombatStatsResolver;
 import java.io.BufferedReader;
@@ -26,14 +27,21 @@ public class VerticalEnemyTeamService {
         this.enemies = load();
     }
 
-    public List<BattleUnitSeed> battleUnits() {
-        List<BattleUnitSeed> result = new ArrayList<>();
+    public List<EnemyBattleEntry> battleEntries() {
+        List<EnemyBattleEntry> result = new ArrayList<>();
         for (Enemy enemy : enemies) {
-            catalog.require(enemy.characterId());
-            result.add(stats.resolve("enemy:" + enemy.slot() + ":" + enemy.characterId(), enemy.characterId(),
-                    enemy.variant().isBlank() ? null : enemy.variant(), enemy.level(), TeamSide.B, enemy.slot()));
+            HeroCatalogEntry hero = catalog.require(enemy.characterId());
+            String variant = enemy.variant().isBlank() ? null : enemy.variant();
+            BattleUnitSeed unit = stats.resolve(
+                    "enemy:" + enemy.slot() + ":" + enemy.characterId(),
+                    enemy.characterId(), variant, enemy.level(), TeamSide.B, enemy.slot());
+            result.add(new EnemyBattleEntry(unit, enemy.characterId(), hero.character(), variant, enemy.level()));
         }
-        return result;
+        return List.copyOf(result);
+    }
+
+    public List<BattleUnitSeed> battleUnits() {
+        return battleEntries().stream().map(EnemyBattleEntry::unit).toList();
     }
 
     private static List<Enemy> load() {
@@ -56,6 +64,14 @@ public class VerticalEnemyTeamService {
             throw new IllegalStateException("cannot load vertical slice enemy team", e);
         }
     }
+
+    public record EnemyBattleEntry(
+            BattleUnitSeed unit,
+            String characterId,
+            String displayName,
+            String variant,
+            int level
+    ) {}
 
     private record Enemy(int slot, String characterId, String variant, int level) {}
 }
