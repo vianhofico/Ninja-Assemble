@@ -1,0 +1,42 @@
+name: awakening-production-data-generation
+
+on:
+  push:
+    branches:
+      - agent/m42-awakening-data-model
+
+permissions:
+  contents: write
+
+jobs:
+  generate-awakening-data:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/m42-awakening-data-model
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate explicit Hero Version and Awakening catalogs
+        run: python scripts/generate-awakening-production-data.py --write
+      - name: Re-validate generation inputs
+        run: python scripts/generate-awakening-production-data.py
+      - name: Commit generated production-model artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add game-data/heroes/heroes.csv \
+                  game-data/skills/hero-version-skills.csv \
+                  game-data/progression/awakenings.csv \
+                  game-data/skills/awakening-skills.csv \
+                  game-data/assets/awakening-visuals.csv \
+                  server/src/main/resources/db/migration/V10__hero_version_awakening_model.sql
+          if git diff --cached --quiet; then
+            echo "Generated M42 data is already up to date"
+          else
+            git commit -m "M42: generate explicit hero version and awakening catalogs"
+            git push origin HEAD:agent/m42-awakening-data-model
+          fi
