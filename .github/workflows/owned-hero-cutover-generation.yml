@@ -1,0 +1,38 @@
+name: owned-hero-cutover-generation
+
+on:
+  push:
+    branches:
+      - agent/m43-owned-hero-cutover
+
+permissions:
+  contents: write
+
+jobs:
+  generate-cutover:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/m43-owned-hero-cutover
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate legacy ownership bridge and V11
+        run: python scripts/generate-owned-hero-cutover.py --write
+      - name: Validate generator inputs
+        run: python scripts/generate-owned-hero-cutover.py
+      - name: Commit generated cutover artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add game-data/migration/legacy-hero-version-map.csv \
+                  server/src/main/resources/db/migration/V11__owned_hero_version_cutover.sql
+          if git diff --cached --quiet; then
+            echo "Generated M43 cutover is already up to date"
+          else
+            git commit -m "M43: generate legacy ownership cutover mapping"
+            git push origin HEAD:agent/m43-owned-hero-cutover
+          fi
