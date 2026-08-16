@@ -39,6 +39,8 @@ jobs:
         run: python scripts/validate-campaign-stage-flow.py
       - name: Validate multi-wave campaign and inventory rewards
         run: python scripts/validate-multiwave-inventory.py
+      - name: Validate playable Arena flow
+        run: python scripts/validate-playable-arena.py
       - name: Verify Unity runtime art catalog can be regenerated from manifest
         run: |
           python scripts/generate-unity-art-runtime-catalog.py --output /tmp/hero-art-runtime-catalog.json

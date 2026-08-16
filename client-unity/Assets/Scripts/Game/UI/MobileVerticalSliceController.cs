@@ -77,6 +77,25 @@ namespace NinjaAssemble.UI
                         SetStatus(BattleStatus(result));
                         break;
                     }
+                    case ScreenId.Arena:
+                    {
+                        ArenaOpponentDto opponent = store.RecommendedArenaOpponent;
+                        if (opponent == null)
+                        {
+                            await store.RefreshArenaAsync();
+                            opponent = store.RecommendedArenaOpponent;
+                        }
+                        if (opponent == null)
+                        {
+                            SetStatus("No Arena opponent is available yet. Save a five-ninja formation first.");
+                            break;
+                        }
+                        SetStatus((opponent.training ? "Training mirror" : opponent.displayName) + " • Arena battle in progress...");
+                        ArenaBattleDto result = await store.FightArenaAsync(opponent.playerId);
+                        await PresentArenaBattle(result);
+                        SetStatus(ArenaBattleStatus(result));
+                        break;
+                    }
                     case ScreenId.Summon:
                     {
                         SetStatus("Summoning...");
@@ -146,6 +165,22 @@ namespace NinjaAssemble.UI
             }
         }
 
+        private async Task PresentArenaBattle(ArenaBattleDto result)
+        {
+            var visual = new PlayBattleDto
+            {
+                battleId = result.battleId,
+                stageId = "arena",
+                combatStatsVersion = result.combatStatsVersion,
+                abilityProfileVersion = result.abilityProfileVersion,
+                techniqueMappingVersion = result.techniqueMappingVersion,
+                passiveProfileVersion = result.passiveProfileVersion,
+                participants = result.participants,
+                battle = result.battle
+            };
+            await PresentBattle(visual);
+        }
+
         private async Task WaitForReplayAsync()
         {
             while (GetComponentsInChildren<BattleTimelinePlayer>(true).Any(player => player != null && player.IsPlaying))
@@ -165,6 +200,14 @@ namespace NinjaAssemble.UI
                 : " • " + string.Join(", ", result.itemRewards.Select(item => $"+{item.quantity} {item.itemId}"));
             return $"{result.stageId} • {result.battle?.outcome} • {result.stars}★ • {waveCount} wave(s) • {rounds} rounds" +
                    $" • +{result.goldReward} Gold • +{result.diamondReward} Diamond • +{result.playerExpReward} EXP{itemText}{clear}";
+        }
+
+        private static string ArenaBattleStatus(ArenaBattleDto result)
+        {
+            if (result.training)
+                return $"TRAINING • {result.battle?.outcome} • {result.battle?.rounds ?? 0} rounds • rating/reward unchanged";
+            string delta = result.ratingDelta >= 0 ? "+" + result.ratingDelta : result.ratingDelta.ToString();
+            return $"ARENA • {result.battle?.outcome} • Rating {result.ratingBefore:N0} → {result.ratingAfter:N0} ({delta}) • +{result.arenaCoinReward} Arena Coin";
         }
 
         private void Render()
@@ -189,14 +232,14 @@ namespace NinjaAssemble.UI
         {
             return screenId switch
             {
-                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\nCampaign: {store.Campaign?.stages?.Count(s => s.clearCount > 0) ?? 0}/{store.Campaign?.stages?.Length ?? 0} cleared\nInventory stacks: {store.Inventory?.items?.Length ?? 0}\n\nChoose a destination from the navigation below.",
+                ScreenId.Home => $"Hidden Village\n\nOwned ninja: {store.Heroes.Length}\nFormation: {(store.Formation?.heroes?.Length ?? 0)}/5\nCampaign: {store.Campaign?.stages?.Count(s => s.clearCount > 0) ?? 0}/{store.Campaign?.stages?.Length ?? 0} cleared\nInventory stacks: {store.Inventory?.items?.Length ?? 0}\nArena rating: {store.Arena?.rating ?? 0:N0}\n\nChoose a destination from the navigation below.",
                 ScreenId.NinjaRoster => "Ninja Roster\n\n" + string.Join("\n", store.Heroes.Take(18).Select(h => $"• {h.displayName}  Lv.{h.level}  [{h.currentVariant ?? "BASE"}]")),
                 ScreenId.HeroDetail => store.Heroes.FirstOrDefault() is { } h ? $"{h.displayName}\nLv.{h.level} • {h.frameTier}\nVariant: {h.currentVariant ?? "BASE"}\nAwakening: {h.awakeningLevel}\n\nUse TRAIN to exercise the live progression endpoint." : "No owned ninja yet.",
                 ScreenId.Formation => "Formation 5\n\n" + string.Join("\n", (store.Formation?.heroes ?? Array.Empty<OwnedHeroDto>()).Select((h, i) => $"{i + 1}. {h.displayName}  Lv.{h.level}")),
                 ScreenId.Adventure => BuildAdventure(store),
                 ScreenId.Battle => "Battle Debug\n\n5 vs 5 deterministic simulation\nDefault stage: c1-s1\nServer seed • structured skills/passives • authoritative rewards\n\nUse Adventure for campaign progression and boss multi-wave battles.",
                 ScreenId.Summon => $"Complete Roster+ Summon\n\nCost: {PlayableGameStore.CompleteRosterSummonCost} Diamond\nHard pity and duplicate Hero Coin conversion are server-authoritative.",
-                ScreenId.Arena => "Arena\n\n5-ninja asynchronous defense/offense foundation is available on the server domain.",
+                ScreenId.Arena => BuildArena(store),
                 ScreenId.ShadowArena => "Shadow Arena\n\n15 ninja • 3 squads • best-of-three foundation.",
                 ScreenId.Guild => "Guild\n\nMembership • contribution • mission • boss foundations.",
                 ScreenId.Shop => "Shops\n\nGold / Diamond / Arena / Hero / Guild / Shadow economy foundations.",
@@ -223,6 +266,18 @@ namespace NinjaAssemble.UI
             return $"Adventure • Lv.{campaign.playerLevel}\n{campaign.catalogVersion}\n\n{lines}\n\n{nextText}";
         }
 
+        private static string BuildArena(PlayableGameStore store)
+        {
+            ArenaStateDto arena = store.Arena;
+            if (arena == null) return "Arena\n\nArena state is loading...";
+            ArenaOpponentDto[] opponents = arena.opponents ?? Array.Empty<ArenaOpponentDto>();
+            string lines = opponents.Length == 0
+                ? "No five-ninja opponents available."
+                : string.Join("\n", opponents.Select((opponent, index) =>
+                    $"{index + 1}. {(opponent.training ? "[TRAINING] " : string.Empty)}{opponent.displayName} • R{opponent.rating:N0} • P{opponent.power:N0}"));
+            return $"Arena • {arena.seasonId}\nRating {arena.rating:N0}\n{arena.ratingProfileVersion}\n\n{lines}";
+        }
+
         private static string BuildInventory(PlayableGameStore store)
         {
             InventoryViewDto inventory = store.Inventory;
@@ -241,6 +296,9 @@ namespace NinjaAssemble.UI
                 ScreenId.Adventure => MobileGameBootstrap.IsReady && MobileGameBootstrap.Store.RecommendedStage != null
                     ? "FIGHT " + MobileGameBootstrap.Store.RecommendedStage.stageId
                     : "REFRESH",
+                ScreenId.Arena => MobileGameBootstrap.IsReady && MobileGameBootstrap.Store.RecommendedArenaOpponent is { } opponent
+                    ? opponent.training ? "TRAIN MIRROR" : "FIGHT " + opponent.displayName
+                    : "REFRESH ARENA",
                 ScreenId.Summon => "SUMMON",
                 ScreenId.HeroDetail => "TRAIN",
                 ScreenId.Inventory => "REFRESH INVENTORY",
