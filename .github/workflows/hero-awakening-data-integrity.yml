@@ -30,7 +30,7 @@ jobs:
       - name: Validate committed M42 data
         run: python scripts/validate-awakening-production-data.py
       - name: Regenerate M42 data deterministically
-        run: python scripts/generate-awakening-production-data.py --write
+        run: python scripts/generate-awakening-production-data-v2.py --write
       - name: Validate regenerated M42 data
         run: python scripts/validate-awakening-production-data.py
       - name: Require generated artifacts to be reproducible
