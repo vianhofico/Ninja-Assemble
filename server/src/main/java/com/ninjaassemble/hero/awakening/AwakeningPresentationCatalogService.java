@@ -1,11 +1,11 @@
 package com.ninjaassemble.hero.awakening;
 
-import com.ninjaassemble.hero.catalog.HeroContentCatalogService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public final class AwakeningPresentationCatalogService {
                 while ((line = reader.readLine()) != null) {
                     if (header) { header = false; continue; }
                     if (line.isBlank()) continue;
-                    List<String> cells = HeroContentCatalogService.parseCsvLine(line);
+                    List<String> cells = parseCsvLine(line);
                     if (cells.size() < 27) throw new IllegalStateException("invalid Awakening visual row");
                     AwakeningPresentation value = new AwakeningPresentation(
                             cells.get(0), cells.get(1),
@@ -60,6 +60,31 @@ public final class AwakeningPresentationCatalogService {
         } catch (IOException e) {
             throw new IllegalStateException("cannot read Awakening visual catalog", e);
         }
+    }
+
+    private static List<String> parseCsvLine(String line) {
+        List<String> cells = new ArrayList<>();
+        StringBuilder cell = new StringBuilder();
+        boolean quoted = false;
+        for (int i = 0; i < line.length(); i++) {
+            char ch = line.charAt(i);
+            if (ch == '"') {
+                if (quoted && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    cell.append('"');
+                    i++;
+                } else {
+                    quoted = !quoted;
+                }
+            } else if (ch == ',' && !quoted) {
+                cells.add(cell.toString());
+                cell.setLength(0);
+            } else {
+                cell.append(ch);
+            }
+        }
+        if (quoted) throw new IllegalStateException("unterminated quoted CSV field in Awakening visual catalog");
+        cells.add(cell.toString());
+        return cells;
     }
 
     public record AwakeningPresentation(
