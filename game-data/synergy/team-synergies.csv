@@ -1,0 +1,9 @@
+id,name_key,minimum_members,characters,status
+team-7,synergy.team7,4,naruto-uzumaki|sasuke-uchiha|sakura-haruno|kakashi-hatake,DESIGN_PENDING_PARITY
+team-10,synergy.team10,4,shikamaru-nara|ino-yamanaka|choji-akimichi|asuma-sarutobi,DESIGN_PENDING_PARITY
+team-guy,synergy.team_guy,4,neji-hyuga|rock-lee|tenten|might-guy,DESIGN_PENDING_PARITY
+team-8,synergy.team8,4,hinata-hyuga|kiba-inuzuka|shino-aburame|kurenai-yuhi,DESIGN_PENDING_PARITY
+legendary-sannin,synergy.sannin,3,jiraiya|tsunade|orochimaru,DESIGN_PENDING_PARITY
+founders,synergy.founders,2,hashirama-senju|madara-uchiha,DESIGN_PENDING_PARITY
+uchiha-brothers,synergy.uchiha_brothers,2,itachi-uchiha|sasuke-uchiha,DESIGN_PENDING_PARITY
+akatsuki-core,synergy.akatsuki,3,itachi-uchiha|kisame-hoshigaki|deidara|sasori|hidan|kakuzu|konan|nagato,DESIGN_PENDING_PARITY
