@@ -13,13 +13,18 @@ if spec is None or spec.loader is None:
 module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
 
-class ForceSkillMap(dict):
-    """Keep tuple-key lookup/items semantics while yielding variant labels for validation loops."""
-    def __iter__(self):
-        for character_id, variant in dict.keys(self):
-            yield variant
+class ForceKey(tuple):
+    """Tuple key that also behaves like its variant label for legacy validation code."""
+    def __new__(cls, character_id: str, variant: str):
+        return super().__new__(cls, (character_id, variant))
 
-module.FORCE_SKILLS = ForceSkillMap(module.FORCE_SKILLS)
+    def lower(self) -> str:
+        return self[1].lower()
+
+module.FORCE_SKILLS = {
+    ForceKey(character_id, variant): reason
+    for (character_id, variant), reason in module.FORCE_SKILLS.items()
+}
 
 if __name__ == "__main__":
     raise SystemExit(module.main())
