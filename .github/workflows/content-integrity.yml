@@ -25,6 +25,20 @@ jobs:
         run: python scripts/validate-mobile-build-source.py
       - name: Validate recorded mobile device evidence
         run: python scripts/validate-mobile-release-evidence.py
+      - name: Validate runtime 5v5 battle presentation contract
+        run: python scripts/validate-battle-visual-stage.py
+      - name: Verify Unity runtime art catalog can be regenerated from manifest
+        run: |
+          python scripts/generate-unity-art-runtime-catalog.py --output /tmp/hero-art-runtime-catalog.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          expected = json.loads(Path('client-unity/Assets/Resources/Generated/hero-art-runtime-catalog.json').read_text(encoding='utf-8'))
+          generated = json.loads(Path('/tmp/hero-art-runtime-catalog.json').read_text(encoding='utf-8'))
+          if expected != generated:
+              raise SystemExit('committed Unity art runtime catalog is out of sync with hero-art-manifest.csv')
+          print(f"UNITY_ART_RUNTIME_CATALOG_SYNC_OK rows={len(expected.get('entries', []))}")
+          PY
       - name: Generate full 427-variant art manifest candidate
         run: python scripts/generate-full-art-manifest.py --output /tmp/hero-art-manifest-full.csv
       - name: Generate full 427-variant component-status candidate

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using NinjaAssemble.Bootstrap;
 using NinjaAssemble.Playable;
+using NinjaAssemble.Presentation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,7 @@ namespace NinjaAssemble.UI
         [SerializeField] private TMP_Text statusText;
         [SerializeField] private Button primaryAction;
         [SerializeField] private TMP_Text primaryActionLabel;
+        private BattleVisualStage battleVisualStage;
 
         public void Configure(ScreenId id, TMP_Text resources, TMP_Text body, TMP_Text status, Button action, TMP_Text actionLabel)
         {
@@ -56,7 +58,9 @@ namespace NinjaAssemble.UI
                     {
                         SetStatus("Battle in progress...");
                         var result = await store.BattleAsync();
-                        SetStatus($"{result.battle.outcome} • {result.battle.rounds} rounds • +{result.goldReward} Gold");
+                        if (battleVisualStage == null) battleVisualStage = gameObject.AddComponent<BattleVisualStage>();
+                        await battleVisualStage.PresentAsync(result);
+                        SetStatus($"{result.battle.outcome} • {result.battle.rounds} rounds • +{result.goldReward} Gold • visual replay running");
                         break;
                     }
                     case ScreenId.Summon:
@@ -114,8 +118,8 @@ namespace NinjaAssemble.UI
                 ScreenId.NinjaRoster => "Ninja Roster\n\n" + string.Join("\n", store.Heroes.Take(18).Select(h => $"• {h.displayName}  Lv.{h.level}  [{h.currentVariant ?? "BASE"}]")),
                 ScreenId.HeroDetail => store.Heroes.FirstOrDefault() is { } h ? $"{h.displayName}\nLv.{h.level} • {h.frameTier}\nVariant: {h.currentVariant ?? "BASE"}\nAwakening: {h.awakeningLevel}\n\nUse TRAIN to exercise the live progression endpoint." : "No owned ninja yet.",
                 ScreenId.Formation => "Formation 5\n\n" + string.Join("\n", (store.Formation?.heroes ?? Array.Empty<NinjaAssemble.Network.OwnedHeroDto>()).Select((h, i) => $"{i + 1}. {h.displayName}  Lv.{h.level}")),
-                ScreenId.Adventure => "Adventure\n\nNormal • Elite • Heroic\n\nThe vertical slice launches the deterministic server-authoritative battle loop.",
-                ScreenId.Battle => "Battle\n\n5 vs 5 deterministic simulation\nServer seed • replay timeline • authoritative rewards\n\nTap FIGHT to run the current vertical-slice encounter.",
+                ScreenId.Adventure => "Adventure\n\nNormal • Elite • Heroic\n\nFIGHT launches the deterministic server battle and its 5v5 visual replay.",
+                ScreenId.Battle => "Battle\n\n5 vs 5 deterministic simulation\nServer seed • participant metadata • replay timeline • authoritative rewards\n\nFIGHT runs the encounter and visual replay.",
                 ScreenId.Summon => $"Complete Roster+ Summon\n\nCost: {PlayableGameStore.CompleteRosterSummonCost} Diamond\nHard pity and duplicate Hero Coin conversion are server-authoritative.",
                 ScreenId.Arena => "Arena\n\n5-ninja asynchronous defense/offense foundation is available on the server domain.",
                 ScreenId.ShadowArena => "Shadow Arena\n\n15 ninja • 3 squads • best-of-three foundation.",
