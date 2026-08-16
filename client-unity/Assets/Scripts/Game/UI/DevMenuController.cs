@@ -16,6 +16,17 @@ namespace NinjaAssemble.UI
         private TMP_Text status;
         private bool busy;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void EnsurePlaytestMenu()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (FindFirstObjectByType<DevMenuController>() != null) return;
+            var go = new GameObject("PlaytestDevMenu");
+            DontDestroyOnLoad(go);
+            go.AddComponent<DevMenuController>();
+#endif
+        }
+
         private void Start()
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -55,26 +66,21 @@ namespace NinjaAssemble.UI
             panelRect.anchoredPosition = new Vector2(-20f, -98f);
 
             TMP_Text title = CreateText(panel.transform, "Title", "PLAYTEST DEV MENU", 30, FontStyles.Bold, TextAlignmentOptions.Center);
-            SetRect(title.rectTransform, 24f, -24f, -24f, 72f);
+            SetRect(title.rectTransform, 24f, 24f, -24f, 48f);
 
             TMP_Text hint = CreateText(panel.transform, "Hint", "Requires server GAME_DEV_ENABLED=true", 18, FontStyles.Italic, TextAlignmentOptions.Center);
-            SetRect(hint.rectTransform, 24f, -72f, -24f, 42f);
+            SetRect(hint.rectTransform, 24f, 76f, -24f, 36f);
             hint.color = new Color(0.75f, 0.75f, 0.78f, 1f);
 
-            AddActionButton("GrantPack", "+1M GOLD / +10K DIAMOND", 116f, GrantPack);
-            AddActionButton("UnlockAll", "UNLOCK ALL HEROES", 188f, UnlockAllHeroes);
-            AddActionButton("RefillEnergy", "REFILL ENERGY", 260f, RefillEnergy);
-            AddActionButton("BattleTest", "OPEN BATTLE TEST", 332f, () => OpenScreen(ScreenId.Battle));
-            AddActionButton("SummonTest", "OPEN SUMMON TEST", 404f, () => OpenScreen(ScreenId.Summon));
-            AddActionButton("ResetGuest", "RESET LOCAL GUEST", 476f, ResetGuest);
+            AddActionButton("GrantPack", "+1M GOLD / +10K DIAMOND", 124f, GrantPack);
+            AddActionButton("UnlockAll", "UNLOCK ALL HEROES", 196f, UnlockAllHeroes);
+            AddActionButton("RefillEnergy", "REFILL ENERGY", 268f, RefillEnergy);
+            AddActionButton("BattleTest", "OPEN BATTLE TEST", 340f, () => OpenScreen(ScreenId.Battle));
+            AddActionButton("SummonTest", "OPEN SUMMON TEST", 412f, () => OpenScreen(ScreenId.Summon));
+            AddActionButton("ResetGuest", "RESET LOCAL GUEST", 484f, ResetGuest);
 
             status = CreateText(panel.transform, "Status", "Ready", 18, FontStyles.Normal, TextAlignmentOptions.TopLeft);
-            RectTransform statusRect = status.rectTransform;
-            statusRect.anchorMin = new Vector2(0f, 1f);
-            statusRect.anchorMax = new Vector2(1f, 1f);
-            statusRect.pivot = new Vector2(0.5f, 1f);
-            statusRect.offsetMin = new Vector2(24f, -620f);
-            statusRect.offsetMax = new Vector2(-24f, -548f);
+            SetRect(status.rectTransform, 24f, 556f, -24f, 60f);
             status.enableWordWrapping = true;
 
             panel.SetActive(false);
@@ -161,13 +167,15 @@ namespace NinjaAssemble.UI
         private void ResetGuest()
         {
             if (busy) return;
+            SetStatus("Resetting local guest...");
             MobileGameBootstrap.ResetLocalGuestAndRestart();
         }
 
         private static void RefreshCurrentScreen()
         {
-            MobileVerticalSliceController[] controllers = FindObjectsByType<MobileVerticalSliceController>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (MobileVerticalSliceController controller in controllers) controller.RefreshView();
+            Scene active = SceneManager.GetActiveScene();
+            if (!active.IsValid() || string.IsNullOrWhiteSpace(active.name) || active.name == MobileSceneNames.Bootstrap) return;
+            SceneManager.LoadScene(active.name);
         }
 
         private void SetStatus(string value)
