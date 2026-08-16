@@ -100,12 +100,10 @@ public class PlayableGameController {
     @PostMapping("/battle") public PlayableBattleService.PlayBattleResult battle(@PathVariable UUID playerId) { return battles.play(playerId); }
     @PostMapping("/summon") public SummonApplicationService.SummonResult summon(@PathVariable UUID playerId, @RequestBody ActionRequest request) { return summons.summon(playerId, requireRequestId(request)); }
     @PostMapping("/heroes/{playerHeroId}/level-up") public HeroUpgradeService.UpgradeResult levelUp(@PathVariable UUID playerId, @PathVariable UUID playerHeroId, @RequestBody ActionRequest request) { return upgrades.levelUp(playerId, playerHeroId, requireRequestId(request)); }
-    @PutMapping("/heroes/{playerHeroId}/variant") public OwnedHeroView selectVariant(@PathVariable UUID playerId, @PathVariable UUID playerHeroId, @RequestBody VariantRequest request) { return ownership.selectVariant(playerId, playerHeroId, request.variant()); }
 
     private static UUID requireRequestId(ActionRequest request) { if (request == null || request.requestId() == null) throw new IllegalArgumentException("requestId is required"); return request.requestId(); }
     public record FormationRequest(List<UUID> playerHeroIds) {}
     public record ActionRequest(UUID requestId) {}
-    public record VariantRequest(String variant) {}
     public record GuildNameRequest(String name) {}
     public record GuildContributionRequest(long goldAmount, UUID requestId) {}
 }
