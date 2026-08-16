@@ -1,0 +1,8 @@
+shop_id,status,currency,unknowns
+ninja-store,COMMUNITY_CONFIRMED,HERO_COIN,Exact offers/prices/reset
+mystic-vendor,COMMUNITY_CONFIRMED,MIXED,Exact refresh rules/offers
+six-path-shop,COMMUNITY_CONFIRMED,MIXED,Exact unlock/offers
+arena-store,COMMUNITY_CONFIRMED,ARENA_COIN,Exact offers/prices
+crusade-store,COMMUNITY_CONFIRMED,MIXED,Exact naming/offers
+guild-store,COMMUNITY_CONFIRMED,GUILD_COIN,Exact offers/prices
+shadow-store,COMMUNITY_CONFIRMED,SHADOW_COIN,Exact offers/prices
