@@ -55,8 +55,8 @@ def main() -> int:
         errors.append("proposal has duplicate hero_id")
     if set(hero_by_id) != set(pair_by_hero):
         errors.append(f"heroes.csv must exactly match proposal hero IDs proposal={len(pair_by_hero)} heroes={len(hero_by_id)}")
-    if len(heroes) != 194:
-        errors.append(f"M42 baseline expected 194 Hero Versions from M41, got {len(heroes)}")
+    if len(heroes) != len(pairs):
+        errors.append(f"Hero Version count must derive from approved proposal expected={len(pairs)} actual={len(heroes)}")
 
     aliases_by_hero: dict[str, list[dict[str, str]]] = defaultdict(list)
     alias_ids: set[str] = set()
@@ -95,10 +95,9 @@ def main() -> int:
             errors.append(f"{hero_id}: awakening_id does not match M41 proposal")
 
     proposed_awake = [r for r in pairs if r["awakening_form_id"].strip()]
-    if len(awakenings) != len(proposed_awake):
-        errors.append(f"Awakening count must match proposal pairs expected={len(proposed_awake)} actual={len(awakenings)}")
-    if len(awakenings) != 61:
-        errors.append(f"M42 baseline expected 61 Awakenings, got {len(awakenings)}")
+    expected_awakenings = len(proposed_awake)
+    if len(awakenings) != expected_awakenings:
+        errors.append(f"Awakening count must match proposal pairs expected={expected_awakenings} actual={len(awakenings)}")
     if len(awake_by_id) != len(awakenings):
         errors.append("duplicate awakening_id")
     awakened_forms = [r["awakened_form_id"].strip() for r in awakenings]
