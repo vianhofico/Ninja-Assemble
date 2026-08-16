@@ -1,0 +1,76 @@
+package com.ninjaassemble.play.api;
+
+import com.ninjaassemble.hero.ownership.HeroOwnershipService;
+import com.ninjaassemble.hero.ownership.OwnedHeroView;
+import com.ninjaassemble.play.application.FormationService;
+import com.ninjaassemble.play.application.HeroUpgradeService;
+import com.ninjaassemble.play.application.PlayableBattleService;
+import com.ninjaassemble.play.application.StarterRosterService;
+import com.ninjaassemble.play.application.SummonApplicationService;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/play/{playerId}")
+public class PlayableGameController {
+    private final StarterRosterService bootstrap;
+    private final HeroOwnershipService ownership;
+    private final FormationService formations;
+    private final PlayableBattleService battles;
+    private final SummonApplicationService summons;
+    private final HeroUpgradeService upgrades;
+
+    public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
+                                  PlayableBattleService battles, SummonApplicationService summons, HeroUpgradeService upgrades) {
+        this.bootstrap = bootstrap; this.ownership = ownership; this.formations = formations;
+        this.battles = battles; this.summons = summons; this.upgrades = upgrades;
+    }
+
+    @PostMapping("/bootstrap")
+    public StarterRosterService.BootstrapResult bootstrap(@PathVariable UUID playerId) { return bootstrap.bootstrap(playerId); }
+
+    @GetMapping("/heroes")
+    public List<OwnedHeroView> heroes(@PathVariable UUID playerId) { return ownership.list(playerId); }
+
+    @PutMapping("/formation")
+    public FormationService.FormationView formation(@PathVariable UUID playerId, @RequestBody FormationRequest request) {
+        return formations.save(playerId, request.playerHeroIds());
+    }
+
+    @GetMapping("/formation")
+    public FormationService.FormationView formation(@PathVariable UUID playerId) { return formations.load(playerId); }
+
+    @PostMapping("/battle")
+    public PlayableBattleService.PlayBattleResult battle(@PathVariable UUID playerId) { return battles.play(playerId); }
+
+    @PostMapping("/summon")
+    public SummonApplicationService.SummonResult summon(@PathVariable UUID playerId, @RequestBody ActionRequest request) {
+        return summons.summon(playerId, requireRequestId(request));
+    }
+
+    @PostMapping("/heroes/{playerHeroId}/level-up")
+    public HeroUpgradeService.UpgradeResult levelUp(@PathVariable UUID playerId, @PathVariable UUID playerHeroId, @RequestBody ActionRequest request) {
+        return upgrades.levelUp(playerId, playerHeroId, requireRequestId(request));
+    }
+
+    @PutMapping("/heroes/{playerHeroId}/variant")
+    public OwnedHeroView selectVariant(@PathVariable UUID playerId, @PathVariable UUID playerHeroId, @RequestBody VariantRequest request) {
+        return ownership.selectVariant(playerId, playerHeroId, request.variant());
+    }
+
+    private static UUID requireRequestId(ActionRequest request) {
+        if (request == null || request.requestId() == null) throw new IllegalArgumentException("requestId is required");
+        return request.requestId();
+    }
+
+    public record FormationRequest(List<UUID> playerHeroIds) {}
+    public record ActionRequest(UUID requestId) {}
+    public record VariantRequest(String variant) {}
+}
