@@ -28,12 +28,21 @@ public final class DeterministicBattleEngine {
                 if (!actor.alive() || winner(states) != null) break;
                 State target = selectFrontmostEnemy(states, actor.side());
                 if (target == null) break;
-                boolean critical = rollCritical(random, actor.seed);
-                long damage = damage(actor.seed, target.seed, request.ruleset(), critical);
-                events.add(new BattleEvent(seq++, BattleEventType.ATTACK, round, actor.id(), target.id(), 0, critical));
+
+                BattleAbility ability = actor.nextAbility();
+                boolean critical = rollCritical(random, actor.seed, ability.channel());
+                long damage = damage(actor.seed, target.seed, ability, request.ruleset(), critical);
+                int energyAfter = actor.applyEnergy(ability.energyDelta());
+
+                events.add(new BattleEvent(seq++, BattleEventType.ATTACK, round, actor.id(), target.id(), 0, critical,
+                        ability.id(), ability.kind(), ability.effectKey(), energyAfter));
                 long applied = target.damage(damage);
-                events.add(new BattleEvent(seq++, BattleEventType.DAMAGE, round, actor.id(), target.id(), applied, critical));
-                if (!target.alive()) events.add(new BattleEvent(seq++, BattleEventType.KO, round, actor.id(), target.id(), 0, false));
+                events.add(new BattleEvent(seq++, BattleEventType.DAMAGE, round, actor.id(), target.id(), applied, critical,
+                        ability.id(), ability.kind(), ability.effectKey(), energyAfter));
+                if (!target.alive()) {
+                    events.add(new BattleEvent(seq++, BattleEventType.KO, round, actor.id(), target.id(), 0, false,
+                            ability.id(), ability.kind(), ability.effectKey(), energyAfter));
+                }
             }
         }
 
@@ -49,16 +58,16 @@ public final class DeterministicBattleEngine {
                 .min(Comparator.comparingInt(State::slot).thenComparing(State::id)).orElse(null);
     }
 
-    private static boolean rollCritical(SplittableRandom random, BattleUnitSeed actor) {
-        int chance = actor.primaryChannel() == DamageChannel.PHYSICAL ? actor.physicalCritBps() : actor.chakraCritBps();
+    private static boolean rollCritical(SplittableRandom random, BattleUnitSeed actor, DamageChannel channel) {
+        int chance = channel == DamageChannel.PHYSICAL ? actor.physicalCritBps() : actor.chakraCritBps();
         return random.nextInt(10_000) < chance;
     }
 
-    private static long damage(BattleUnitSeed actor, BattleUnitSeed target, BattleRuleset rules, boolean critical) {
-        boolean physical = actor.primaryChannel() == DamageChannel.PHYSICAL;
+    private static long damage(BattleUnitSeed actor, BattleUnitSeed target, BattleAbility ability, BattleRuleset rules, boolean critical) {
+        boolean physical = ability.channel() == DamageChannel.PHYSICAL;
         long attack = physical ? actor.physicalAttack() : actor.chakraAttack();
         long defense = physical ? target.physicalDefense() : target.chakraDefense();
-        long raw = Math.max(1, Math.multiplyExact(attack, rules.basicAttackCoefficientBps()) / 10_000);
+        long raw = Math.max(1, Math.multiplyExact(attack, ability.coefficientBps()) / 10_000);
         long mitigated = Math.max(1, raw * rules.defenseScale() / (rules.defenseScale() + defense));
         return critical ? Math.max(1, mitigated * rules.criticalMultiplierBps() / 10_000) : mitigated;
     }
@@ -78,7 +87,33 @@ public final class DeterministicBattleEngine {
     private static final class State {
         private final BattleUnitSeed seed;
         private long hp;
-        private State(BattleUnitSeed seed) { this.seed = seed; this.hp = seed.maxHp(); }
+        private int energy;
+        private int comboStep;
+
+        private State(BattleUnitSeed seed) {
+            this.seed = seed;
+            this.hp = seed.maxHp();
+        }
+
+        private BattleAbility nextAbility() {
+            if (energy >= 100) {
+                comboStep = 0;
+                return seed.abilities().ultimate();
+            }
+            BattleAbility ability = switch (comboStep) {
+                case 0 -> seed.abilities().basic();
+                case 1 -> seed.abilities().skill1();
+                default -> seed.abilities().skill2();
+            };
+            comboStep = (comboStep + 1) % 3;
+            return ability;
+        }
+
+        private int applyEnergy(int delta) {
+            energy = Math.max(0, Math.min(100, energy + delta));
+            return energy;
+        }
+
         private boolean alive() { return hp > 0; }
         private String id() { return seed.id(); }
         private TeamSide side() { return seed.side(); }

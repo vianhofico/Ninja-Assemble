@@ -3,3 +3,4 @@ experimental-combat-stats-v1,COMBAT_STATS,EXPERIMENTAL,30,10,3,Temporary derived
 experimental-v1-unverified-formula,DAMAGE_FORMULA,EXPERIMENTAL,50,15,3,Temporary deterministic damage/crit/defense ruleset
 complete-roster-experimental-v1,SUMMON_PROFILE,EXPERIMENTAL,500,10,3,Development Complete Roster+ summon rates rarity and pity
 experimental-level-cost-v1,LEVEL_COST,EXPERIMENTAL,20,10,2,Temporary hero level-up Gold cost profile
+experimental-ability-cycle-v1,ABILITY_CYCLE,EXPERIMENTAL,60,20,3,Temporary basic/skill/ultimate coefficients and energy cycle

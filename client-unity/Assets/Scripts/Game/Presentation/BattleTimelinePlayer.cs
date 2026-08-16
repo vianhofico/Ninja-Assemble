@@ -48,7 +48,11 @@ namespace NinjaAssemble.Presentation
                 {
                     case "ATTACK":
                         BattleActorView actor;
-                        if (TryGetActor(item.ActorId, out actor)) actor.PlayAttack();
+                        if (TryGetActor(item.ActorId, out actor))
+                        {
+                            actor.PlayAbility(item.AbilityKind);
+                            actor.SetEnergy(item.EnergyAfter);
+                        }
                         yield return new WaitForSeconds(attackLeadSeconds);
                         break;
                     case "DAMAGE":

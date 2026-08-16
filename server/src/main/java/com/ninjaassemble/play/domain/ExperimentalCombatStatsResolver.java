@@ -11,9 +11,11 @@ import org.springframework.stereotype.Component;
 public class ExperimentalCombatStatsResolver {
     public static final String VERSION = ReferenceProfiles.COMBAT_STATS;
     private final HeroContentCatalogService content;
+    private final ExperimentalAbilityProfile abilities;
 
-    public ExperimentalCombatStatsResolver(HeroContentCatalogService content) {
+    public ExperimentalCombatStatsResolver(HeroContentCatalogService content, ExperimentalAbilityProfile abilities) {
         this.content = content;
+        this.abilities = abilities;
     }
 
     public BattleUnitSeed resolve(String battleUnitId, String characterId, String variant, int level, TeamSide side, int slot) {
@@ -30,6 +32,6 @@ public class ExperimentalCombatStatsResolver {
         long cDef = 80L + level * 10L + (hash / 13) % 31;
         int speed = 90 + hash % 31;
         int crit = 800 + hash % 1_201;
-        return new BattleUnitSeed(battleUnitId, side, slot, hp, pAtk, cAtk, pDef, cDef, speed, crit, crit, channel);
+        return new BattleUnitSeed(battleUnitId, side, slot, hp, pAtk, cAtk, pDef, cDef, speed, crit, crit, channel, abilities.resolve(kit));
     }
 }

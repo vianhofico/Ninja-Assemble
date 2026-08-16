@@ -11,14 +11,18 @@ namespace NinjaAssemble.Presentation
         [field: SerializeField] public string Variant { get; private set; }
         [field: SerializeField] public long MaxHp { get; private set; }
         [field: SerializeField] public long CurrentHp { get; private set; }
+        [field: SerializeField] public int Energy { get; private set; }
 
         [SerializeField] private Animator animator;
         [SerializeField] private Transform hitAnchor;
         [SerializeField] private TMP_Text nameLabel;
         [SerializeField] private TMP_Text levelLabel;
         [SerializeField] private Slider healthSlider;
+        [SerializeField] private Slider energySlider;
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip attackClip;
+        [SerializeField] private AudioClip skillClip;
+        [SerializeField] private AudioClip ultimateClip;
         [SerializeField] private AudioClip hitClip;
         [SerializeField] private AudioClip deathClip;
         [SerializeField] private AudioClip victoryClip;
@@ -44,9 +48,11 @@ namespace NinjaAssemble.Presentation
             Variant = variant ?? string.Empty;
             MaxHp = System.Math.Max(1L, maxHp);
             CurrentHp = MaxHp;
+            Energy = 0;
             if (nameLabel != null) nameLabel.text = string.IsNullOrWhiteSpace(displayName) ? CharacterId : displayName;
             if (levelLabel != null) levelLabel.text = "Lv." + Mathf.Max(1, level);
             UpdateHealthUi();
+            UpdateEnergyUi();
         }
 
         public void ConfigureUi(TMP_Text name, TMP_Text level, Slider hp)
@@ -57,10 +63,43 @@ namespace NinjaAssemble.Presentation
             UpdateHealthUi();
         }
 
-        public void PlayAttack()
+        public void ConfigureEnergyUi(Slider energy)
         {
-            Trigger("Attack");
-            PlayClip(attackClip);
+            energySlider = energy;
+            UpdateEnergyUi();
+        }
+
+        public void PlayAttack() => PlayAbility("BASIC");
+
+        public void PlayAbility(string abilityKind)
+        {
+            string kind = string.IsNullOrWhiteSpace(abilityKind) ? "BASIC" : abilityKind.ToUpperInvariant();
+            switch (kind)
+            {
+                case "ULTIMATE":
+                    TriggerWithFallback("Ultimate", "Attack");
+                    PlayClip(ultimateClip != null ? ultimateClip : skillClip);
+                    break;
+                case "SKILL1":
+                    TriggerWithFallback("Skill1", "Attack");
+                    PlayClip(skillClip != null ? skillClip : attackClip);
+                    break;
+                case "SKILL2":
+                    TriggerWithFallback("Skill2", "Attack");
+                    PlayClip(skillClip != null ? skillClip : attackClip);
+                    break;
+                default:
+                    Trigger("Attack");
+                    PlayClip(attackClip);
+                    break;
+            }
+        }
+
+        public void SetEnergy(int value)
+        {
+            if (value < 0) return;
+            Energy = Mathf.Clamp(value, 0, 100);
+            UpdateEnergyUi();
         }
 
         public void ApplyDamage(long amount, bool critical)
@@ -94,6 +133,29 @@ namespace NinjaAssemble.Presentation
             healthSlider.minValue = 0f;
             healthSlider.maxValue = 1f;
             healthSlider.value = MaxHp <= 0 ? 0f : Mathf.Clamp01((float)CurrentHp / MaxHp);
+        }
+
+        private void UpdateEnergyUi()
+        {
+            if (energySlider == null) return;
+            energySlider.minValue = 0f;
+            energySlider.maxValue = 100f;
+            energySlider.value = Energy;
+        }
+
+        private void TriggerWithFallback(string primary, string fallback)
+        {
+            if (animator == null) return;
+            int primaryHash = Animator.StringToHash(primary);
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.nameHash == primaryHash)
+                {
+                    animator.SetTrigger(primaryHash);
+                    return;
+                }
+            }
+            Trigger(fallback);
         }
 
         private void Trigger(string trigger)

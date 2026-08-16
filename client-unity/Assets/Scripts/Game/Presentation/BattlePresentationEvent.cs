@@ -12,5 +12,9 @@ namespace NinjaAssemble.Presentation
         public string TargetId;
         public long Amount;
         public bool Critical;
+        public string AbilityId;
+        public string AbilityKind;
+        public string EffectKey;
+        public int EnergyAfter;
     }
 }

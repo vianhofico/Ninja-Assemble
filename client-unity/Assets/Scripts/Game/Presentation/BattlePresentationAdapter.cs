@@ -24,7 +24,11 @@ namespace NinjaAssemble.Presentation
                     ActorId = item.actorId ?? string.Empty,
                     TargetId = item.targetId ?? string.Empty,
                     Amount = item.amount,
-                    Critical = item.critical
+                    Critical = item.critical,
+                    AbilityId = item.abilityId ?? string.Empty,
+                    AbilityKind = item.abilityKind ?? string.Empty,
+                    EffectKey = item.effectKey ?? string.Empty,
+                    EnergyAfter = item.energyAfter
                 });
             }
             return result;
