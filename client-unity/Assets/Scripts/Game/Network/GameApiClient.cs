@@ -27,6 +27,8 @@ namespace NinjaAssemble.Network
         public Task<BootstrapDto> BootstrapAsync(string playerId) => PostJsonAsync<BootstrapDto>($"/api/v1/play/{Escape(playerId)}/bootstrap", "{}");
         public Task<OwnedHeroDto[]> GetOwnedHeroesAsync(string playerId) => GetArrayAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes");
         public Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds) => PutJsonAsync<FormationDto>($"/api/v1/play/{Escape(playerId)}/formation", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
+        public Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId) => GetAsync<CampaignStageListDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages");
+        public Task<PlayBattleDto> PlayCampaignStageAsync(string playerId, string stageId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages/{Escape(stageId)}/battle", "{}");
         public Task<PlayBattleDto> PlayBattleAsync(string playerId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/battle", "{}");
         public Task<SummonResultDto> SummonAsync(string playerId, string requestId) => PostJsonAsync<SummonResultDto>($"/api/v1/play/{Escape(playerId)}/summon", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<UpgradeResultDto> LevelUpAsync(string playerId, string playerHeroId, string requestId) => PostJsonAsync<UpgradeResultDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/level-up", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));

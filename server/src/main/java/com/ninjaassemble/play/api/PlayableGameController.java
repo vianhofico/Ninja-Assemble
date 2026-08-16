@@ -1,5 +1,6 @@
 package com.ninjaassemble.play.api;
 
+import com.ninjaassemble.campaign.application.CampaignStageFlowService;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.play.application.FormationService;
@@ -24,13 +25,20 @@ public class PlayableGameController {
     private final HeroOwnershipService ownership;
     private final FormationService formations;
     private final PlayableBattleService battles;
+    private final CampaignStageFlowService campaign;
     private final SummonApplicationService summons;
     private final HeroUpgradeService upgrades;
 
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
-                                  PlayableBattleService battles, SummonApplicationService summons, HeroUpgradeService upgrades) {
-        this.bootstrap = bootstrap; this.ownership = ownership; this.formations = formations;
-        this.battles = battles; this.summons = summons; this.upgrades = upgrades;
+                                  PlayableBattleService battles, CampaignStageFlowService campaign,
+                                  SummonApplicationService summons, HeroUpgradeService upgrades) {
+        this.bootstrap = bootstrap;
+        this.ownership = ownership;
+        this.formations = formations;
+        this.battles = battles;
+        this.campaign = campaign;
+        this.summons = summons;
+        this.upgrades = upgrades;
     }
 
     @PostMapping("/bootstrap")
@@ -46,6 +54,14 @@ public class PlayableGameController {
 
     @GetMapping("/formation")
     public FormationService.FormationView formation(@PathVariable UUID playerId) { return formations.load(playerId); }
+
+    @GetMapping("/campaign/stages")
+    public CampaignStageFlowService.CampaignStageList campaignStages(@PathVariable UUID playerId) { return campaign.list(playerId); }
+
+    @PostMapping("/campaign/stages/{stageId}/battle")
+    public PlayableBattleService.PlayBattleResult campaignBattle(@PathVariable UUID playerId, @PathVariable String stageId) {
+        return battles.play(playerId, stageId);
+    }
 
     @PostMapping("/battle")
     public PlayableBattleService.PlayBattleResult battle(@PathVariable UUID playerId) { return battles.play(playerId); }
