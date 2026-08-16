@@ -16,6 +16,9 @@ client-unity/[Bb]uilds/
 client-unity/[Ll]ogs/
 client-unity/[Uu]ser[Ss]ettings/
 
+# Generated build output
+builds/
+
 # OS
 .DS_Store
 Thumbs.db

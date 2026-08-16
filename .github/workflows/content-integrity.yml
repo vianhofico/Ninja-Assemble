@@ -15,10 +15,16 @@ jobs:
         run: python scripts/validate-content.py
       - name: Validate component-level art package states
         run: python scripts/validate-art-packages.py
+      - name: Validate production files behind READY art components
+        run: python scripts/validate-production-assets.py
       - name: Validate reference evidence confidence gates
         run: python scripts/validate-reference-evidence.py
       - name: Validate mobile scene source shell
         run: python scripts/validate-unity-shell.py
+      - name: Validate Android build automation source
+        run: python scripts/validate-mobile-build-source.py
+      - name: Validate recorded mobile device evidence
+        run: python scripts/validate-mobile-release-evidence.py
       - name: Generate full 427-variant art manifest candidate
         run: python scripts/generate-full-art-manifest.py --output /tmp/hero-art-manifest-full.csv
       - name: Generate full 427-variant component-status candidate
