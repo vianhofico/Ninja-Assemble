@@ -19,7 +19,17 @@ jobs:
           java-version: '21'
           cache: maven
       - name: Validate all Hero Version skill identities
-        run: python scripts/validate-m47-skill-identity.py
+        shell: bash
+        run: |
+          set +e
+          output=$(python scripts/validate-m47-skill-identity.py 2>&1)
+          code=$?
+          printf '%s\n' "$output"
+          if [ "$code" -ne 0 ]; then
+            compact=$(printf '%s' "$output" | tr '\n' ' ' | sed 's/%/%25/g; s/\r/%0D/g; s/\n/%0A/g')
+            echo "::error title=M47 Skill Identity::$compact"
+            exit "$code"
+          fi
       - name: Run focused runtime catalog tests
         working-directory: server
         run: mvn -B -Dtest=HeroContentCatalogServiceTest test
