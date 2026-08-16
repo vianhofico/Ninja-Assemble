@@ -1,0 +1,5 @@
+profile_id,category,status,min_samples,min_distinct_contexts,min_evidence_refs,description
+experimental-combat-stats-v1,COMBAT_STATS,EXPERIMENTAL,30,10,3,Temporary derived stats for catalog characters/forms
+experimental-v1-unverified-formula,DAMAGE_FORMULA,EXPERIMENTAL,50,15,3,Temporary deterministic damage/crit/defense ruleset
+complete-roster-experimental-v1,SUMMON_PROFILE,EXPERIMENTAL,500,10,3,Development Complete Roster+ summon rates rarity and pity
+experimental-level-cost-v1,LEVEL_COST,EXPERIMENTAL,20,10,2,Temporary hero level-up Gold cost profile

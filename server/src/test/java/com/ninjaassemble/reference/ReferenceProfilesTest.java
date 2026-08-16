@@ -1,0 +1,21 @@
+package com.ninjaassemble.reference;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ReferenceProfilesTest {
+    @Test
+    void allCurrentRuntimeProfilesRemainExplicitlyExperimental() {
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.COMBAT_STATS));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.DAMAGE_FORMULA));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.COMPLETE_ROSTER_SUMMON));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.HERO_LEVEL_COST));
+    }
+
+    @Test
+    void unknownProfilesCannotBeSilentlyTreatedAsVerified() {
+        assertThrows(IllegalArgumentException.class, () -> ReferenceProfiles.confidence("unknown-profile"));
+    }
+}

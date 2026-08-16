@@ -13,6 +13,8 @@ jobs:
           python-version: '3.12'
       - name: Validate roster, variants, localization and art manifest
         run: python scripts/validate-content.py
+      - name: Validate reference evidence confidence gates
+        run: python scripts/validate-reference-evidence.py
       - name: Validate mobile scene source shell
         run: python scripts/validate-unity-shell.py
       - name: Generate full 427-variant art manifest candidate

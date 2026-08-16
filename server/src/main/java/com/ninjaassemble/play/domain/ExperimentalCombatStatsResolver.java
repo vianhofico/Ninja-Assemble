@@ -4,11 +4,12 @@ import com.ninjaassemble.battle.domain.DamageChannel;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.hero.catalog.HeroContentCatalogService;
+import com.ninjaassemble.reference.ReferenceProfiles;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ExperimentalCombatStatsResolver {
-    public static final String VERSION = "experimental-combat-stats-v1";
+    public static final String VERSION = ReferenceProfiles.COMBAT_STATS;
     private final HeroContentCatalogService content;
 
     public ExperimentalCombatStatsResolver(HeroContentCatalogService content) {

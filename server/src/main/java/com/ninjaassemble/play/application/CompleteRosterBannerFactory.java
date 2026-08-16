@@ -3,6 +3,7 @@ package com.ninjaassemble.play.application;
 import com.ninjaassemble.hero.catalog.HeroCatalogService;
 import com.ninjaassemble.hero.catalog.HeroVariantEntry;
 import com.ninjaassemble.hero.catalog.VariantCatalogService;
+import com.ninjaassemble.reference.ReferenceProfiles;
 import com.ninjaassemble.summon.domain.SummonBannerDefinition;
 import com.ninjaassemble.summon.domain.SummonPoolEntry;
 import com.ninjaassemble.summon.domain.SummonRarity;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompleteRosterBannerFactory {
     public static final String BANNER_ID = "complete-roster";
-    public static final String VERSION = "complete-roster-experimental-v1";
+    public static final String VERSION = ReferenceProfiles.COMPLETE_ROSTER_SUMMON;
     public static final long COST = 200;
     private final HeroCatalogService catalog;
     private final VariantCatalogService variants;

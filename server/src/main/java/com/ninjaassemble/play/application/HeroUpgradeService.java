@@ -5,6 +5,7 @@ import com.ninjaassemble.economy.domain.Currency;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.player.application.PlayerService;
+import com.ninjaassemble.reference.ReferenceProfiles;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,7 +38,7 @@ public class HeroUpgradeService {
         wallet.mutate(playerId, Currency.GOLD, -goldCost, "HERO_LEVEL_UP", playerHeroId.toString(), "upgrade:" + requestId + ":gold");
         jdbc.update("update player_heroes set level = level + 1 where id = ? and player_id = ?", playerHeroId, playerId);
         OwnedHeroView after = ownership.requireOwned(playerId, playerHeroId);
-        UpgradeResult result = new UpgradeResult(after, goldCost, "experimental-level-cost-v1");
+        UpgradeResult result = new UpgradeResult(after, goldCost, ReferenceProfiles.HERO_LEVEL_COST);
         requests.complete(playerId, requestId, after.id() + "\t" + goldCost);
         return result;
     }
@@ -47,7 +48,7 @@ public class HeroUpgradeService {
         if (p.length != 2) throw new IllegalStateException("corrupt stored upgrade response");
         UUID heroId = UUID.fromString(p[0]);
         long cost = Long.parseLong(p[1]);
-        return new UpgradeResult(ownership.requireOwned(playerId, heroId), cost, "experimental-level-cost-v1");
+        return new UpgradeResult(ownership.requireOwned(playerId, heroId), cost, ReferenceProfiles.HERO_LEVEL_COST);
     }
 
     public record UpgradeResult(OwnedHeroView hero, long goldCost, String costProfileVersion) {}
