@@ -11,6 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ExperimentalAbilityProfile {
     public static final String VERSION = ReferenceProfiles.ABILITY_CYCLE;
+    private final TechniqueEffectResolver effects;
+
+    public ExperimentalAbilityProfile() {
+        this(new TechniqueEffectResolver());
+    }
+
+    ExperimentalAbilityProfile(TechniqueEffectResolver effects) {
+        this.effects = effects;
+    }
 
     public BattleAbilitySet resolve(HeroContentCatalogService.HeroKitView kit) {
         if (kit == null || kit.techniques() == null || kit.techniques().size() < 4) throw new IllegalArgumentException("kit needs four executable techniques");
@@ -21,14 +30,18 @@ public final class ExperimentalAbilityProfile {
                 map(kit.techniques().get(3), BattleAbilityKind.ULTIMATE, 22_000, -100));
     }
 
-    private static BattleAbility map(HeroContentCatalogService.TechniqueView technique, BattleAbilityKind kind, int coefficientBps, int energyDelta) {
+    private BattleAbility map(HeroContentCatalogService.TechniqueView technique, BattleAbilityKind kind, int coefficientBps, int energyDelta) {
         DamageChannel channel = DamageChannel.valueOf(technique.channel());
+        TechniqueEffectResolver.Resolution resolution = effects.resolve(technique);
+        if (resolution.status() != TechniqueEffectResolver.MappingStatus.RUNTIME || resolution.effects().isEmpty())
+            throw new IllegalStateException("executable technique has no runtime effect mapping: " + technique.id());
         return new BattleAbility(
                 technique.id(),
                 kind,
                 channel,
                 coefficientBps,
                 energyDelta,
-                "vfx/techniques/" + technique.id());
+                "vfx/techniques/" + technique.id(),
+                resolution.effects());
     }
 }

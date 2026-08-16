@@ -9,6 +9,7 @@ public final class ReferenceProfiles {
     public static final String HERO_LEVEL_COST = "experimental-level-cost-v1";
     public static final String ABILITY_CYCLE = "experimental-ability-cycle-v1";
     public static final String STRUCTURED_EFFECTS = "experimental-structured-effects-v1";
+    public static final String TECHNIQUE_MAPPING = "experimental-technique-mapping-v1";
 
     private static final Map<String, ReferenceConfidence> CONFIDENCE = Map.of(
             COMBAT_STATS, ReferenceConfidence.EXPERIMENTAL,
@@ -16,7 +17,8 @@ public final class ReferenceProfiles {
             COMPLETE_ROSTER_SUMMON, ReferenceConfidence.EXPERIMENTAL,
             HERO_LEVEL_COST, ReferenceConfidence.EXPERIMENTAL,
             ABILITY_CYCLE, ReferenceConfidence.EXPERIMENTAL,
-            STRUCTURED_EFFECTS, ReferenceConfidence.EXPERIMENTAL
+            STRUCTURED_EFFECTS, ReferenceConfidence.EXPERIMENTAL,
+            TECHNIQUE_MAPPING, ReferenceConfidence.EXPERIMENTAL
     );
 
     private ReferenceProfiles() {}
