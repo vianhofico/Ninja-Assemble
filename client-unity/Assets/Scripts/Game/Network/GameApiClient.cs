@@ -33,56 +33,27 @@ namespace NinjaAssemble.Network
         public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/arena");
         public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle", "{}");
         public Task<ShopViewDto> GetShopAsync(string playerId) => GetAsync<ShopViewDto>($"/api/v1/play/{Escape(playerId)}/shop");
-        public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId) =>
-            PostJsonAsync<ShopPurchaseResultDto>($"/api/v1/play/{Escape(playerId)}/shop/{Escape(shopId)}/{Escape(offerId)}/purchase", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId) => PostJsonAsync<ShopPurchaseResultDto>($"/api/v1/play/{Escape(playerId)}/shop/{Escape(shopId)}/{Escape(offerId)}/purchase", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<QuestBoardDto> GetQuestsAsync(string playerId) => GetAsync<QuestBoardDto>($"/api/v1/play/{Escape(playerId)}/quests");
+        public Task<QuestClaimDto> ClaimQuestAsync(string playerId, string questId) => PostJsonAsync<QuestClaimDto>($"/api/v1/play/{Escape(playerId)}/quests/{Escape(questId)}/claim", "{}");
+        public Task<MailboxDto> GetMailAsync(string playerId) => GetAsync<MailboxDto>($"/api/v1/play/{Escape(playerId)}/mail");
+        public async Task ReadMailAsync(string playerId, string mailId) { using UnityWebRequest request = new UnityWebRequest(baseUrl + $"/api/v1/play/{Escape(playerId)}/mail/{Escape(mailId)}/read", UnityWebRequest.kHttpVerbPOST); request.uploadHandler = new UploadHandlerRaw(Array.Empty<byte>()); request.downloadHandler = new DownloadHandlerBuffer(); await Send(request); }
+        public Task<MailClaimDto> ClaimMailAsync(string playerId, string mailId) => PostJsonAsync<MailClaimDto>($"/api/v1/play/{Escape(playerId)}/mail/{Escape(mailId)}/claim", "{}");
         public Task<PlayBattleDto> PlayBattleAsync(string playerId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/battle", "{}");
         public Task<SummonResultDto> SummonAsync(string playerId, string requestId) => PostJsonAsync<SummonResultDto>($"/api/v1/play/{Escape(playerId)}/summon", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<UpgradeResultDto> LevelUpAsync(string playerId, string playerHeroId, string requestId) => PostJsonAsync<UpgradeResultDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/level-up", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<OwnedHeroDto> SelectVariantAsync(string playerId, string playerHeroId, string variant) => PutJsonAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/variant", JsonUtility.ToJson(new VariantRequestDto { variant = variant }));
 
-        public Task<DevStateDto> GrantDevStandardPackAsync(string playerId) =>
-            PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/grant-standard-pack", "{}");
-        public Task<DevRosterResultDto> UnlockAllHeroesDevAsync(string playerId) =>
-            PostJsonAsync<DevRosterResultDto>($"/api/v1/dev/{Escape(playerId)}/unlock-all-heroes", "{}");
-        public Task<DevStateDto> RefillEnergyDevAsync(string playerId) =>
-            PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/refill-energy", "{}");
+        public Task<DevStateDto> GrantDevStandardPackAsync(string playerId) => PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/grant-standard-pack", "{}");
+        public Task<DevRosterResultDto> UnlockAllHeroesDevAsync(string playerId) => PostJsonAsync<DevRosterResultDto>($"/api/v1/dev/{Escape(playerId)}/unlock-all-heroes", "{}");
+        public Task<DevStateDto> RefillEnergyDevAsync(string playerId) => PostJsonAsync<DevStateDto>($"/api/v1/dev/{Escape(playerId)}/refill-energy", "{}");
 
-        private async Task<T> GetAsync<T>(string path)
-        {
-            using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path);
-            await Send(request);
-            return JsonUtility.FromJson<T>(request.downloadHandler.text);
-        }
-
-        private async Task<T[]> GetArrayAsync<T>(string path)
-        {
-            using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path);
-            await Send(request);
-            string wrapped = "{\"items\":" + request.downloadHandler.text + "}";
-            return JsonUtility.FromJson<ArrayEnvelope<T>>(wrapped)?.items ?? Array.Empty<T>();
-        }
-
+        private async Task<T> GetAsync<T>(string path) { using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path); await Send(request); return JsonUtility.FromJson<T>(request.downloadHandler.text); }
+        private async Task<T[]> GetArrayAsync<T>(string path) { using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path); await Send(request); string wrapped = "{\"items\":" + request.downloadHandler.text + "}"; return JsonUtility.FromJson<ArrayEnvelope<T>>(wrapped)?.items ?? Array.Empty<T>(); }
         private Task<T> PostJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPOST, json);
         private Task<T> PutJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPUT, json);
-
-        private async Task<T> SendJsonAsync<T>(string path, string method, string json)
-        {
-            using UnityWebRequest request = new UnityWebRequest(baseUrl + path, method);
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            await Send(request);
-            return JsonUtility.FromJson<T>(request.downloadHandler.text);
-        }
-
-        private static async Task Send(UnityWebRequest request)
-        {
-            UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-            while (!operation.isDone) await Task.Yield();
-            if (request.result != UnityWebRequest.Result.Success)
-                throw new InvalidOperationException($"HTTP {(long)request.responseCode}: {request.error} :: {request.downloadHandler?.text}");
-        }
-
+        private async Task<T> SendJsonAsync<T>(string path, string method, string json) { using UnityWebRequest request = new UnityWebRequest(baseUrl + path, method); request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json)); request.downloadHandler = new DownloadHandlerBuffer(); request.SetRequestHeader("Content-Type", "application/json"); await Send(request); return JsonUtility.FromJson<T>(request.downloadHandler.text); }
+        private static async Task Send(UnityWebRequest request) { UnityWebRequestAsyncOperation operation = request.SendWebRequest(); while (!operation.isDone) await Task.Yield(); if (request.result != UnityWebRequest.Result.Success) throw new InvalidOperationException($"HTTP {(long)request.responseCode}: {request.error} :: {request.downloadHandler?.text}"); }
         private static string Escape(string value) => UnityWebRequest.EscapeURL(value ?? string.Empty);
     }
 }
