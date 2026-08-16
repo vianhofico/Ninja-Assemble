@@ -13,6 +13,7 @@ namespace NinjaAssemble.Playable
         public FormationDto Formation { get; private set; }
         public CampaignStageListDto Campaign { get; private set; }
         public InventoryViewDto Inventory { get; private set; }
+        public ArenaStateDto Arena { get; private set; }
         public long Gold { get; private set; }
         public long Diamond { get; private set; }
         public int Energy { get; private set; }
@@ -27,6 +28,8 @@ namespace NinjaAssemble.Playable
             }
         }
 
+        public ArenaOpponentDto RecommendedArenaOpponent => Arena?.opponents?.FirstOrDefault();
+
         public PlayableGameStore(GameApiClient api) => this.api = api ?? throw new ArgumentNullException(nameof(api));
 
         public async Task LoginAndBootstrapAsync(string guestKey, string displayName)
@@ -40,7 +43,7 @@ namespace NinjaAssemble.Playable
             Energy = bootstrap.energy;
             if (Heroes.Length >= 5)
                 Formation = await api.SaveFormationAsync(PlayerId, Heroes.Take(5).Select(h => h.id).ToArray());
-            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync());
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshArenaAsync());
         }
 
         public Task<PlayBattleDto> BattleAsync() => BattleCampaignAsync("c1-s1");
@@ -62,9 +65,15 @@ namespace NinjaAssemble.Playable
             if (Campaign != null) Energy = Campaign.energy;
         }
 
-        public async Task RefreshInventoryAsync()
+        public async Task RefreshInventoryAsync() => Inventory = await api.GetInventoryAsync(PlayerId);
+        public async Task RefreshArenaAsync() => Arena = await api.GetArenaAsync(PlayerId);
+
+        public async Task<ArenaBattleDto> FightArenaAsync(string opponentPlayerId)
         {
-            Inventory = await api.GetInventoryAsync(PlayerId);
+            if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
+            ArenaBattleDto result = await api.FightArenaAsync(PlayerId, opponentPlayerId);
+            await RefreshArenaAsync();
+            return result;
         }
 
         public async Task<SummonResultDto> SummonAsync()

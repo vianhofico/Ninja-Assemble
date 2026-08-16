@@ -40,6 +40,22 @@ namespace NinjaAssemble.Network
     [Serializable] public sealed class InventoryRewardItemDto { public string itemId; public long quantity; public long balanceAfter; }
     [Serializable] public sealed class InventoryItemDto { public string itemId; public string itemType; public string nameEn; public string nameVi; public long quantity; }
     [Serializable] public sealed class InventoryViewDto { public string catalogVersion; public InventoryItemDto[] items; }
+    [Serializable] public sealed class ArenaOpponentDto
+    {
+        public string playerId; public string displayName; public long rating; public long power; public bool training;
+    }
+    [Serializable] public sealed class ArenaStateDto
+    {
+        public string seasonId; public long rating; public string ratingProfileVersion; public string rewardProfileVersion; public ArenaOpponentDto[] opponents;
+    }
+    [Serializable] public sealed class ArenaBattleDto
+    {
+        public string battleId; public string seasonId; public bool training; public string opponentPlayerId; public string opponentDisplayName;
+        public long opponentRating; public long opponentPower; public long ratingBefore; public long ratingAfter; public long ratingDelta;
+        public string ratingProfileVersion; public long arenaCoinReward; public string rewardProfileVersion;
+        public string combatStatsVersion; public string abilityProfileVersion; public string techniqueMappingVersion; public string passiveProfileVersion;
+        public BattleParticipantDto[] participants; public BattleResultDto battle;
+    }
     [Serializable] public sealed class PlayBattleDto
     {
         public string battleId; public string stageId; public string campaignCatalogVersion; public string waveRulesVersion; public int energyCost; public int stars; public bool firstClear;

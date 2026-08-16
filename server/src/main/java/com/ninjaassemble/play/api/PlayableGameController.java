@@ -9,6 +9,7 @@ import com.ninjaassemble.play.application.HeroUpgradeService;
 import com.ninjaassemble.play.application.PlayableBattleService;
 import com.ninjaassemble.play.application.StarterRosterService;
 import com.ninjaassemble.play.application.SummonApplicationService;
+import com.ninjaassemble.pvp.application.ArenaApplicationService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,18 +29,20 @@ public class PlayableGameController {
     private final PlayableBattleService battles;
     private final CampaignStageFlowService campaign;
     private final InventoryService inventory;
+    private final ArenaApplicationService arena;
     private final SummonApplicationService summons;
     private final HeroUpgradeService upgrades;
 
     public PlayableGameController(StarterRosterService bootstrap, HeroOwnershipService ownership, FormationService formations,
                                   PlayableBattleService battles, CampaignStageFlowService campaign, InventoryService inventory,
-                                  SummonApplicationService summons, HeroUpgradeService upgrades) {
+                                  ArenaApplicationService arena, SummonApplicationService summons, HeroUpgradeService upgrades) {
         this.bootstrap = bootstrap;
         this.ownership = ownership;
         this.formations = formations;
         this.battles = battles;
         this.campaign = campaign;
         this.inventory = inventory;
+        this.arena = arena;
         this.summons = summons;
         this.upgrades = upgrades;
     }
@@ -68,6 +71,14 @@ public class PlayableGameController {
 
     @GetMapping("/inventory")
     public InventoryService.InventoryView inventory(@PathVariable UUID playerId) { return inventory.view(playerId); }
+
+    @GetMapping("/arena")
+    public ArenaApplicationService.ArenaState arena(@PathVariable UUID playerId) { return arena.state(playerId); }
+
+    @PostMapping("/arena/{opponentPlayerId}/battle")
+    public ArenaApplicationService.ArenaBattleView arenaBattle(@PathVariable UUID playerId, @PathVariable UUID opponentPlayerId) {
+        return arena.fight(playerId, opponentPlayerId);
+    }
 
     @PostMapping("/battle")
     public PlayableBattleService.PlayBattleResult battle(@PathVariable UUID playerId) { return battles.play(playerId); }
