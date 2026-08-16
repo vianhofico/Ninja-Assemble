@@ -16,5 +16,8 @@ namespace NinjaAssemble.Presentation
         public string AbilityKind;
         public string EffectKey;
         public int EnergyAfter;
+        public string EffectType;
+        public string StatusId;
+        public int DurationTurns;
     }
 }

@@ -18,6 +18,7 @@ namespace NinjaAssemble.Network
     {
         public long sequence; public string type; public int round; public string actorId; public string targetId; public long amount; public bool critical;
         public string abilityId; public string abilityKind; public string effectKey; public int energyAfter;
+        public string effectType; public string statusId; public int durationTurns;
     }
     [Serializable] public sealed class BattleResultDto { public long seed; public string rulesetVersion; public string outcome; public int rounds; public BattleEventDto[] events; }
     [Serializable] public sealed class PlayBattleDto

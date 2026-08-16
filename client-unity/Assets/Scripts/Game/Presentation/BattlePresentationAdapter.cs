@@ -28,7 +28,10 @@ namespace NinjaAssemble.Presentation
                     AbilityId = item.abilityId ?? string.Empty,
                     AbilityKind = item.abilityKind ?? string.Empty,
                     EffectKey = item.effectKey ?? string.Empty,
-                    EnergyAfter = item.energyAfter
+                    EnergyAfter = item.energyAfter,
+                    EffectType = item.effectType ?? string.Empty,
+                    StatusId = item.statusId ?? string.Empty,
+                    DurationTurns = item.durationTurns
                 });
             }
             return result;

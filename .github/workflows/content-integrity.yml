@@ -29,6 +29,8 @@ jobs:
         run: python scripts/validate-battle-visual-stage.py
       - name: Validate deterministic ability and ultimate protocol
         run: python scripts/validate-ability-protocol.py
+      - name: Validate structured battle effects
+        run: python scripts/validate-structured-effects.py
       - name: Verify Unity runtime art catalog can be regenerated from manifest
         run: |
           python scripts/generate-unity-art-runtime-catalog.py --output /tmp/hero-art-runtime-catalog.json
