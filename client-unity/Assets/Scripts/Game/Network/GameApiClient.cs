@@ -23,11 +23,14 @@ namespace NinjaAssemble.Network
             if (!string.IsNullOrWhiteSpace(variant)) path += "?variant=" + Escape(variant);
             return GetAsync<HeroKitDto>(path);
         }
-
-        public Task<PlayerDto> LoginGuestAsync(string guestKey, string displayName)
-        {
-            return PostJsonAsync<PlayerDto>("/api/v1/players/guest", JsonUtility.ToJson(new GuestLoginRequest { guestKey = guestKey, displayName = displayName }));
-        }
+        public Task<PlayerDto> LoginGuestAsync(string guestKey, string displayName) => PostJsonAsync<PlayerDto>("/api/v1/players/guest", JsonUtility.ToJson(new GuestLoginRequest { guestKey = guestKey, displayName = displayName }));
+        public Task<BootstrapDto> BootstrapAsync(string playerId) => PostJsonAsync<BootstrapDto>($"/api/v1/play/{Escape(playerId)}/bootstrap", "{}");
+        public Task<OwnedHeroDto[]> GetOwnedHeroesAsync(string playerId) => GetArrayAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes");
+        public Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds) => PutJsonAsync<FormationDto>($"/api/v1/play/{Escape(playerId)}/formation", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
+        public Task<PlayBattleDto> PlayBattleAsync(string playerId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/battle", "{}");
+        public Task<SummonResultDto> SummonAsync(string playerId, string requestId) => PostJsonAsync<SummonResultDto>($"/api/v1/play/{Escape(playerId)}/summon", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<UpgradeResultDto> LevelUpAsync(string playerId, string playerHeroId, string requestId) => PostJsonAsync<UpgradeResultDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/level-up", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<OwnedHeroDto> SelectVariantAsync(string playerId, string playerHeroId, string variant) => PutJsonAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/variant", JsonUtility.ToJson(new VariantRequestDto { variant = variant }));
 
         private async Task<T> GetAsync<T>(string path)
         {
@@ -44,9 +47,12 @@ namespace NinjaAssemble.Network
             return JsonUtility.FromJson<ArrayEnvelope<T>>(wrapped)?.items ?? Array.Empty<T>();
         }
 
-        private async Task<T> PostJsonAsync<T>(string path, string json)
+        private Task<T> PostJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPOST, json);
+        private Task<T> PutJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPUT, json);
+
+        private async Task<T> SendJsonAsync<T>(string path, string method, string json)
         {
-            using UnityWebRequest request = new UnityWebRequest(baseUrl + path, UnityWebRequest.kHttpVerbPOST);
+            using UnityWebRequest request = new UnityWebRequest(baseUrl + path, method);
             request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
