@@ -29,8 +29,11 @@ def audit():
     overrides = rows(ROOT / "game-data/skills/variant-kit-overrides.csv")
     art = rows(ROOT / "art/manifests/hero-art-manifest.csv")
     localizations = many("game-data/localization/*.csv")
+    reference_profiles = rows(ROOT / "game-data/reference/balance-profiles.csv")
     ready_art = [row for row in art if row.get("status", "").strip() == "READY"]
     concept_art = [row for row in art if row.get("status", "").strip() == "CONCEPT"]
+    verified_profiles = [row for row in reference_profiles if row.get("status", "").strip().upper() == "VERIFIED"]
+    all_reference_verified = bool(reference_profiles) and len(verified_profiles) == len(reference_profiles)
     return {
         "baseCharacters": len(roster),
         "variants": len(variants),
@@ -43,9 +46,13 @@ def audit():
         "artReady": len(ready_art),
         "artConcept": len(concept_art),
         "artMissingManifest": max(0, len(variants) - len(art)),
+        "referenceProfiles": len(reference_profiles),
+        "referenceProfilesVerified": len(verified_profiles),
+        "referenceProfilesAllVerified": all_reference_verified,
         "releaseReady": len(roster) >= 180 and len(variants) >= 300 and len(techniques) >= 100
                         and len(kits) >= 35 and len({row["character_id"] for row in maps}) == len(roster)
                         and len(art) == len(variants) and len(ready_art) == len(variants)
+                        and all_reference_verified
     }
 
 
@@ -61,7 +68,10 @@ def markdown(data):
         f"| Base character kit mapping | {data['mappedCharacters']} | {data['baseCharacters']} | {'PASS' if data['mappedCharacters'] == data['baseCharacters'] else 'BLOCKED'} |",
         f"| Art manifest rows | {data['artManifestRows']} | {data['variants']} | {'PASS' if data['artManifestRows'] == data['variants'] else 'BLOCKED'} |",
         f"| Art READY | {data['artReady']} | {data['variants']} | {'PASS' if data['artReady'] == data['variants'] else 'BLOCKED'} |",
-        "", "The final two art gates intentionally remain blocked until every playable variant has a reviewed portrait/icon/chibi prefab/animation/VFX/SFX package."
+        f"| Reference/balance profiles VERIFIED | {data['referenceProfilesVerified']} | {data['referenceProfiles']} | {'PASS' if data['referenceProfilesAllVerified'] else 'BLOCKED'} |",
+        "",
+        "Art remains blocked until every playable variant has a reviewed portrait/icon/chibi prefab/animation/VFX/SFX package.",
+        "Reference/balance profiles remain blocked until measurement datasets satisfy their declared sample/context/evidence thresholds."
     ]
     return "\n".join(lines) + "\n"
 

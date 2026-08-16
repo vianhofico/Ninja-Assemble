@@ -1,5 +1,7 @@
 package com.ninjaassemble.battle.sim;
 
+import com.ninjaassemble.reference.ReferenceProfiles;
+
 public record BattleRuleset(
         String version,
         int basicAttackCoefficientBps,
@@ -13,6 +15,6 @@ public record BattleRuleset(
     }
 
     public static BattleRuleset experimentalV1() {
-        return new BattleRuleset("experimental-v1-unverified-formula", 10_000, 1_000, 15_000, 50);
+        return new BattleRuleset(ReferenceProfiles.DAMAGE_FORMULA, 10_000, 1_000, 15_000, 50);
     }
 }
