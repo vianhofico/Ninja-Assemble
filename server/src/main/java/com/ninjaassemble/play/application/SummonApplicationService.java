@@ -2,6 +2,7 @@ package com.ninjaassemble.play.application;
 
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
+import com.ninjaassemble.hero.catalog.HeroVersionAcquisitionCatalogService;
 import com.ninjaassemble.hero.ownership.HeroOwnershipService;
 import com.ninjaassemble.player.application.PlayerService;
 import com.ninjaassemble.summon.domain.DuplicateConversionProfile;
@@ -22,6 +23,7 @@ public class SummonApplicationService {
     private static final String ACTION = "SUMMON";
     private final PlayerService players;
     private final CompleteRosterBannerFactory bannerFactory;
+    private final HeroVersionAcquisitionCatalogService acquisitionCatalog;
     private final HeroOwnershipService ownership;
     private final WalletService wallet;
     private final ActionRequestService requests;
@@ -32,10 +34,22 @@ public class SummonApplicationService {
     private final DuplicateConversionProfile duplicateProfile = new DuplicateConversionProfile(
             "duplicate-experimental-v1", Map.of(SummonRarity.R, 5L, SummonRarity.SR, 10L, SummonRarity.SSR, 30L, SummonRarity.UR, 100L));
 
-    public SummonApplicationService(PlayerService players, CompleteRosterBannerFactory bannerFactory, HeroOwnershipService ownership,
-                                    WalletService wallet, ActionRequestService requests, JdbcTemplate jdbc, Clock clock) {
-        this.players = players; this.bannerFactory = bannerFactory; this.ownership = ownership; this.wallet = wallet;
-        this.requests = requests; this.jdbc = jdbc; this.clock = clock;
+    public SummonApplicationService(PlayerService players,
+                                    CompleteRosterBannerFactory bannerFactory,
+                                    HeroVersionAcquisitionCatalogService acquisitionCatalog,
+                                    HeroOwnershipService ownership,
+                                    WalletService wallet,
+                                    ActionRequestService requests,
+                                    JdbcTemplate jdbc,
+                                    Clock clock) {
+        this.players = players;
+        this.bannerFactory = bannerFactory;
+        this.acquisitionCatalog = acquisitionCatalog;
+        this.ownership = ownership;
+        this.wallet = wallet;
+        this.requests = requests;
+        this.jdbc = jdbc;
+        this.clock = clock;
     }
 
     @Transactional
@@ -51,18 +65,16 @@ public class SummonApplicationService {
                 (rs, row) -> rs.getInt(1), playerId, banner.id()).stream().findFirst().orElse(0);
         long seed = secureRandom.nextLong();
         var pulled = engine.pull(banner, new SummonState(pity), seed);
-        String[] parts = pulled.entry().heroVariantId().split("::", 2);
-        String characterId = parts[0];
-        String variant = parts.length == 2 ? parts[1] : "BASE";
-        boolean duplicate;
-        if (variant.equals("BASE")) {
-            duplicate = !ownership.grantBase(playerId, characterId).newHero();
-        } else {
-            ownership.grantBase(playerId, characterId);
-            duplicate = !ownership.unlockVariant(playerId, characterId, variant);
-        }
+
+        String heroId = pulled.entry().heroId();
+        var hero = acquisitionCatalog.require(heroId);
+        if (!hero.summonable()) throw new IllegalStateException("summon selected non-collectible Hero Version: " + heroId);
+        boolean duplicate = !ownership.grantHeroVersion(playerId, heroId).newHero();
         long duplicateCoins = duplicate ? duplicateProfile.soulsFor(pulled.entry().rarity()) : 0;
-        if (duplicateCoins > 0) wallet.mutate(playerId, Currency.HERO_COIN, duplicateCoins, "SUMMON_DUPLICATE", characterId, "summon:" + requestId + ":duplicate");
+        if (duplicateCoins > 0) {
+            wallet.mutate(playerId, Currency.HERO_COIN, duplicateCoins, "SUMMON_DUPLICATE", heroId,
+                    "summon:" + requestId + ":duplicate");
+        }
 
         jdbc.update("""
                 insert into summon_state(player_id, banner_id, banner_version, pulls_since_pity, total_pulls)
@@ -71,27 +83,41 @@ public class SummonApplicationService {
                     pulls_since_pity = excluded.pulls_since_pity, total_pulls = summon_state.total_pulls + 1
                 """, playerId, banner.id(), banner.version(), pulled.nextState().pullsSincePity());
         jdbc.update("""
-                insert into summon_history(id, player_id, banner_id, banner_version, seed, hero_variant_id, rarity, pity_triggered, duplicate, created_at)
+                insert into summon_history(id, player_id, banner_id, banner_version, seed, hero_version_id, rarity, pity_triggered, duplicate, created_at)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, UUID.randomUUID(), playerId, banner.id(), banner.version(), seed, pulled.entry().heroVariantId(), pulled.entry().rarity().name(), pulled.pityTriggered(), duplicate, clock.instant());
-        SummonResult result = new SummonResult(characterId, variant, pulled.entry().rarity(), pulled.pityTriggered(), duplicate, duplicateCoins,
-                pulled.nextState().pullsSincePity(), banner.version(), seed);
+                """, UUID.randomUUID(), playerId, banner.id(), banner.version(), seed, heroId,
+                pulled.entry().rarity().name(), pulled.pityTriggered(), duplicate, clock.instant());
+
+        SummonResult result = new SummonResult(
+                heroId, hero.characterId(), hero.displayNameEn(), pulled.entry().rarity(), pulled.pityTriggered(), duplicate,
+                duplicateCoins, pulled.nextState().pullsSincePity(), banner.version(), seed);
         requests.complete(playerId, requestId, encode(result));
         return result;
     }
 
     private static String encode(SummonResult r) {
-        return String.join("\t", r.characterId(), r.variant(), r.rarity().name(), Boolean.toString(r.pityTriggered()),
-                Boolean.toString(r.duplicate()), Long.toString(r.duplicateHeroCoins()), Integer.toString(r.pullsSincePity()), r.bannerVersion(), Long.toString(r.seed()));
+        return String.join("\t", r.heroId(), r.characterId(), r.displayName(), r.rarity().name(),
+                Boolean.toString(r.pityTriggered()), Boolean.toString(r.duplicate()), Long.toString(r.duplicateHeroCoins()),
+                Integer.toString(r.pullsSincePity()), r.bannerVersion(), Long.toString(r.seed()));
     }
 
     private static SummonResult decode(String value) {
         String[] p = value.split("\t", -1);
-        if (p.length != 9) throw new IllegalStateException("corrupt stored summon response");
-        return new SummonResult(p[0], p[1], SummonRarity.valueOf(p[2]), Boolean.parseBoolean(p[3]), Boolean.parseBoolean(p[4]),
-                Long.parseLong(p[5]), Integer.parseInt(p[6]), p[7], Long.parseLong(p[8]));
+        if (p.length != 10) throw new IllegalStateException("corrupt stored summon response");
+        return new SummonResult(p[0], p[1], p[2], SummonRarity.valueOf(p[3]), Boolean.parseBoolean(p[4]),
+                Boolean.parseBoolean(p[5]), Long.parseLong(p[6]), Integer.parseInt(p[7]), p[8], Long.parseLong(p[9]));
     }
 
-    public record SummonResult(String characterId, String variant, SummonRarity rarity, boolean pityTriggered, boolean duplicate,
-                               long duplicateHeroCoins, int pullsSincePity, String bannerVersion, long seed) {}
+    public record SummonResult(
+            String heroId,
+            String characterId,
+            String displayName,
+            SummonRarity rarity,
+            boolean pityTriggered,
+            boolean duplicate,
+            long duplicateHeroCoins,
+            int pullsSincePity,
+            String bannerVersion,
+            long seed
+    ) {}
 }
