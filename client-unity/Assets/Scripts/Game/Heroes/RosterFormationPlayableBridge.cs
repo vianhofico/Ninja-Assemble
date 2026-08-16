@@ -66,7 +66,7 @@ namespace NinjaAssemble.Heroes
                 if (id == ScreenId.Formation) binding.Primary.onClick.AddListener(AddSelectedToFormation);
                 if (id == ScreenId.HeroDetail)
                 {
-                    binding.Primary.onClick.AddListener(SelectNextVariant);
+                    binding.Primary.onClick.AddListener(AwakenSelected);
                     binding.Secondary = CreateSecondaryButton(binding, "TRAIN", TrainSelected);
                 }
             }
@@ -92,22 +92,31 @@ namespace NinjaAssemble.Heroes
             RenderAll();
         }
 
-        private async void SelectNextVariant()
+        private async void AwakenSelected()
         {
             OwnedHeroDto hero = SelectedHero;
             if (hero == null) return;
             try
             {
-                HeroVariantDto[] variants = await api.GetVariantsAsync(hero.characterId);
-                string[] names = variants.Select(VariantName).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct().ToArray();
-                if (names.Length == 0) { SetStatus(ScreenId.HeroDetail, "No selectable variants for this ninja."); return; }
-                string current = string.IsNullOrWhiteSpace(hero.currentVariant) ? "BASE" : hero.currentVariant;
-                int currentIndex = Array.FindIndex(names, value => string.Equals(value, current, StringComparison.OrdinalIgnoreCase));
-                string next = names[(currentIndex + 1 + names.Length) % names.Length];
-                SetStatus(ScreenId.HeroDetail, "Switching variant to " + next + "...");
-                await api.SelectVariantAsync(store.PlayerId, hero.id, string.Equals(next, "BASE", StringComparison.OrdinalIgnoreCase) ? null : next);
+                AwakeningViewDto preview = await api.GetAwakeningAsync(store.PlayerId, hero.id);
+                if (!preview.available)
+                {
+                    SetStatus(ScreenId.HeroDetail, "This Hero Version has no Awakening.");
+                    RenderAll();
+                    return;
+                }
+                if (preview.awakened)
+                {
+                    SetStatus(ScreenId.HeroDetail, (preview.awakeningName ?? "Awakening") + " is already active.");
+                    RenderAll();
+                    return;
+                }
+
+                SetStatus(ScreenId.HeroDetail, "Awakening " + hero.displayName + "...");
+                AwakeningViewDto result = await api.AwakenAsync(store.PlayerId, hero.id);
                 await RefreshHeroes();
-                SetStatus(ScreenId.HeroDetail, "Variant selected: " + (SelectedHero.currentVariant ?? "BASE"));
+                string visualState = result.visual == null ? string.Empty : " • Visual: " + result.visual.status;
+                SetStatus(ScreenId.HeroDetail, "AWAKENED → " + result.awakeningName + visualState);
                 RenderAll();
             }
             catch (Exception exception) { Debug.LogException(exception); SetStatus(ScreenId.HeroDetail, exception.Message); }
@@ -161,38 +170,38 @@ namespace NinjaAssemble.Heroes
             field.SetValue(target, value);
         }
 
-        private static string VariantName(HeroVariantDto variant)
-        {
-            if (variant == null) return null;
-            Type type = variant.GetType();
-            foreach (string candidate in new[] { "variant", "name", "id", "variantId" })
-            {
-                FieldInfo field = type.GetField(candidate, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
-                string value = field?.GetValue(variant) as string;
-                if (!string.IsNullOrWhiteSpace(value)) return value;
-            }
-            return null;
-        }
-
         private void RenderAll()
         {
             OwnedHeroDto hero = SelectedHero;
             if (screens.TryGetValue(ScreenId.NinjaRoster, out ScreenBinding roster))
             {
                 OwnedHeroDto[] heroes = store?.Heroes ?? Array.Empty<OwnedHeroDto>();
-                string rows = string.Join("\n", heroes.Take(30).Select((value, index) => $"{(index == selectedIndex ? "▶" : "•")} {value.displayName} • Lv.{value.level} • [{value.currentVariant ?? "BASE"}]"));
+                string rows = string.Join("\n", heroes.Take(30).Select((value, index) =>
+                    $"{(index == selectedIndex ? "▶" : "•")} {value.displayName} • Lv.{value.level} • {value.heroId} {(value.awakened ? "• AWAKENED" : string.Empty)}"));
                 roster.Body.text = $"Ninja Roster • {heroes.Length} owned\n\n{rows}";
                 roster.PrimaryLabel.text = heroes.Length > 1 ? "SELECT NEXT" : "SELECTED";
             }
             if (screens.TryGetValue(ScreenId.HeroDetail, out ScreenBinding detail))
             {
-                detail.Body.text = hero == null ? "No owned ninja." : $"{hero.displayName}\nLv.{hero.level} • {hero.frameTier}\nVariant: {hero.currentVariant ?? "BASE"}\nAwakening: {hero.awakeningLevel}\n\nSelected from Ninja Roster.";
-                detail.PrimaryLabel.text = "NEXT VARIANT";
+                if (hero == null)
+                {
+                    detail.Body.text = "No owned ninja.";
+                    detail.PrimaryLabel.text = "AWAKEN";
+                }
+                else
+                {
+                    string awakening = string.IsNullOrWhiteSpace(hero.awakeningId)
+                        ? "Not available"
+                        : hero.awakened ? (hero.awakeningName ?? hero.awakeningId) + " • ACTIVE" : (hero.awakeningName ?? hero.awakeningId) + " • READY";
+                    detail.Body.text = $"{hero.displayName}\nHero Version: {hero.heroId}\nLv.{hero.level} • {hero.frameTier}\nAwakening: {awakening}\n\nSelected from Ninja Roster.";
+                    detail.PrimaryLabel.text = hero.awakened ? "AWAKENED" : string.IsNullOrWhiteSpace(hero.awakeningId) ? "NO AWAKENING" : "AWAKEN";
+                    detail.Primary.interactable = !hero.awakened && !string.IsNullOrWhiteSpace(hero.awakeningId);
+                }
             }
             if (screens.TryGetValue(ScreenId.Formation, out ScreenBinding formation))
             {
                 OwnedHeroDto[] team = store?.Formation?.heroes ?? Array.Empty<OwnedHeroDto>();
-                string rows = string.Join("\n", team.Select((value, index) => $"{index + 1}. {value.displayName} • Lv.{value.level}"));
+                string rows = string.Join("\n", team.Select((value, index) => $"{index + 1}. {value.displayName} • {value.heroId} • Lv.{value.level}{(value.awakened ? " • AWAKENED" : string.Empty)}"));
                 formation.Body.text = $"Formation 5\n\n{rows}\n\nSelected candidate: {hero?.displayName ?? "none"}\nADD SELECTED replaces slot 5.";
                 formation.PrimaryLabel.text = "ADD SELECTED";
             }

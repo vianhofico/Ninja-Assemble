@@ -1,0 +1,25 @@
+name: awakening-ux-presentation-integrity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate-awakening-ux-presentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate Awakening UX and presentation contract
+        run: python scripts/validate-awakening-ux-presentation.py
+      - name: Run focused Awakening presentation tests
+        working-directory: server
+        run: mvn -B -Dtest=AwakeningPresentationCatalogServiceTest,BattleParticipantTest test

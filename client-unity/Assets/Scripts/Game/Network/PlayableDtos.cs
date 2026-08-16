@@ -2,10 +2,10 @@ using System;
 
 namespace NinjaAssemble.Network
 {
-    [Serializable] public sealed class OwnedHeroDto { public string id; public string characterId; public string displayName; public int level; public long exp; public string frameTier; public string currentVariant; public int awakeningLevel; }
+    [Serializable] public sealed class OwnedHeroDto { public string id; public string characterId; public string heroId; public string displayName; public int level; public long exp; public string frameTier; public bool awakened; public string awakeningId; public string awakeningName; public string currentVariant; public int awakeningLevel; }
     [Serializable] public sealed class BootstrapDto { public OwnedHeroDto[] heroes; public long gold; public long diamond; public int energy; public int energyCap; }
     [Serializable] public sealed class FormationDto { public OwnedHeroDto[] heroes; }
-    [Serializable] public sealed class BattleParticipantDto { public string battleUnitId; public string characterId; public string displayName; public string variant; public int level; public string side; public int slot; public long maxHp; }
+    [Serializable] public sealed class BattleParticipantDto { public string battleUnitId; public string characterId; public string heroId; public bool awakened; public string awakeningId; public string presentationKey; public string displayName; public string variant; public int level; public string side; public int slot; public long maxHp; }
     [Serializable] public sealed class BattleEventDto { public long sequence; public string type; public int round; public string actorId; public string targetId; public long amount; public bool critical; public string abilityId; public string abilityKind; public string effectKey; public int energyAfter; public string effectType; public string statusId; public int durationTurns; public string triggerId; }
     [Serializable] public sealed class BattleResultDto { public long seed; public string rulesetVersion; public string outcome; public int rounds; public BattleEventDto[] events; }
     [Serializable] public sealed class CampaignItemRewardDto { public string itemId; public string nameEn; public string nameVi; public long quantity; }
@@ -36,7 +36,7 @@ namespace NinjaAssemble.Network
     [Serializable] public sealed class MailGrantDto { public string kind; public string id; public long quantity; public long balanceAfter; }
     [Serializable] public sealed class MailClaimDto { public string mailId; public bool replayed; public MailGrantDto[] grants; }
     [Serializable] public sealed class PlayBattleDto { public string battleId; public string stageId; public string campaignCatalogVersion; public string waveRulesVersion; public int energyCost; public int stars; public bool firstClear; public long playerExpReward; public long goldReward; public long diamondReward; public int accountLevelAfter; public InventoryRewardItemDto[] itemRewards; public string combatStatsVersion; public string abilityProfileVersion; public string techniqueMappingVersion; public string passiveProfileVersion; public CampaignWaveDto[] waves; public BattleParticipantDto[] participants; public BattleResultDto battle; }
-    [Serializable] public sealed class SummonResultDto { public string characterId; public string variant; public string rarity; public bool pityTriggered; public bool duplicate; public long duplicateHeroCoins; public int pullsSincePity; public string bannerVersion; public long seed; }
+    [Serializable] public sealed class SummonResultDto { public string heroId; public string characterId; public string displayName; public string rarity; public bool pityTriggered; public bool duplicate; public long duplicateHeroCoins; public int pullsSincePity; public string bannerVersion; public long seed; }
     [Serializable] public sealed class UpgradeResultDto { public OwnedHeroDto hero; public long goldCost; public string costProfileVersion; }
     [Serializable] public sealed class FormationRequestDto { public string[] playerHeroIds; }
     [Serializable] public sealed class ActionRequestDto { public string requestId; }

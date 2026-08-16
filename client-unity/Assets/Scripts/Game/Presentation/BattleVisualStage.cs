@@ -104,7 +104,9 @@ namespace NinjaAssemble.Presentation
 
         private async Task<BattleActorView> CreateActorAsync(BattleParticipantDto participant, RectTransform slot)
         {
-            HeroArtRuntimeEntry art = artCatalog.Resolve(participant.characterId, participant.variant);
+            HeroArtRuntimeEntry art = string.IsNullOrWhiteSpace(participant.heroId)
+                ? artCatalog.Resolve(participant.characterId, participant.variant)
+                : artCatalog.ResolveHeroVersion(participant.heroId, participant.awakened, participant.characterId, participant.variant);
             if (art.IsReady)
             {
                 GameObject prefab = await loader.TryLoadPrefabAsync(art.prefabAddress);
@@ -119,13 +121,7 @@ namespace NinjaAssemble.Presentation
                         rect.anchorMax = Vector2.one;
                         rect.offsetMin = Vector2.zero;
                         rect.offsetMax = Vector2.zero;
-                        actor.Configure(
-                            participant.battleUnitId,
-                            participant.characterId,
-                            participant.variant,
-                            participant.displayName,
-                            participant.level,
-                            participant.maxHp);
+                        ConfigureActor(actor, participant);
                         return actor;
                     }
                     Destroy(instance);
@@ -139,9 +135,24 @@ namespace NinjaAssemble.Presentation
             return CreateFallbackActor(participant, slot);
         }
 
+        private static void ConfigureActor(BattleActorView actor, BattleParticipantDto participant)
+        {
+            actor.Configure(
+                participant.battleUnitId,
+                participant.characterId,
+                participant.heroId,
+                participant.awakened,
+                participant.awakeningId,
+                participant.presentationKey,
+                participant.variant,
+                participant.displayName,
+                participant.level,
+                participant.maxHp);
+        }
+
         private BattleActorView CreateFallbackActor(BattleParticipantDto participant, RectTransform slot)
         {
-            var actorObject = new GameObject("Fallback_" + participant.characterId, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            var actorObject = new GameObject("Fallback_" + (string.IsNullOrWhiteSpace(participant.heroId) ? participant.characterId : participant.heroId), typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
             RectTransform rect = actorObject.GetComponent<RectTransform>();
             rect.SetParent(slot, false);
             rect.anchorMin = new Vector2(0.08f, 0.05f);
@@ -161,17 +172,15 @@ namespace NinjaAssemble.Presentation
                 new Vector2(0.02f, 0.16f), new Vector2(0.98f, 0.34f));
             TMP_Text level = CreateText(rect, "Level", "Lv." + participant.level, 15f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.5f, 1f),
                 new Vector2(0.20f, 0.06f), new Vector2(0.80f, 0.18f));
+            TMP_Text status = CreateText(rect, "Status", participant.awakened ? "AWAKENED" : string.Empty, 13f, TextAlignmentOptions.Center,
+                participant.awakened ? new Color(1f, 0.72f, 0.20f, 1f) : Color.white,
+                new Vector2(0.12f, 0.00f), new Vector2(0.88f, 0.09f));
             Slider hp = CreateHealthSlider(rect);
 
             BattleActorView actor = actorObject.AddComponent<BattleActorView>();
             actor.ConfigureUi(name, level, hp);
-            actor.Configure(
-                participant.battleUnitId,
-                participant.characterId,
-                participant.variant,
-                participant.displayName,
-                participant.level,
-                participant.maxHp);
+            actor.ConfigureStatusUi(status);
+            ConfigureActor(actor, participant);
             return actor;
         }
 

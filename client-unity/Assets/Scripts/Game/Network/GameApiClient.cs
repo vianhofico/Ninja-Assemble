@@ -44,6 +44,10 @@ namespace NinjaAssemble.Network
         public Task<PlayBattleDto> PlayBattleAsync(string playerId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/battle", "{}");
         public Task<SummonResultDto> SummonAsync(string playerId, string requestId) => PostJsonAsync<SummonResultDto>($"/api/v1/play/{Escape(playerId)}/summon", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<UpgradeResultDto> LevelUpAsync(string playerId, string playerHeroId, string requestId) => PostJsonAsync<UpgradeResultDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/level-up", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<AwakeningViewDto> GetAwakeningAsync(string playerId, string playerHeroId) => GetAsync<AwakeningViewDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/awakening");
+        public Task<AwakeningViewDto> AwakenAsync(string playerId, string playerHeroId) => PostJsonAsync<AwakeningViewDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/awakening", "{}");
+
+        [Obsolete("Legacy variant selection is compatibility-only. Use Hero Version ownership + AwakenAsync.")]
         public Task<OwnedHeroDto> SelectVariantAsync(string playerId, string playerHeroId, string variant) => PutJsonAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes/{Escape(playerHeroId)}/variant", JsonUtility.ToJson(new VariantRequestDto { variant = variant }));
 
         private async Task<T> GetAsync<T>(string path) { using UnityWebRequest request = UnityWebRequest.Get(baseUrl + path); await Send(request); return JsonUtility.FromJson<T>(request.downloadHandler.text); }
