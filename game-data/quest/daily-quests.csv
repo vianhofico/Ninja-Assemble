@@ -1,0 +1,5 @@
+quest_id,name_en,name_vi,metric,target,reward_gold,reward_diamond,reward_item_id,reward_item_quantity,status
+daily-campaign-clear,Win a Campaign Stage,Thắng một ải Chiến Dịch,CAMPAIGN_CLEAR,1,1500,0,training-scroll,1,DESIGN_BASELINE
+daily-arena-battle,Fight in Arena,Chiến đấu Arena,ARENA_BATTLE,1,1000,0,chakra-crystal,1,DESIGN_BASELINE
+daily-summon,Perform a Summon,Triệu hồi Ninja,SUMMON,1,0,50,summon-ticket,1,DESIGN_BASELINE
+daily-hero-training,Train a Ninja,Huấn luyện Ninja,HERO_LEVEL_UP,1,1200,0,training-scroll,1,DESIGN_BASELINE
