@@ -24,7 +24,7 @@ def main() -> int:
         "nextAbility()", "ability.coefficientBps()", "ability.effectKey()", "energyAfter")
     require(
         "server/src/main/java/com/ninjaassemble/play/domain/ExperimentalAbilityProfile.java",
-        "experimental", "BattleAbilityKind.ULTIMATE", "22_000", "-100")
+        "ReferenceProfiles.ABILITY_CYCLE", "BattleAbilityKind.ULTIMATE", "22_000", "-100")
     require(
         "server/src/test/java/com/ninjaassemble/battle/sim/DeterministicBattleEngineTest.java",
         "executableAbilityCycleBuildsEnergyThenUsesUltimate", "List.of(30, 65, 100, 0)")
