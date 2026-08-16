@@ -22,6 +22,8 @@ jobs:
           python-version: '3.12'
       - name: Generate full 427-variant proposal
         run: python scripts/generate-hero-awakening-proposal.py --write
+      - name: Apply semantic research corrections
+        run: python scripts/refine-hero-awakening-proposal.py
       - name: Validate structural proposal rules
         run: python scripts/generate-hero-awakening-proposal.py
       - name: Commit generated design artifacts
@@ -35,6 +37,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Generated proposal is already up to date"
           else
-            git commit -m "M41: generate 427-variant hero awakening proposal"
+            git commit -m "M41: regenerate semantically refined hero awakening proposal"
             git push origin HEAD:agent/m41-hero-awakening-proposal
           fi
