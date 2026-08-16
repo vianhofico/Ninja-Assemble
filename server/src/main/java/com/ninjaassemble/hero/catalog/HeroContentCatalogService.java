@@ -42,6 +42,8 @@ public class HeroContentCatalogService {
                 requireTechnique(kit.ultimate()), requireTechnique(kit.passive())));
     }
 
+    public List<TechniqueView> allTechniques() { return List.copyOf(techniques.values()); }
+    public TechniqueView technique(String id) { return requireTechnique(id); }
     public int techniqueCount() { return techniques.size(); }
     public int profileCount() { return profiles.size(); }
     public int mappedCharacterCount() { return characterProfiles.size(); }

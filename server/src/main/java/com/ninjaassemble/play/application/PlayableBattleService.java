@@ -12,7 +12,9 @@ import com.ninjaassemble.hero.ownership.OwnedHeroView;
 import com.ninjaassemble.player.application.EnergyService;
 import com.ninjaassemble.player.application.PlayerService;
 import com.ninjaassemble.play.domain.BattleParticipant;
+import com.ninjaassemble.play.domain.ExperimentalAbilityProfile;
 import com.ninjaassemble.play.domain.ExperimentalCombatStatsResolver;
+import com.ninjaassemble.play.domain.TechniqueEffectResolver;
 import java.security.SecureRandom;
 import java.time.Clock;
 import java.util.ArrayList;
@@ -86,6 +88,8 @@ public class PlayableBattleService {
                 ENERGY_COST,
                 gold,
                 ExperimentalCombatStatsResolver.VERSION,
+                ExperimentalAbilityProfile.VERSION,
+                TechniqueEffectResolver.VERSION,
                 List.copyOf(participants),
                 result);
     }
@@ -95,6 +99,8 @@ public class PlayableBattleService {
             int energyCost,
             long goldReward,
             String combatStatsVersion,
+            String abilityProfileVersion,
+            String techniqueMappingVersion,
             List<BattleParticipant> participants,
             BattleResult battle
     ) {}

@@ -24,6 +24,7 @@ namespace NinjaAssemble.Network
     [Serializable] public sealed class PlayBattleDto
     {
         public string battleId; public int energyCost; public long goldReward; public string combatStatsVersion;
+        public string abilityProfileVersion; public string techniqueMappingVersion;
         public BattleParticipantDto[] participants; public BattleResultDto battle;
     }
     [Serializable] public sealed class SummonResultDto
