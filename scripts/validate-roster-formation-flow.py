@@ -13,8 +13,10 @@ def require(path: str, *tokens: str) -> None:
 
 
 def main() -> int:
+    # Validate real server invariants rather than milestone-era naming tokens.
     require("server/src/main/java/com/ninjaassemble/play/application/FormationService.java",
-            "player_hero_ids", "player_heroes", "five")
+            "List<UUID> playerHeroIds", "BattleRules.requireArenaTeamSize(playerHeroIds.size())",
+            "new HashSet<>(playerHeroIds).size()", "ownership.requireOwned", "formation_slots")
     require("client-unity/Assets/Scripts/Game/Heroes/RosterFormationPlayableBridge.cs",
             "ScreenId.NinjaRoster", "ScreenId.HeroDetail", "ScreenId.Formation",
             "SELECT NEXT", "NEXT VARIANT", "TRAIN", "ADD SELECTED",
