@@ -55,28 +55,27 @@ jobs:
         env:
           PGPASSWORD: postgres
         run: |
-          psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -v ON_ERROR_STOP=1 <<'SQL'
-          do $$
-          declare
-            hero_count integer;
-            alias_count integer;
-            awakening_count integer;
-            skill_count integer;
-            visual_count integer;
-            collision_count integer;
-          begin
-            select count(*) into hero_count from hero_versions;
-            select count(*) into alias_count from hero_version_skill_aliases;
-            select count(*) into awakening_count from awakening_definitions;
-            select count(*) into skill_count from awakening_skill_definitions;
-            select count(*) into visual_count from awakening_visual_definitions;
-            select count(*) into collision_count
-              from hero_versions h join awakening_definitions a on h.base_form_id = a.awakened_form_id;
-            if hero_count <> 194 then raise exception 'hero_count expected 194 got %', hero_count; end if;
-            if alias_count <> 970 then raise exception 'alias_count expected 970 got %', alias_count; end if;
-            if awakening_count <> 61 then raise exception 'awakening_count expected 61 got %', awakening_count; end if;
-            if skill_count <> 61 then raise exception 'awakening skill count expected 61 got %', skill_count; end if;
-            if visual_count <> 61 then raise exception 'visual count expected 61 got %', visual_count; end if;
-            if collision_count <> 0 then raise exception 'base/Awakening form collision count %', collision_count; end if;
-          end $$;
-          SQL
+          hero_expected=$(($(wc -l < game-data/heroes/heroes.csv) - 1))
+          alias_expected=$(($(wc -l < game-data/skills/hero-version-skills.csv) - 1))
+          awakening_expected=$(($(wc -l < game-data/progression/awakenings.csv) - 1))
+          skill_expected=$(($(wc -l < game-data/skills/awakening-skills.csv) - 1))
+          visual_expected=$(($(wc -l < game-data/assets/awakening-visuals.csv) - 1))
+
+          query_count() {
+            psql -h 127.0.0.1 -U postgres -d ninja_assemble_ci -tA -c "$1" | tr -d '[:space:]'
+          }
+          assert_count() {
+            label="$1"; expected="$2"; actual="$3"
+            if [ "$actual" != "$expected" ]; then
+              echo "$label expected=$expected actual=$actual" >&2
+              exit 1
+            fi
+          }
+
+          assert_count hero_versions "$hero_expected" "$(query_count 'select count(*) from hero_versions')"
+          assert_count hero_version_skill_aliases "$alias_expected" "$(query_count 'select count(*) from hero_version_skill_aliases')"
+          assert_count awakening_definitions "$awakening_expected" "$(query_count 'select count(*) from awakening_definitions')"
+          assert_count awakening_skill_definitions "$skill_expected" "$(query_count 'select count(*) from awakening_skill_definitions')"
+          assert_count awakening_visual_definitions "$visual_expected" "$(query_count 'select count(*) from awakening_visual_definitions')"
+          assert_count base_awakening_collision 0 "$(query_count 'select count(*) from hero_versions h join awakening_definitions a on h.base_form_id = a.awakened_form_id')"
+          echo "POSTGRES_AWAKENING_SCHEMA_OK heroes=$hero_expected aliases=$alias_expected awakenings=$awakening_expected"
