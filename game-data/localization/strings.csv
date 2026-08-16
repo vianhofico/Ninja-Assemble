@@ -1,0 +1,43 @@
+key,en,vi
+app.title,Ninja Assemble,Ninja Assemble
+language.english,English,Tiếng Anh
+language.vietnamese,Vietnamese,Tiếng Việt
+menu.home,Home,Làng Ninja
+menu.ninja,Ninja,Ninja
+menu.formation,Formation,Đội hình
+menu.adventure,Adventure,Phiêu lưu
+menu.summon,Summon,Chiêu mộ
+menu.arena,Arena,Đấu trường
+menu.shadow_arena,Shadow Arena,Đấu trường Bóng Tối
+menu.guild,Guild,Bang hội
+menu.shop,Shop,Cửa hàng
+menu.inventory,Inventory,Túi đồ
+menu.quest,Quest,Nhiệm vụ
+menu.events,Events,Sự kiện
+menu.settings,Settings,Cài đặt
+common.level,Level,Cấp
+common.power,Power,Lực chiến
+common.attack,Attack,Tấn công
+common.defense,Defense,Phòng thủ
+common.speed,Speed,Tốc độ
+common.hp,HP,Sinh lực
+common.energy,Energy,Năng lượng
+common.confirm,Confirm,Xác nhận
+common.cancel,Cancel,Hủy
+common.back,Back,Quay lại
+hero.evolve,Evolve,Tiến hóa
+hero.awaken,Awaken,Thức tỉnh
+hero.advance,Advance,Đột phá
+hero.skills,Skills,Kỹ năng
+hero.equipment,Equipment,Trang bị
+battle.victory,Victory,Chiến thắng
+battle.defeat,Defeat,Thất bại
+battle.auto,Auto,Tự động
+battle.speed,Speed,Tốc độ
+battle.pause,Pause,Tạm dừng
+currency.gold,Gold,Vàng
+currency.diamond,Diamond,Kim cương
+currency.arena_coin,Arena Coin,Xu Đấu Trường
+currency.hero_coin,Hero Coin,Xu Ninja
+currency.guild_coin,Guild Coin,Xu Bang Hội
+currency.shadow_coin,Shadow Coin,Xu Bóng Tối

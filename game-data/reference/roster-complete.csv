@@ -1,0 +1,190 @@
+id,character,group,scope,playable,status
+naruto-uzumaki,Naruto Uzumaki,Konoha,CORE,YES,CENSUS
+sasuke-uchiha,Sasuke Uchiha,Konoha,CORE,YES,CENSUS
+sakura-haruno,Sakura Haruno,Konoha,CORE,YES,CENSUS
+kakashi-hatake,Kakashi Hatake,Konoha,CORE,YES,CENSUS
+sai,Sai,Konoha,CORE,YES,CENSUS
+yamato,Yamato,Konoha,CORE,YES,CENSUS
+iruka-umino,Iruka Umino,Konoha,CORE,YES,CENSUS
+konohamaru-sarutobi,Konohamaru Sarutobi,Konoha,CORE,YES,CENSUS
+moegi-kazamatsuri,Moegi Kazamatsuri,Konoha,CORE,YES,CENSUS
+udon-ise,Udon Ise,Konoha,CORE,YES,CENSUS
+shikamaru-nara,Shikamaru Nara,Konoha,CORE,YES,CENSUS
+ino-yamanaka,Ino Yamanaka,Konoha,CORE,YES,CENSUS
+choji-akimichi,Choji Akimichi,Konoha,CORE,YES,CENSUS
+asuma-sarutobi,Asuma Sarutobi,Konoha,CORE,YES,CENSUS
+kurenai-yuhi,Kurenai Yuhi,Konoha,CORE,YES,CENSUS
+hinata-hyuga,Hinata Hyuga,Konoha,CORE,YES,CENSUS
+kiba-inuzuka,Kiba Inuzuka,Konoha,CORE,YES,CENSUS
+shino-aburame,Shino Aburame,Konoha,CORE,YES,CENSUS
+neji-hyuga,Neji Hyuga,Konoha,CORE,YES,CENSUS
+rock-lee,Rock Lee,Konoha,CORE,YES,CENSUS
+tenten,Tenten,Konoha,CORE,YES,CENSUS
+might-guy,Might Guy,Konoha,CORE,YES,CENSUS
+ebisu,Ebisu,Konoha,CORE,YES,CENSUS
+anko-mitarashi,Anko Mitarashi,Konoha,CORE,YES,CENSUS
+shizune,Shizune,Konoha,CORE,YES,CENSUS
+tsunade,Tsunade,Konoha,CORE,YES,CENSUS
+jiraiya,Jiraiya,Konoha,CORE,YES,CENSUS
+hiruzen-sarutobi,Hiruzen Sarutobi,Konoha,CORE,YES,CENSUS
+minato-namikaze,Minato Namikaze,Konoha,CORE,YES,CENSUS
+kushina-uzumaki,Kushina Uzumaki,Konoha,CORE,YES,CENSUS
+hashirama-senju,Hashirama Senju,Konoha,CORE,YES,CENSUS
+tobirama-senju,Tobirama Senju,Konoha,CORE,YES,CENSUS
+danzo-shimura,Danzo Shimura,Konoha,CORE,YES,CENSUS
+shisui-uchiha,Shisui Uchiha,Konoha,CORE,YES,CENSUS
+fugaku-uchiha,Fugaku Uchiha,Konoha,CORE,YES,CENSUS
+izuna-uchiha,Izuna Uchiha,Konoha,CORE,YES,CENSUS
+madara-uchiha,Madara Uchiha,Konoha,CORE,YES,CENSUS
+obito-uchiha,Obito Uchiha,Konoha,CORE,YES,CENSUS
+rin-nohara,Rin Nohara,Konoha,CORE,YES,CENSUS
+sakumo-hatake,Sakumo Hatake,Konoha,CORE,YES,CENSUS
+dan-kato,Dan Kato,Konoha,CORE,YES,CENSUS
+hiashi-hyuga,Hiashi Hyuga,Konoha,CORE,YES,CENSUS
+hizashi-hyuga,Hizashi Hyuga,Konoha,CORE,YES,CENSUS
+hanabi-hyuga,Hanabi Hyuga,Konoha,CORE,YES,CENSUS
+torune-aburame,Torune Aburame,Konoha,CORE,YES,CENSUS
+fu-yamanaka,Fu Yamanaka,Konoha,CORE,YES,CENSUS
+kotetsu-hagane,Kotetsu Hagane,Konoha,CORE,YES,CENSUS
+izumo-kamizuki,Izumo Kamizuki,Konoha,CORE,YES,CENSUS
+genma-shiranui,Genma Shiranui,Konoha,CORE,YES,CENSUS
+raido-namiashi,Raidō Namiashi,Konoha,CORE,YES,CENSUS
+aoba-yamashiro,Aoba Yamashiro,Konoha,CORE,YES,CENSUS
+ibiki-morino,Ibiki Morino,Konoha,CORE,YES,CENSUS
+hayate-gekko,Hayate Gekko,Konoha,CORE,YES,CENSUS
+yugao-uzuki,Yugao Uzuki,Konoha,CORE,YES,CENSUS
+might-duy,Might Duy,Konoha,CORE,YES,CENSUS
+shikaku-nara,Shikaku Nara,Konoha,CORE,YES,CENSUS
+inoichi-yamanaka,Inoichi Yamanaka,Konoha,CORE,YES,CENSUS
+choza-akimichi,Choza Akimichi,Konoha,CORE,YES,CENSUS
+kagami-uchiha,Kagami Uchiha,Konoha,CORE,YES,CENSUS
+torifu-akimichi,Torifu Akimichi,Konoha,CORE,YES,CENSUS
+nono-yakushi,Nono Yakushi,Konoha,CORE,YES,CENSUS
+kosuke-maruboshi,Kosuke Maruboshi,Konoha,CORE,YES,CENSUS
+mizuki,Mizuki,Konoha,CORE,YES,CENSUS
+idate-morino,Idate Morino,Konoha,CORE,YES,CENSUS
+gaara,Gaara,Sunagakure,CORE,YES,CENSUS
+temari,Temari,Sunagakure,CORE,YES,CENSUS
+kankuro,Kankuro,Sunagakure,CORE,YES,CENSUS
+rasa,Rasa,Sunagakure,CORE,YES,CENSUS
+chiyo,Chiyo,Sunagakure,CORE,YES,CENSUS
+ebizo,Ebizo,Sunagakure,CORE,YES,CENSUS
+sasori,Sasori,Sunagakure,CORE,YES,CENSUS
+pakura,Pakura,Sunagakure,CORE,YES,CENSUS
+maki,Maki,Sunagakure,CORE,YES,CENSUS
+baki,Baki,Sunagakure,CORE,YES,CENSUS
+yashamaru,Yashamaru,Sunagakure,CORE,YES,CENSUS
+matsuri,Matsuri,Sunagakure,CORE,YES,CENSUS
+sari,Sari,Sunagakure,CORE,YES,CENSUS
+mei-terumi,Mei Terumi,Kirigakure,CORE,YES,CENSUS
+chojuro,Chojuro,Kirigakure,CORE,YES,CENSUS
+ao,Ao,Kirigakure,CORE,YES,CENSUS
+yagura-karatachi,Yagura Karatachi,Kirigakure,CORE,YES,CENSUS
+zabuza-momochi,Zabuza Momochi,Kirigakure,CORE,YES,CENSUS
+haku,Haku,Kirigakure,CORE,YES,CENSUS
+kisame-hoshigaki,Kisame Hoshigaki,Kirigakure,CORE,YES,CENSUS
+mangetsu-hozuki,Mangetsu Hozuki,Kirigakure,CORE,YES,CENSUS
+suigetsu-hozuki,Suigetsu Hozuki,Kirigakure,CORE,YES,CENSUS
+fuguki-suikazan,Fuguki Suikazan,Kirigakure,CORE,YES,CENSUS
+jinin-akebino,Jinin Akebino,Kirigakure,CORE,YES,CENSUS
+jinpachi-munashi,Jinpachi Munashi,Kirigakure,CORE,YES,CENSUS
+kushimaru-kuriarare,Kushimaru Kuriarare,Kirigakure,CORE,YES,CENSUS
+ameyuri-ringo,Ameyuri Ringo,Kirigakure,CORE,YES,CENSUS
+raiga-kurosuki,Raiga Kurosuki,Kirigakure,CORE,YES,CENSUS
+gengetsu-hozuki,Gengetsu Hozuki,Kirigakure,CORE,YES,CENSUS
+byakuren,Byakuren,Kirigakure,CORE,YES,CENSUS
+chukichi,Chukichi,Kirigakure,CORE,YES,CENSUS
+a-fourth-raikage,A (Fourth Raikage),Kumogakure,CORE,YES,CENSUS
+third-raikage,Third Raikage,Kumogakure,CORE,YES,CENSUS
+killer-b,Killer B,Kumogakure,CORE,YES,CENSUS
+yugito-nii,Yugito Nii,Kumogakure,CORE,YES,CENSUS
+darui,Darui,Kumogakure,CORE,YES,CENSUS
+c,C,Kumogakure,CORE,YES,CENSUS
+omoi,Omoi,Kumogakure,CORE,YES,CENSUS
+karui,Karui,Kumogakure,CORE,YES,CENSUS
+samui,Samui,Kumogakure,CORE,YES,CENSUS
+atsui,Atsui,Kumogakure,CORE,YES,CENSUS
+dodai,Dodai,Kumogakure,CORE,YES,CENSUS
+mabui,Mabui,Kumogakure,CORE,YES,CENSUS
+toroi,Toroi,Kumogakure,CORE,YES,CENSUS
+blue-b,Blue B,Kumogakure,CORE,YES,CENSUS
+motoi,Motoi,Kumogakure,CORE,YES,CENSUS
+first-raikage,First Raikage,Kumogakure,CORE,YES,CENSUS
+second-raikage,Second Raikage,Kumogakure,CORE,YES,CENSUS
+onoki,Onoki,Iwagakure,CORE,YES,CENSUS
+kurotsuchi,Kurotsuchi,Iwagakure,CORE,YES,CENSUS
+akatsuchi,Akatsuchi,Iwagakure,CORE,YES,CENSUS
+mu,Mu,Iwagakure,CORE,YES,CENSUS
+deidara,Deidara,Iwagakure,CORE,YES,CENSUS
+roshi,Roshi,Iwagakure,CORE,YES,CENSUS
+han,Han,Iwagakure,CORE,YES,CENSUS
+kitsuchi,Kitsuchi,Iwagakure,CORE,YES,CENSUS
+gari,Gari,Iwagakure,CORE,YES,CENSUS
+ishikawa,Ishikawa,Iwagakure,CORE,YES,CENSUS
+kakko,Kakko,Iwagakure,CORE,YES,CENSUS
+taiseki,Taiseki,Iwagakure,CORE,YES,CENSUS
+mahiru,Mahiru,Iwagakure,CORE,YES,CENSUS
+nagato,Nagato,Amegakure,CORE,YES,CENSUS
+yahiko,Yahiko,Amegakure,CORE,YES,CENSUS
+konan,Konan,Amegakure,CORE,YES,CENSUS
+hanzo,Hanzo,Amegakure,CORE,YES,CENSUS
+ajisai,Ajisai,Amegakure,CORE,YES,CENSUS
+shigure,Shigure,Amegakure,CORE,YES,CENSUS
+baiu,Baiu,Amegakure,CORE,YES,CENSUS
+midare,Midare,Amegakure,CORE,YES,CENSUS
+oboro,Oboro,Amegakure,CORE,YES,CENSUS
+mubi,Mubi,Amegakure,CORE,YES,CENSUS
+kagari,Kagari,Amegakure,CORE,YES,CENSUS
+orochimaru,Orochimaru,Otogakure,CORE,YES,CENSUS
+kabuto-yakushi,Kabuto Yakushi,Otogakure,CORE,YES,CENSUS
+kimimaro,Kimimaro,Otogakure,CORE,YES,CENSUS
+jugo,Jugo,Otogakure,CORE,YES,CENSUS
+karin,Karin,Otogakure,CORE,YES,CENSUS
+tayuya,Tayuya,Otogakure,CORE,YES,CENSUS
+kidomaru,Kidomaru,Otogakure,CORE,YES,CENSUS
+sakon,Sakon,Otogakure,CORE,YES,CENSUS
+ukon,Ukon,Otogakure,CORE,YES,CENSUS
+jirobo,Jirobo,Otogakure,CORE,YES,CENSUS
+dosu-kinuta,Dosu Kinuta,Otogakure,CORE,YES,CENSUS
+kin-tsuchi,Kin Tsuchi,Otogakure,CORE,YES,CENSUS
+zaku-abumi,Zaku Abumi,Otogakure,CORE,YES,CENSUS
+guren,Guren,Otogakure,CORE,YES,CENSUS
+yoroi-akado,Yoroi Akado,Otogakure,CORE,YES,CENSUS
+misumi-tsurugi,Misumi Tsurugi,Otogakure,CORE,YES,CENSUS
+itachi-uchiha,Itachi Uchiha,Akatsuki,CORE,YES,CENSUS
+hidan,Hidan,Akatsuki,CORE,YES,CENSUS
+kakuzu,Kakuzu,Akatsuki,CORE,YES,CENSUS
+black-zetsu,Black Zetsu,Akatsuki,CORE,YES,CENSUS
+white-zetsu,White Zetsu,Akatsuki,CORE,YES,CENSUS
+bunpuku,Bunpuku,Jinchuriki,CORE,YES,CENSUS
+mito-uzumaki,Mito Uzumaki,Jinchuriki,CORE,YES,CENSUS
+utakata,Utakata,Jinchuriki,CORE,YES,CENSUS
+fu,Fu,Jinchuriki,CORE,YES,CENSUS
+kinkaku,Kinkaku,WarEra,CORE,YES,CENSUS
+ginkaku,Ginkaku,WarEra,CORE,YES,CENSUS
+mifune,Mifune,Samurai,CORE,YES,CENSUS
+okisuke,Okisuke,Samurai,CORE,YES,CENSUS
+kaguya-otsutsuki,Kaguya Otsutsuki,Ancients,CORE,YES,CENSUS
+hagoromo-otsutsuki,Hagoromo Otsutsuki,Ancients,CORE,YES,CENSUS
+hamura-otsutsuki,Hamura Otsutsuki,Ancients,CORE,YES,CENSUS
+indra-otsutsuki,Indra Otsutsuki,Ancients,CORE,YES,CENSUS
+asura-otsutsuki,Asura Otsutsuki,Ancients,CORE,YES,CENSUS
+gamabunta,Gamabunta,Summons,EXPANSION,YES,CENSUS
+gamakichi,Gamakichi,Summons,EXPANSION,YES,CENSUS
+fukasaku,Fukasaku,Summons,EXPANSION,YES,CENSUS
+shima,Shima,Summons,EXPANSION,YES,CENSUS
+manda,Manda,Summons,EXPANSION,YES,CENSUS
+aoda,Aoda,Summons,EXPANSION,YES,CENSUS
+katsuyu,Katsuyu,Summons,EXPANSION,YES,CENSUS
+enma,Enma,Summons,EXPANSION,YES,CENSUS
+sora,Sora,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+menma-uzumaki,Menma Uzumaki,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+hiruko,Hiruko,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+mukade,Mukade,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+shinno,Shinno,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+toneri-otsutsuki,Toneri Otsutsuki,AnimeMovieExpansion,EXPANSION,YES,CENSUS
+gozu,Gozu,Other,EXPANSION,YES,CENSUS
+meizu,Meizu,Other,EXPANSION,YES,CENSUS
+fuen,Fuen,Other,EXPANSION,YES,CENSUS
+fudo,Fudo,Other,EXPANSION,YES,CENSUS
+fuka,Fuka,Other,EXPANSION,YES,CENSUS

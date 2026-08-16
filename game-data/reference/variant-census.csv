@@ -1,0 +1,164 @@
+character_id,variant,status
+naruto-uzumaki,Academy,PLANNED
+naruto-uzumaki,Genin,PLANNED
+naruto-uzumaki,One-Tail Cloak,PLANNED
+naruto-uzumaki,Four-Tails Cloak,PLANNED
+naruto-uzumaki,Sage Mode,PLANNED
+naruto-uzumaki,KCM1,PLANNED
+naruto-uzumaki,KCM2,PLANNED
+naruto-uzumaki,Bijuu Mode,PLANNED
+naruto-uzumaki,Six Paths Sage Mode,PLANNED
+naruto-uzumaki,Hokage,PLANNED
+sasuke-uchiha,Genin,PLANNED
+sasuke-uchiha,Curse Mark Level 2,PLANNED
+sasuke-uchiha,Hebi,PLANNED
+sasuke-uchiha,Mangekyo Sharingan,PLANNED
+sasuke-uchiha,Eternal Mangekyo Sharingan,PLANNED
+sasuke-uchiha,Rinnegan,PLANNED
+sasuke-uchiha,Six Paths,PLANNED
+sasuke-uchiha,Adult,PLANNED
+sakura-haruno,Genin,PLANNED
+sakura-haruno,Shippuden,PLANNED
+sakura-haruno,Byakugo,PLANNED
+kakashi-hatake,Young,PLANNED
+kakashi-hatake,ANBU,PLANNED
+kakashi-hatake,Sharingan,PLANNED
+kakashi-hatake,Mangekyo Sharingan,PLANNED
+kakashi-hatake,Double Mangekyo,PLANNED
+itachi-uchiha,ANBU,PLANNED
+itachi-uchiha,Akatsuki,PLANNED
+itachi-uchiha,Mangekyo,PLANNED
+itachi-uchiha,Susanoo,PLANNED
+itachi-uchiha,Edo Tensei,PLANNED
+madara-uchiha,Warring States,PLANNED
+madara-uchiha,Eternal Mangekyo,PLANNED
+madara-uchiha,Edo Tensei,PLANNED
+madara-uchiha,Rinnegan,PLANNED
+madara-uchiha,Ten-Tails Jinchuriki,PLANNED
+madara-uchiha,Six Paths,PLANNED
+obito-uchiha,Young,PLANNED
+obito-uchiha,Masked Man,PLANNED
+obito-uchiha,Tobi,PLANNED
+obito-uchiha,Mangekyo,PLANNED
+obito-uchiha,White Mask,PLANNED
+obito-uchiha,Ten-Tails Jinchuriki,PLANNED
+minato-namikaze,Jonin,PLANNED
+minato-namikaze,Fourth Hokage,PLANNED
+minato-namikaze,Edo Tensei,PLANNED
+minato-namikaze,KCM,PLANNED
+hashirama-senju,Warring States,PLANNED
+hashirama-senju,First Hokage,PLANNED
+hashirama-senju,Sage Mode,PLANNED
+hashirama-senju,Edo Tensei,PLANNED
+tobirama-senju,Second Hokage,PLANNED
+tobirama-senju,Edo Tensei,PLANNED
+hiruzen-sarutobi,Prime,PLANNED
+hiruzen-sarutobi,Third Hokage,PLANNED
+hiruzen-sarutobi,Edo Tensei,PLANNED
+gaara,Genin,PLANNED
+gaara,Kazekage,PLANNED
+gaara,Shukaku Cloak,PLANNED
+gaara,War Arc,PLANNED
+killer-b,Base,PLANNED
+killer-b,Eight-Tails Cloak,PLANNED
+killer-b,Full Gyuki,PLANNED
+yagura-karatachi,Mizukage,PLANNED
+yagura-karatachi,Three-Tails Cloak,PLANNED
+yugito-nii,Base,PLANNED
+yugito-nii,Two-Tails Cloak,PLANNED
+roshi,Base,PLANNED
+roshi,Four-Tails Cloak,PLANNED
+han,Base,PLANNED
+han,Five-Tails Cloak,PLANNED
+utakata,Base,PLANNED
+utakata,Six-Tails Cloak,PLANNED
+fu,Base,PLANNED
+fu,Seven-Tails Cloak,PLANNED
+nagato,Young,PLANNED
+nagato,Pain Controller,PLANNED
+nagato,Edo Tensei,PLANNED
+orochimaru,Sannin,PLANNED
+orochimaru,Akatsuki Era,PLANNED
+orochimaru,Shippuden,PLANNED
+orochimaru,White Snake,PLANNED
+kabuto-yakushi,Part I,PLANNED
+kabuto-yakushi,Shippuden,PLANNED
+kabuto-yakushi,Snake Sage,PLANNED
+kabuto-yakushi,War Arc,PLANNED
+might-guy,Base,PLANNED
+might-guy,Sixth Gate,PLANNED
+might-guy,Seventh Gate,PLANNED
+might-guy,Eighth Gate,PLANNED
+rock-lee,Genin,PLANNED
+rock-lee,Shippuden,PLANNED
+rock-lee,Fifth Gate,PLANNED
+rock-lee,Sixth Gate,PLANNED
+neji-hyuga,Genin,PLANNED
+neji-hyuga,Shippuden,PLANNED
+hinata-hyuga,Genin,PLANNED
+hinata-hyuga,Shippuden,PLANNED
+hinata-hyuga,War Arc,PLANNED
+shikamaru-nara,Genin,PLANNED
+shikamaru-nara,Chunin,PLANNED
+shikamaru-nara,Shippuden,PLANNED
+shikamaru-nara,War Arc,PLANNED
+choji-akimichi,Genin,PLANNED
+choji-akimichi,Butterfly Mode,PLANNED
+choji-akimichi,Shippuden,PLANNED
+choji-akimichi,War Arc,PLANNED
+ino-yamanaka,Genin,PLANNED
+ino-yamanaka,Shippuden,PLANNED
+ino-yamanaka,War Arc,PLANNED
+deidara,Akatsuki,PLANNED
+deidara,C2 Dragon,PLANNED
+deidara,C4,PLANNED
+deidara,Edo Tensei,PLANNED
+sasori,Hiruko Puppet,PLANNED
+sasori,True Body,PLANNED
+sasori,Hundred Puppets,PLANNED
+sasori,Edo Tensei,PLANNED
+kisame-hoshigaki,Akatsuki,PLANNED
+kisame-hoshigaki,Samehada Fusion,PLANNED
+hidan,Akatsuki,PLANNED
+hidan,Curse Ritual,PLANNED
+kakuzu,Akatsuki,PLANNED
+kakuzu,Earth Grudge Fear,PLANNED
+konan,Akatsuki,PLANNED
+konan,Paper Angel,PLANNED
+danzo-shimura,Hokage Candidate,PLANNED
+danzo-shimura,Izanagi Arm,PLANNED
+shisui-uchiha,ANBU,PLANNED
+shisui-uchiha,Mangekyo Sharingan,PLANNED
+toneri-otsutsuki,Base,PLANNED
+toneri-otsutsuki,Tenseigan Chakra Mode,PLANNED
+kaguya-otsutsuki,Base,PLANNED
+kaguya-otsutsuki,Rabbit Goddess,PLANNED
+hagoromo-otsutsuki,Young,PLANNED
+hagoromo-otsutsuki,Sage of Six Paths,PLANNED
+hamura-otsutsuki,Young,PLANNED
+hamura-otsutsuki,Tenseigan Legacy,PLANNED
+asura-otsutsuki,Base,PLANNED
+asura-otsutsuki,Six Paths Avatar,PLANNED
+indra-otsutsuki,Base,PLANNED
+indra-otsutsuki,Susanoo,PLANNED
+chiyo,Base,PLANNED
+chiyo,Ten Puppets,PLANNED
+zabuza-momochi,Base,PLANNED
+zabuza-momochi,Edo Tensei,PLANNED
+haku,Base,PLANNED
+haku,Edo Tensei,PLANNED
+gengetsu-hozuki,Second Mizukage,PLANNED
+gengetsu-hozuki,Edo Tensei,PLANNED
+mu,Second Tsuchikage,PLANNED
+mu,Edo Tensei,PLANNED
+third-raikage,Third Raikage,PLANNED
+third-raikage,Edo Tensei,PLANNED
+rasa,Fourth Kazekage,PLANNED
+rasa,Edo Tensei,PLANNED
+hanzo,Prime,PLANNED
+hanzo,Edo Tensei,PLANNED
+asuma-sarutobi,Jonin,PLANNED
+asuma-sarutobi,Edo Tensei,PLANNED
+kimimaro,Base,PLANNED
+kimimaro,Curse Mark Level 2,PLANNED
+kimimaro,Edo Tensei,PLANNED
