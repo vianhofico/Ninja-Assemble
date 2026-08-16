@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class HeroVersionAcquisitionCatalogService {
                     List<String> cells = HeroContentCatalogService.parseCsvLine(line);
                     if (cells.size() < 19) throw new IllegalStateException("invalid Hero Version acquisition row");
                     HeroVersionAcquisitionEntry entry = new HeroVersionAcquisitionEntry(
-                            cells.get(0), cells.get(1), cells.get(3), cells.get(4), cells.get(7),
+                            cells.get(0), cells.get(1), cells.get(3), cells.get(4), cells.get(6),
                             cells.get(16), Boolean.parseBoolean(cells.get(17)), cells.get(18));
                     if (entry.heroId().isBlank() || entry.characterId().isBlank() || entry.rarity().isBlank()) {
                         throw new IllegalStateException("invalid Hero Version acquisition identity: " + line);
