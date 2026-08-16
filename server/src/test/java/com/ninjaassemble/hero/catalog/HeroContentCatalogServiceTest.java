@@ -50,8 +50,10 @@ class HeroContentCatalogServiceTest {
         assertEquals("six-paths-barrage", narutoSixPaths.skill("ULTIMATE").sourceTechniqueId());
 
         var obitoYoung = content.resolveHero("obito-young", false);
+        var obitoMasked = content.resolveHero("obito-masked", false);
         var obitoWhiteMask = content.resolveHero("obito-white-mask", false);
-        assertEquals("fireball-jutsu", obitoYoung.skill("SKILL_2").sourceTechniqueId());
+        assertEquals("taijutsu-combo", obitoYoung.skill("SKILL_1").sourceTechniqueId());
+        assertEquals("kamui-phase", obitoMasked.skill("SKILL_1").sourceTechniqueId());
         assertEquals("passive-rinnegan", obitoWhiteMask.skill("PASSIVE").sourceTechniqueId());
     }
 
