@@ -1,0 +1,5 @@
+stage_id,chapter,index,difficulty,energy_cost,min_player_level,prerequisite,status
+chapter-1-normal-1,1,1,NORMAL,TBD,1,,TEMPLATE
+chapter-1-normal-2,1,2,NORMAL,TBD,TBD,chapter-1-normal-1,TEMPLATE
+chapter-1-elite-1,1,1,ELITE,TBD,TBD,TBD_AFTER_REFERENCE_CENSUS,TEMPLATE
+chapter-1-heroic-1,1,1,HEROIC,TBD,TBD,TBD_AFTER_REFERENCE_CENSUS,TEMPLATE
