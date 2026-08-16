@@ -1,0 +1,42 @@
+name: hero-awakening-proposal-generation
+
+on:
+  push:
+    branches:
+      - agent/m41-hero-awakening-proposal
+
+permissions:
+  contents: write
+
+jobs:
+  generate-proposal:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/m41-hero-awakening-proposal
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate full 427-variant proposal
+        run: python scripts/generate-hero-awakening-proposal.py --write
+      - name: Apply semantic research corrections
+        run: python scripts/refine-hero-awakening-proposal-v2.py
+      - name: Validate structural proposal rules
+        run: python scripts/generate-hero-awakening-proposal.py
+      - name: Commit generated design artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add game-data/design/character-form-pool.csv \
+                  game-data/design/hero-awakening-pairs.csv \
+                  game-data/design/variant-reclassification.csv \
+                  docs/design/HERO_AWAKENING_PAIR_PROPOSAL.md
+          if git diff --cached --quiet; then
+            echo "Generated proposal is already up to date"
+          else
+            git commit -m "M41: regenerate semantically refined hero awakening proposal"
+            git push origin HEAD:agent/m41-hero-awakening-proposal
+          fi
