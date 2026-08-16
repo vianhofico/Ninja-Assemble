@@ -33,6 +33,7 @@ public class HeroContentCatalogService {
     public HeroContentCatalogService() {
         for (String resource : TECHNIQUE_RESOURCES) loadTechniques(resource);
         loadHeroSkills();
+        loadHeroSkillOverrides();
         loadHeroes();
         loadAwakeningSkills();
         loadLegacyBridge();
@@ -136,6 +137,25 @@ public class HeroContentCatalogService {
             if (cells.size() < 12) throw new IllegalStateException("invalid Hero Version skill alias row");
             HeroSkillAlias row = new HeroSkillAlias(cells.get(0), cells.get(1), cells.get(2), cells.get(3), cells.get(10));
             if (heroSkills.putIfAbsent(row.skillId(), row) != null) throw new IllegalStateException("duplicate Hero Version skill id: " + row.skillId());
+        });
+    }
+
+    /**
+     * M47 keeps the generated 970-row alias catalog reproducible, then overlays a small reviewed set of
+     * version-identity corrections. These rows are deliberately baseline/research statuses; M50 owns final
+     * canon evidence, Rage/timing and cinematic design.
+     */
+    private void loadHeroSkillOverrides() {
+        forEachDataRow("/game-data/skills/hero-version-skill-overrides.csv", cells -> {
+            if (cells.size() < 6) throw new IllegalStateException("invalid Hero Version skill override row");
+            String skillId = cells.get(0);
+            String sourceTechniqueId = cells.get(1);
+            String status = cells.get(4);
+            HeroSkillAlias current = heroSkills.get(skillId);
+            if (current == null) throw new IllegalStateException("Hero Version override references unknown skill: " + skillId);
+            requireTechnique(sourceTechniqueId);
+            heroSkills.put(skillId, new HeroSkillAlias(
+                    current.skillId(), current.heroId(), current.slot(), sourceTechniqueId, status));
         });
     }
 
