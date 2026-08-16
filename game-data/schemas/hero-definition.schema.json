@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.ninja-assemble/schema/hero-definition.json",
+  "title": "HeroDefinition",
+  "type": "object",
+  "required": ["id", "displayName", "archetype", "skills", "parity"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "displayName": {"type": "string", "minLength": 1},
+    "variant": {"type": "string"},
+    "archetype": {"enum": ["PHYSICAL", "CHAKRA", "HYBRID", "UNKNOWN"]},
+    "position": {"enum": ["FRONT", "REAR", "FLEX", "UNKNOWN"]},
+    "skills": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
+    "frame": {"type": "object", "properties": {"sixPathEligible": {"type": "boolean"}, "awakeningEligible": {"type": "boolean"}}, "additionalProperties": false},
+    "presentation": {"type": "object", "properties": {"portraitAddress": {"type": "string"}, "prefabAddress": {"type": "string"}, "animationSet": {"type": "string"}, "vfxSet": {"type": "string"}}, "additionalProperties": false},
+    "parity": {"type": "object", "required": ["status", "evidence"], "properties": {"status": {"enum": ["DISCOVERED", "DOCUMENTED", "IMPLEMENTED", "VERIFIED", "PARITY_PASS"]}, "evidence": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

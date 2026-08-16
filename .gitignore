@@ -1,0 +1,26 @@
+# Java
+server/target/
+*.class
+
+# IntelliJ / VS Code
+.idea/
+.vscode/
+*.iml
+
+# Unity
+client-unity/[Ll]ibrary/
+client-unity/[Tt]emp/
+client-unity/[Oo]bj/
+client-unity/[Bb]uild/
+client-unity/[Bb]uilds/
+client-unity/[Ll]ogs/
+client-unity/[Uu]ser[Ss]ettings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# env
+.env
+.env.*
+!.env.example

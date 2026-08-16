@@ -1,0 +1,19 @@
+name: server-core
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  verified-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Verify dependency-free researched rules
+        run: bash scripts/validate-core.sh
+      - name: Maven test
+        run: mvn -B -f server/pom.xml test

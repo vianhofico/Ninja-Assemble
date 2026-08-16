@@ -1,0 +1,18 @@
+feature_id,category,name,evidence,status,notes
+hidden-village,core,Hidden Village,OFFICIAL_CONFIRMED,DOCUMENTED,Build/gather/train theme confirmed by official listing
+main-quest,pve,Main Quest,COMMUNITY_CONFIRMED,DOCUMENTED,Normal/Elite/Heroic progression
+arena,pvp,Arena/Hero War,COMMUNITY_CONFIRMED,DOCUMENTED,5 ninja formation; asynchronous battle described
+shadow-arena,pvp,Shadow Arena/Shadow Fight,COMMUNITY_CONFIRMED,DOCUMENTED,15 ninja; 3 squads; best of three
+ninja-trial,pve,Ninja Trial,COMMUNITY_CONFIRMED,DOCUMENTED,Authentic Waterfall/Gama Temple/Path of Kunoichi
+forest-hunt,pve,Forest Hunt,COMMUNITY_CONFIRMED,DOCUMENTED,Hunt Forest + Land of Pain
+beast-conquer,pve,Tailed Beast Conquer,COMMUNITY_CONFIRMED,DOCUMENTED,Tailed Beast challenge; rare progression materials
+ninja-quest,pve,Ninja Quest,COMMUNITY_CONFIRMED,DOCUMENTED,Ranks S/A/B/C/D
+crusade,pve,Crusade,COMMUNITY_CONFIRMED,DISCOVERED,Opponent scaling/reward steps; exact difficulties need capture
+frame-advance,progression,Frame Advance,COMMUNITY_CONFIRMED,IMPLEMENTED,Genin/Chunin/Jonin/Kage/Six Path/Awakening model
+six-path-transform,progression,Six Path character transformation,COMMUNITY_CONFIRMED,DOCUMENTED,Hero-specific eligibility; exact paths need census
+tailed-beast,progression,Tailed Beast/Jinchuriki,COMMUNITY_CONFIRMED,DOCUMENTED,Soul + beast bone; late-game prerequisite
+ninja-college,progression,Ninja College/Scroll,COMMUNITY_CONFIRMED,DOCUMENTED,Training/Inlay/Combine; max scroll level 10
+team-synergy,progression,Team synergy,COMMUNITY_CONFIRMED,DOCUMENTED,Related ninja groups grant attributes
+shops,economy,Mode stores,COMMUNITY_CONFIRMED,DOCUMENTED,Ninja/Mystic/6-Path/Arena/Guild/Shadow etc.
+daily,economy,Daily Quest + daily events,COMMUNITY_CONFIRMED,DOCUMENTED,Multiple battle/spend/free-resource loops
+guild,social,Guild/Guild War,COMMUNITY_CONFIRMED,DISCOVERED,Needs direct current-build census
