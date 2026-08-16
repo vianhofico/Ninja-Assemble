@@ -8,6 +8,7 @@ import com.ninjaassemble.hero.catalog.HeroContentCatalogService;
 import com.ninjaassemble.reference.ReferenceProfiles;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,12 +19,21 @@ public class ExperimentalCombatStatsResolver {
     private final PassiveEffectResolver passiveResolver;
     private final EquipmentApplicationService equipment;
 
+    @Autowired
     public ExperimentalCombatStatsResolver(HeroContentCatalogService content, ExperimentalAbilityProfile abilities,
                                            PassiveEffectResolver passiveResolver, EquipmentApplicationService equipment) {
         this.content = content;
         this.abilities = abilities;
         this.passiveResolver = passiveResolver;
         this.equipment = equipment;
+    }
+
+    ExperimentalCombatStatsResolver(HeroContentCatalogService content, ExperimentalAbilityProfile abilities,
+                                    PassiveEffectResolver passiveResolver) {
+        this.content = content;
+        this.abilities = abilities;
+        this.passiveResolver = passiveResolver;
+        this.equipment = null;
     }
 
     public BattleUnitSeed resolve(String battleUnitId, String characterId, String variant, int level, TeamSide side, int slot) {
@@ -44,7 +54,7 @@ public class ExperimentalCombatStatsResolver {
                 battleUnitId, side, slot, hp, pAtk, cAtk, pDef, cDef, speed, crit, crit, channel,
                 abilities.resolve(kit), List.of(passiveResolver.resolve(kit.techniques().get(4))));
         UUID playerHeroId = playerHeroId(battleUnitId);
-        return playerHeroId == null ? base : equipment.applyCombatBonus(playerHeroId, base);
+        return equipment == null || playerHeroId == null ? base : equipment.applyCombatBonus(playerHeroId, base);
     }
 
     private static UUID playerHeroId(String battleUnitId) {
