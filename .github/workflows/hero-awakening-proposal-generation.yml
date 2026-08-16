@@ -23,7 +23,7 @@ jobs:
       - name: Generate full 427-variant proposal
         run: python scripts/generate-hero-awakening-proposal.py --write
       - name: Apply semantic research corrections
-        run: python scripts/refine-hero-awakening-proposal.py
+        run: python scripts/refine-hero-awakening-proposal-v2.py
       - name: Validate structural proposal rules
         run: python scripts/generate-hero-awakening-proposal.py
       - name: Commit generated design artifacts
