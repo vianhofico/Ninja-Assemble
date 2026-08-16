@@ -13,7 +13,7 @@ class ShadowArenaRosterSnapshotTest {
             List<FormationMemberSnapshot> members = new ArrayList<>();
             for (int slot = 0; slot < 5; slot++) {
                 String id = "h" + (squad * 5 + slot);
-                members.add(new FormationMemberSnapshot(id, id, null, 10));
+                members.add(new FormationMemberSnapshot(id, id, false, 10));
             }
             squads.add(new ArenaFormationSnapshot(members));
         }
