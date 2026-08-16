@@ -21,26 +21,38 @@ namespace NinjaAssemble.EditorTools
         private const string ConfigDir = "Assets/Resources/Config";
         private const string ApiConfigPath = ConfigDir + "/GameApiConfig.asset";
 
-        private readonly record struct ScreenSpec(ScreenId Id, string Title, string TitleKey);
+        private readonly struct ScreenSpec
+        {
+            public ScreenId Id { get; }
+            public string Title { get; }
+            public string TitleKey { get; }
+
+            public ScreenSpec(ScreenId id, string title, string titleKey)
+            {
+                Id = id;
+                Title = title;
+                TitleKey = titleKey;
+            }
+        }
 
         private static readonly ScreenSpec[] Screens =
         {
-            new(ScreenId.Home, "Hidden Village", "screen.home"),
-            new(ScreenId.NinjaRoster, "Ninja Roster", "screen.roster"),
-            new(ScreenId.HeroDetail, "Ninja Detail", "screen.heroDetail"),
-            new(ScreenId.Formation, "Formation", "screen.formation"),
-            new(ScreenId.Adventure, "Adventure", "screen.adventure"),
-            new(ScreenId.Battle, "Battle", "screen.battle"),
-            new(ScreenId.Summon, "Summon", "screen.summon"),
-            new(ScreenId.Arena, "Arena", "screen.arena"),
-            new(ScreenId.ShadowArena, "Shadow Arena", "screen.shadowArena"),
-            new(ScreenId.Guild, "Guild", "screen.guild"),
-            new(ScreenId.Shop, "Shop", "screen.shop"),
-            new(ScreenId.Inventory, "Inventory", "screen.inventory"),
-            new(ScreenId.Quest, "Quest", "screen.quest"),
-            new(ScreenId.Events, "Events", "screen.events"),
-            new(ScreenId.Mail, "Mail", "screen.mail"),
-            new(ScreenId.Settings, "Settings", "screen.settings")
+            new ScreenSpec(ScreenId.Home, "Hidden Village", "screen.home"),
+            new ScreenSpec(ScreenId.NinjaRoster, "Ninja Roster", "screen.roster"),
+            new ScreenSpec(ScreenId.HeroDetail, "Ninja Detail", "screen.heroDetail"),
+            new ScreenSpec(ScreenId.Formation, "Formation", "screen.formation"),
+            new ScreenSpec(ScreenId.Adventure, "Adventure", "screen.adventure"),
+            new ScreenSpec(ScreenId.Battle, "Battle", "screen.battle"),
+            new ScreenSpec(ScreenId.Summon, "Summon", "screen.summon"),
+            new ScreenSpec(ScreenId.Arena, "Arena", "screen.arena"),
+            new ScreenSpec(ScreenId.ShadowArena, "Shadow Arena", "screen.shadowArena"),
+            new ScreenSpec(ScreenId.Guild, "Guild", "screen.guild"),
+            new ScreenSpec(ScreenId.Shop, "Shop", "screen.shop"),
+            new ScreenSpec(ScreenId.Inventory, "Inventory", "screen.inventory"),
+            new ScreenSpec(ScreenId.Quest, "Quest", "screen.quest"),
+            new ScreenSpec(ScreenId.Events, "Events", "screen.events"),
+            new ScreenSpec(ScreenId.Mail, "Mail", "screen.mail"),
+            new ScreenSpec(ScreenId.Settings, "Settings", "screen.settings")
         };
 
         [MenuItem("Ninja Assemble/Mobile/Generate Complete Scene Shell")]
@@ -127,8 +139,6 @@ namespace NinjaAssemble.EditorTools
 
             Image bodyPanel = CreateImage(safeArea, "BodyPanel", MobileTheme.PanelAlt);
             Anchor(bodyPanel.rectTransform, 0.025f, 0.17f, 0.975f, 0.88f);
-            bodyPanel.rectTransform.offsetMin = new Vector2(0, 0);
-            bodyPanel.rectTransform.offsetMax = new Vector2(0, 0);
 
             TMP_Text body = CreateText(bodyPanel.transform, "Body", spec.Title, 28, FontStyles.Normal, TextAlignmentOptions.TopLeft, MobileTheme.Text);
             Anchor(body.rectTransform, 0.04f, 0.22f, 0.96f, 0.94f);
@@ -137,7 +147,8 @@ namespace NinjaAssemble.EditorTools
             TMP_Text status = CreateText(bodyPanel.transform, "Status", string.Empty, 22, FontStyles.Italic, TextAlignmentOptions.BottomLeft, MobileTheme.MutedText);
             Anchor(status.rectTransform, 0.04f, 0.035f, 0.72f, 0.2f);
 
-            Button primary = CreateButton(bodyPanel.transform, "PrimaryAction", "ACTION", MobileTheme.Accent, out TMP_Text actionLabel);
+            TMP_Text actionLabel;
+            Button primary = CreateButton(bodyPanel.transform, "PrimaryAction", "ACTION", MobileTheme.Accent, out actionLabel);
             Anchor(primary.GetComponent<RectTransform>(), 0.76f, 0.045f, 0.95f, 0.18f);
 
             Image navPanel = CreateImage(safeArea, "BottomNavigation", MobileTheme.Panel);
@@ -169,7 +180,8 @@ namespace NinjaAssemble.EditorTools
             {
                 float min = i / (float)items.Length;
                 float max = (i + 1) / (float)items.Length;
-                Button button = CreateButton(parent, "Nav_" + items[i].id, items[i].label, MobileTheme.PanelAlt, out _);
+                TMP_Text ignored;
+                Button button = CreateButton(parent, "Nav_" + items[i].id, items[i].label, MobileTheme.PanelAlt, out ignored);
                 RectTransform rect = button.GetComponent<RectTransform>();
                 Anchor(rect, min + 0.007f, 0.14f, max - 0.007f, 0.86f);
                 SceneNavButton nav = button.gameObject.AddComponent<SceneNavButton>();
@@ -265,7 +277,7 @@ namespace NinjaAssemble.EditorTools
         {
             var scenes = new List<EditorBuildSettingsScene>
             {
-                new($"{SceneDir}/{MobileSceneNames.Bootstrap}.unity", true)
+                new EditorBuildSettingsScene($"{SceneDir}/{MobileSceneNames.Bootstrap}.unity", true)
             };
             foreach (ScreenSpec screen in Screens)
                 scenes.Add(new EditorBuildSettingsScene($"{SceneDir}/{MobileSceneNames.For(screen.Id)}.unity", true));
