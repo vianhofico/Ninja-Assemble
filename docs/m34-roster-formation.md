@@ -16,3 +16,7 @@ The Guild regression gate likewise accepts the domain's overflow-safe `Math.addE
 ## Scope
 
 This milestone intentionally uses a compact one-button mobile interaction: cycle selected hero, cycle variant, train, and replace the fifth formation slot. A future drag/drop editor can reuse the same server contracts without changing game rules.
+
+## CI note
+
+PR #36 is the clean validation PR for this milestone; this documentation-only synchronize commit exists to ensure GitHub Actions evaluates the corrected validator head on the new branch.
