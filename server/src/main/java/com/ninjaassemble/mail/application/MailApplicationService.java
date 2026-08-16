@@ -1,7 +1,5 @@
 package com.ninjaassemble.mail.application;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
 import com.ninjaassemble.inventory.application.InventoryService;
@@ -11,6 +9,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,21 +26,21 @@ public final class MailApplicationService {
              {"kind":"CURRENCY","id":"DIAMOND","quantity":100},
              {"kind":"ITEM","id":"summon-ticket","quantity":1}]
             """;
+    private static final Pattern ATTACHMENT_PATTERN = Pattern.compile(
+            "\\{\\s*\"kind\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"quantity\"\\s*:\\s*(\\d+)\\s*}");
 
     private final JdbcTemplate jdbc;
     private final WalletService wallet;
     private final InventoryService inventory;
     private final ItemCatalogService items;
-    private final ObjectMapper mapper;
     private final Clock clock;
 
     public MailApplicationService(JdbcTemplate jdbc, WalletService wallet, InventoryService inventory,
-                                  ItemCatalogService items, ObjectMapper mapper, Clock clock) {
+                                  ItemCatalogService items, Clock clock) {
         this.jdbc = jdbc;
         this.wallet = wallet;
         this.inventory = inventory;
         this.items = items;
-        this.mapper = mapper;
         this.clock = clock;
     }
 
@@ -110,23 +111,25 @@ public final class MailApplicationService {
                 """, UUID.randomUUID(), playerId, WELCOME_SUBJECT, WELCOME_BODY, WELCOME_ATTACHMENTS, clock.instant());
     }
 
-    private List<Attachment> attachments(String json) {
-        try {
-            JsonNode root = mapper.readTree(json == null ? "[]" : json);
-            if (!root.isArray()) throw new IllegalStateException("mail attachments must be an array");
-            List<Attachment> result = new ArrayList<>();
-            for (JsonNode node : root) {
-                String kind = node.path("kind").asText();
-                String id = node.path("id").asText();
-                long quantity = node.path("quantity").asLong();
-                if (kind.isBlank() || id.isBlank() || quantity <= 0) throw new IllegalStateException("invalid mail attachment");
-                result.add(new Attachment(kind, id, quantity));
-            }
-            return List.copyOf(result);
-        } catch (Exception exception) {
-            if (exception instanceof IllegalStateException state) throw state;
-            throw new IllegalStateException("cannot parse mail attachments", exception);
+    private static List<Attachment> attachments(String json) {
+        String source = json == null ? "[]" : json.trim();
+        if (source.equals("[]")) return List.of();
+        Matcher matcher = ATTACHMENT_PATTERN.matcher(source);
+        List<Attachment> result = new ArrayList<>();
+        while (matcher.find()) {
+            String kind = matcher.group(1);
+            String id = matcher.group(2);
+            long quantity = Long.parseLong(matcher.group(3));
+            if (kind.isBlank() || id.isBlank() || quantity <= 0) throw new IllegalStateException("invalid mail attachment");
+            result.add(new Attachment(kind, id, quantity));
         }
+        if (result.isEmpty()) throw new IllegalStateException("invalid mail attachments json");
+        String normalized = source.replaceAll("\\s+", "");
+        String reconstructed = result.stream()
+                .map(value -> "{\"kind\":\"" + value.kind() + "\",\"id\":\"" + value.id() + "\",\"quantity\":" + value.quantity() + "}")
+                .collect(Collectors.joining(",", "[", "]"));
+        if (!normalized.equals(reconstructed)) throw new IllegalStateException("unsupported mail attachments json");
+        return List.copyOf(result);
     }
 
     private static String displaySubject(String key) { return WELCOME_SUBJECT.equals(key) ? "Welcome to Ninja Assemble" : key; }
