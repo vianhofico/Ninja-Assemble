@@ -1,0 +1,10 @@
+mode_id,type,status,known_rule,unknowns
+ninja-trial-waterfall,NINJA_TRIAL_AUTHENTIC_WATERFALL,COMMUNITY_CONFIRMED,Damage-type restriction exists,Exact immunity values and attempt count
+ninja-trial-gama,NINJA_TRIAL_GAMA_TEMPLE,COMMUNITY_CONFIRMED,Damage-type restriction exists,Exact immunity values and attempt count
+ninja-trial-kunoichi,NINJA_TRIAL_PATH_OF_KUNOICHI,COMMUNITY_CONFIRMED,Female-only team restriction,Exact attempt count and rewards
+forest-hunt,FOREST_HUNT,COMMUNITY_CONFIRMED,Resource PvE mode,Exact schedule/rewards
+land-of-pain,LAND_OF_PAIN,COMMUNITY_CONFIRMED,Forest Hunt related resource content,Exact gates/rewards
+tailed-beast-conquer,TAILED_BEAST_CONQUER,COMMUNITY_CONFIRMED,Tailed Beast battle content,Exact stages/rewards
+ninja-quest,NINJA_QUEST,COMMUNITY_CONFIRMED,Rank/reward progression,Exact rank tables
+challenge,CHALLENGE,COMMUNITY_CONFIRMED,Challenge mode exists,Exact submodes/rewards
+crusade,CRUSADE,COMMUNITY_CONFIRMED,Progressive PvE mode,Exact floor/reset/reward tables

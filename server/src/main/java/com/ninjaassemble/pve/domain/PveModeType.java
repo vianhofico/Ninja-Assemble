@@ -1,0 +1,13 @@
+package com.ninjaassemble.pve.domain;
+
+public enum PveModeType {
+    NINJA_TRIAL_AUTHENTIC_WATERFALL,
+    NINJA_TRIAL_GAMA_TEMPLE,
+    NINJA_TRIAL_PATH_OF_KUNOICHI,
+    FOREST_HUNT,
+    LAND_OF_PAIN,
+    TAILED_BEAST_CONQUER,
+    NINJA_QUEST,
+    CHALLENGE,
+    CRUSADE
+}
