@@ -6,9 +6,9 @@ spring:
     username: ${DB_USER:ninja}
     password: ${DB_PASSWORD:ninja}
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: validate
+    open-in-view: false
   flyway:
     enabled: true
   data:
@@ -20,5 +20,12 @@ management:
     web:
       exposure:
         include: health,info
-server:
-  port: ${SERVER_PORT:8080}
+
+game:
+  clock:
+    zone: ${GAME_TIME_ZONE:Asia/Bangkok}
+    reset-hour: ${GAME_RESET_HOUR:5}
+  energy:
+    # Tunable until exact parity is measured against the frozen reference build.
+    cap: ${GAME_ENERGY_CAP:120}
+    regen-seconds: ${GAME_ENERGY_REGEN_SECONDS:300}
