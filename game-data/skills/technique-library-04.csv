@@ -1,0 +1,31 @@
+technique_id,name_en,name_vi,description_en,description_vi,channel,kind,tags,status
+sand-coffin,Sand Coffin,Sand Coffin,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,sand,DESIGN_BASELINE
+sand-mausoleum,Sand Mausoleum,Sand Mausoleum,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,sand|burst,DESIGN_BASELINE
+sand-shield,Sand Shield,Sand Shield,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,sand,DESIGN_BASELINE
+shadow-clone-rush,Shadow Clone Rush,Shadow Clone Rush,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,shadow,DESIGN_BASELINE
+shadow-neck-bind,Shadow Neck Bind,Shadow Neck Bind,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,shadow,DESIGN_BASELINE
+shadow-possession,Shadow Possession,Shadow Possession,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,shadow,DESIGN_BASELINE
+six-paths-barrage,Six Paths Barrage,Six Paths Barrage,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+snake-sword,Snake Sword,Snake Sword,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,snake,DESIGN_BASELINE
+sound-wave,Sound Wave,Sound Wave,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+storm-laser,Storm Laser,Storm Laser,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+susanoo-arrow,Susanoo Arrow,Susanoo Arrow,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,susanoo|burst,DESIGN_BASELINE
+taijutsu-combo,Taijutsu Combo,Taijutsu Combo,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+tailed-beast-bomb,Tailed Beast Bomb,Tailed Beast Bomb,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+tailed-cloak,Tailed Cloak,Tailed Cloak,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+tengai-shinsei,Tengai Shinsei,Tengai Shinsei,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+totsuka-blade,Totsuka Blade,Totsuka Blade,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+triple-scythe,Triple Scythe,Triple Scythe,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+truth-seeking-orbs,Truth-Seeking Orbs,Truth-Seeking Orbs,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+tsukuyomi,Tsukuyomi,Tsukuyomi,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+two-headed-wolf,Two Headed Wolf,Two Headed Wolf,Signature high-impact physical technique with cinematic VFX.,Tuyệt kỹ vật lý đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,PHYSICAL,ULTIMATE,burst,DESIGN_BASELINE
+universal-pull,Universal Pull,Universal Pull,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+water-dome,Water Dome,Water Dome,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,water,DESIGN_BASELINE
+water-dragon,Water Dragon,Water Dragon,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,water,DESIGN_BASELINE
+water-shark-bomb,Water Shark Bomb,Water Shark Bomb,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,water|burst,DESIGN_BASELINE
+weight-control,Weight Control,Weight Control,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+white-rage,White Rage,White Rage,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+wind-blade,Wind Blade,Wind Blade,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,wind,DESIGN_BASELINE
+wind-scythe,Wind Scythe,Wind Scythe,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,wind,DESIGN_BASELINE
+wood-dragon,Wood Dragon,Wood Dragon,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,wood,DESIGN_BASELINE
+wood-spikes,Wood Spikes,Wood Spikes,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,wood,DESIGN_BASELINE

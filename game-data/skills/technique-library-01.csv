@@ -1,0 +1,31 @@
+technique_id,name_en,name_vi,description_en,description_vi,channel,kind,tags,status
+acid-spray,Acid Spray,Acid Spray,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+almighty-push,Almighty Push,Almighty Push,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+amaterasu,Amaterasu,Amaterasu,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+amenotejikara,Amenotejikara,Amenotejikara,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+basic-chakra-palm,Basic Chakra Palm,Basic Chakra Palm,Fast chakra basic attack for the combat cycle.,Đòn đánh cơ bản chakra nhanh để duy trì nhịp chiến đấu.,CHAKRA,BASIC,combat,DESIGN_BASELINE
+basic-kunai,Basic Kunai,Basic Kunai,Fast physical basic attack for the combat cycle.,Đòn đánh cơ bản vật lý nhanh để duy trì nhịp chiến đấu.,PHYSICAL,BASIC,combat,DESIGN_BASELINE
+basic-punch,Basic Punch,Basic Punch,Fast physical basic attack for the combat cycle.,Đòn đánh cơ bản vật lý nhanh để duy trì nhịp chiến đấu.,PHYSICAL,BASIC,combat,DESIGN_BASELINE
+basic-sword,Basic Sword,Basic Sword,Fast physical basic attack for the combat cycle.,Đòn đánh cơ bản vật lý nhanh để duy trì nhịp chiến đấu.,PHYSICAL,BASIC,combat,DESIGN_BASELINE
+black-lightning,Black Lightning,Black Lightning,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,lightning|burst,DESIGN_BASELINE
+body-flicker,Body Flicker,Body Flicker,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+butterfly-bomb,Butterfly Bomb,Butterfly Bomb,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+c1-birds,C1 Clay Birds,C1 Clay Birds,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+c2-dragon,C2 Clay Dragon,C2 Clay Dragon,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+c4-karura,C4 Karura,C4 Karura,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+chakra-blade,Chakra Blade,Chakra Blade,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+chakra-drain,Chakra Drain,Chakra Drain,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+chakra-punch,Chakra Punch,Chakra Punch,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+chakra-scalpel,Chakra Scalpel,Chakra Scalpel,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+chidori,Chidori,Chidori,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,combat,DESIGN_BASELINE
+copy-tactics,Copy Tactics,Copy Tactics,Persistent passive modifying stats triggers or resources.,Nội tại duy trì để thay đổi chỉ số điều kiện hoặc tài nguyên.,CHAKRA,PASSIVE,passive,DESIGN_BASELINE
+crescent-slash,Crescent Slash,Crescent Slash,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
+curse-ritual,Curse Ritual,Curse Ritual,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+deep-forest-emergence,Deep Forest Emergence,Deep Forest Emergence,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+demon-flute-phantoms,Demon Flute Phantoms,Demon Flute Phantoms,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+dust-release,Dust Release,Dust Release,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,burst,DESIGN_BASELINE
+earth-pillar,Earth Pillar,Earth Pillar,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,earth,DESIGN_BASELINE
+earth-quake,Earth Quake,Earth Quake,Signature high-impact chakra technique with cinematic VFX.,Tuyệt kỹ chakra đặc trưng có sức ảnh hưởng lớn và hiệu ứng riêng.,CHAKRA,ULTIMATE,earth|burst,DESIGN_BASELINE
+earth-spear,Earth Spear,Earth Spear,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,earth,DESIGN_BASELINE
+earth-wall,Earth Wall,Earth Wall,Active chakra technique with configurable targets and effects.,Kỹ năng chủ động chakra với mục tiêu và hiệu ứng có thể cấu hình.,CHAKRA,ACTIVE,earth,DESIGN_BASELINE
+eight-gates,Eight Gates,Eight Gates,Active physical technique with configurable targets and effects.,Kỹ năng chủ động vật lý với mục tiêu và hiệu ứng có thể cấu hình.,PHYSICAL,ACTIVE,combat,DESIGN_BASELINE
