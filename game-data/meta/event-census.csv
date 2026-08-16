@@ -1,0 +1,9 @@
+event_type,status,known_rule,unknowns
+daily-quest,COMMUNITY_CONFIRMED,Daily objectives/rewards exist,Exact objective/reward tables
+gold-spent,COMMUNITY_CONFIRMED,Spend event exists,Threshold/reward values
+diamond-spent,COMMUNITY_CONFIRMED,Spend event exists,Threshold/reward values
+arena-event,COMMUNITY_CONFIRMED,Arena event loop exists,Exact scoring/rewards
+shadow-event,COMMUNITY_CONFIRMED,Shadow event loop exists,Exact scoring/rewards
+ninjutsu-training,COMMUNITY_CONFIRMED,Training event exists,Exact schedule/rewards
+free-gold-stamina,COMMUNITY_CONFIRMED,Free resource windows exist,Exact times/amounts
+roulette-exchange,OBSERVED_PENDING,May exist by reference build,Exact presence/rules

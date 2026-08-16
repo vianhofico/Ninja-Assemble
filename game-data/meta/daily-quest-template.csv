@@ -1,0 +1,7 @@
+quest_id,objective_type,target,reward,status
+login,LOGIN,1,TBD,TEMPLATE
+clear-stage,CLEAR_STAGE,TBD,TBD,TEMPLATE
+arena-win,WIN_ARENA,TBD,TBD,TEMPLATE
+summon,SUMMON,TBD,TBD,TEMPLATE
+hero-upgrade,UPGRADE_HERO,TBD,TBD,TEMPLATE
+guild-contribute,CONTRIBUTE_GUILD,TBD,TBD,TEMPLATE
