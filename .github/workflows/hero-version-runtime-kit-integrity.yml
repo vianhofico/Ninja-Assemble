@@ -13,6 +13,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
       - name: Validate explicit Hero Version runtime kit contract
         run: python scripts/validate-hero-version-runtime-kit.py
       - name: Run focused Hero Version runtime tests
