@@ -43,6 +43,8 @@ jobs:
         run: python scripts/validate-playable-arena.py
       - name: Validate playable Shop flow
         run: python scripts/validate-playable-shop.py
+      - name: Validate daily Quest and Mail loop
+        run: python scripts/validate-quest-mail-loop.py
       - name: Verify Unity runtime art catalog can be regenerated from manifest
         run: |
           python scripts/generate-unity-art-runtime-catalog.py --output /tmp/hero-art-runtime-catalog.json
