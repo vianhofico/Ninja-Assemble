@@ -21,7 +21,7 @@ def main() -> int:
         "BattleAbilitySet abilities", "BattleAbilitySet.basicOnly")
     require(
         "server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
-        "nextAbility()", "ability.coefficientBps()", "ability.effectKey()", "energyAfter")
+        "nextAbility(", "ability.coefficientBps()", "ability.effectKey()", "energyAfter")
     require(
         "server/src/main/java/com/ninjaassemble/play/domain/ExperimentalAbilityProfile.java",
         "ReferenceProfiles.ABILITY_CYCLE", "BattleAbilityKind.ULTIMATE", "22_000", "-100")
