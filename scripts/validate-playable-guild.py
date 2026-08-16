@@ -15,7 +15,6 @@ def require(path: str, *tokens: str) -> None:
 def main() -> int:
     require("server/src/main/resources/db/migration/V8__guild_quests_events_mail.sql",
             "guilds", "guild_members", "guild_contribution_ledger", "guild_boss_runs")
-    # GuildBossState deliberately uses overflow-safe Math.addExact for cumulative damage.
     require("server/src/main/java/com/ninjaassemble/guild/domain/GuildBossState.java",
             "DamageResult apply", "currentHp - applied", "Math.addExact(totalDamage, applied)")
     require("server/src/main/java/com/ninjaassemble/guild/application/GuildApplicationService.java",
@@ -26,7 +25,7 @@ def main() -> int:
             '"/guild"', '"/guild/create"', '"/guild/{guildId}/join"', '"/guild/leave"',
             '"/guild/contribute"', '"/guild/boss/hit"')
     require("server/src/test/java/com/ninjaassemble/guild/domain/GuildBossStateTest.java",
-            "bossDamageCannotReduceHpBelowZero")
+            "damageIsCappedByRemainingBossHp")
     require("client-unity/Assets/Scripts/Game/Guild/GuildPlayableBridge.cs",
             "RuntimeInitializeOnLoadMethod", "ScreenId.Guild", "CREATE GUILD", "JOIN GUILD",
             "HIT GUILD BOSS", "DONATE 1000G", "guild/contribute", "guild/boss/hit")
