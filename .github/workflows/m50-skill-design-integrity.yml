@@ -1,0 +1,33 @@
+name: m50-skill-design-integrity
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  skill-design:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate full Hero Version skill-design candidate
+        run: python scripts/generate-m50-skill-design.py --output /tmp/m50-hero-skill-design.csv
+      - name: Validate five-slot Rage/Signature model
+        run: python scripts/validate-m50-skill-design.py --candidate /tmp/m50-hero-skill-design.csv
+      - name: Ensure M49 continuous-time combat remains green
+        run: |
+          python scripts/validate-realtime-combat.py
+          python scripts/validate-structured-effects.py
+          python scripts/validate-technique-effect-coverage.py
+      - name: Ensure old competing Ultimate slot is not emitted by M50 candidate
+        run: |
+          python - <<'PY'
+          import csv
+          rows=list(csv.DictReader(open('/tmp/m50-hero-skill-design.csv', encoding='utf-8')))
+          if any(r['slot']=='ULTIMATE' for r in rows):
+              raise SystemExit('legacy ULTIMATE slot leaked into M50 candidate')
+          if any(r['slot']=='SKILL_1' and (r['ability_kind']!='RAGE_SKILL' or r['trigger_type']!='RAGE_FULL') for r in rows):
+              raise SystemExit('SKILL_1 Rage contract mismatch')
+          print(f"M50_CANDIDATE_GATE_OK rows={len(rows)}")
+          PY
