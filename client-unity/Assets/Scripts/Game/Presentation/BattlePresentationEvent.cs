@@ -8,6 +8,7 @@ namespace NinjaAssemble.Presentation
         public long Sequence;
         public string Type;
         public int Round;
+        public long TimestampMs;
         public string ActorId;
         public string TargetId;
         public long Amount;
@@ -19,6 +20,8 @@ namespace NinjaAssemble.Presentation
         public string EffectType;
         public string StatusId;
         public int DurationTurns;
+        public long DurationMs;
         public string TriggerId;
+        public bool IsRealtime;
     }
 }
