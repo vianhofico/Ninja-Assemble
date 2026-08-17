@@ -2,6 +2,7 @@ package com.ninjaassemble.battle.sim;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ninjaassemble.battle.domain.DamageChannel;
 import java.util.List;
@@ -9,58 +10,65 @@ import org.junit.jupiter.api.Test;
 
 class DeterministicBattleEngineTest {
     @Test
-    void sameSeedAndRulesetProduceSameTimeline() {
-        BattleRequest request = new BattleRequest(42L, BattleRuleset.experimentalV1(), List.of(
-                unit("naruto", TeamSide.A, 0, 100, 30, 20, 5, 5, 20, 3000, DamageChannel.PHYSICAL),
-                unit("sasuke", TeamSide.B, 0, 100, 20, 32, 5, 5, 18, 3000, DamageChannel.CHAKRA)
-        ));
+    void sameSeedProducesIdenticalTimestampedTimeline() {
+        BattleRequest request = new BattleRequest(77L, BattleRuleset.experimentalV1(), List.of(
+                unit("a", TeamSide.A, 0, 20_000, 300, 1_200),
+                unit("b", TeamSide.B, 0, 20_000, 300, 1_000)));
         DeterministicBattleEngine engine = new DeterministicBattleEngine();
-        BattleResult one = engine.simulate(request);
-        BattleResult two = engine.simulate(request);
-        assertEquals(one, two);
-        assertFalse(one.events().isEmpty());
+        BattleResult first = engine.simulate(request);
+        BattleResult second = engine.simulate(request);
+        assertEquals(first.outcome(), second.outcome());
+        assertEquals(first.durationMs(), second.durationMs());
+        assertEquals(first.events(), second.events());
+        assertEquals(first.finalHp(), second.finalHp());
+        assertTrue(first.events().stream().allMatch(it -> it.timestampMs() >= 0));
     }
 
     @Test
-    void frontmostLivingEnemyIsTargetedFirst() {
-        BattleRequest request = new BattleRequest(1L, BattleRuleset.experimentalV1(), List.of(
-                unit("attacker", TeamSide.A, 0, 100, 100, 0, 0, 0, 50, 0, DamageChannel.PHYSICAL),
-                unit("front", TeamSide.B, 0, 20, 1, 0, 0, 0, 10, 0, DamageChannel.PHYSICAL),
-                unit("rear", TeamSide.B, 1, 100, 1, 0, 0, 0, 9, 0, DamageChannel.PHYSICAL)
-        ));
-        BattleResult result = new DeterministicBattleEngine().simulate(request);
-        BattleEvent firstDamage = result.events().stream().filter(it -> it.type() == BattleEventType.DAMAGE).findFirst().orElseThrow();
-        assertEquals("front", firstDamage.targetId());
+    void speedChangesIndependentActionFrequency() {
+        BattleRuleset shortFight = new BattleRuleset("speed-test", 0, 1_000, 0, 8_000,
+                1_000, 1_500, 400, 3_000, 15, 100, 50);
+        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(88L, shortFight, List.of(
+                unit("fast", TeamSide.A, 0, 1_000_000, 1, 1_500),
+                unit("slow", TeamSide.A, 1, 1_000_000, 1, 750),
+                unit("dummy", TeamSide.B, 0, 1_000_000, 1, 1_000))));
+        long fast = basicStarts(result, "fast");
+        long slow = basicStarts(result, "slow");
+        assertTrue(fast > slow, "fast actor must attack more frequently: fast=" + fast + " slow=" + slow);
+        assertFalse(result.events().stream().anyMatch(it -> it.type().name().contains("ROUND") || it.type().name().contains("TURN")));
     }
 
     @Test
-    void executableAbilityCycleBuildsEnergyThenUsesUltimate() {
-        BattleAbilitySet set = new BattleAbilitySet(
-                ability("basic-kunai", BattleAbilityKind.BASIC, 30),
-                ability("fireball-jutsu", BattleAbilityKind.SKILL1, 35),
-                ability("chidori", BattleAbilityKind.SKILL2, 35),
-                ability("kirin", BattleAbilityKind.ULTIMATE, -100));
-        BattleUnitSeed attacker = new BattleUnitSeed("attacker", TeamSide.A, 0, 100_000, 20, 20, 0, 0, 100, 0, 0, DamageChannel.PHYSICAL, set);
-        BattleUnitSeed defender = new BattleUnitSeed("defender", TeamSide.B, 0, 100_000, 1, 1, 0, 0, 1, 0, 0, DamageChannel.PHYSICAL);
-
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(7L, BattleRuleset.experimentalV1(), List.of(attacker, defender)));
-        List<BattleEvent> attacks = result.events().stream()
-                .filter(it -> it.type() == BattleEventType.ATTACK && "attacker".equals(it.actorId()))
-                .limit(4)
-                .toList();
-
-        assertEquals(List.of(BattleAbilityKind.BASIC, BattleAbilityKind.SKILL1, BattleAbilityKind.SKILL2, BattleAbilityKind.ULTIMATE),
-                attacks.stream().map(BattleEvent::abilityKind).toList());
-        assertEquals(List.of(30, 65, 100, 0), attacks.stream().map(BattleEvent::energyAfter).toList());
-        assertEquals("kirin", attacks.get(3).abilityId());
-        assertEquals("vfx/techniques/kirin", attacks.get(3).effectKey());
+    void rageCapsAtOneHundredAndUnlocksSignatureRageSkill() {
+        BattleRuleset rules = new BattleRuleset("rage-test", 0, 1_000, 0, 20_000,
+                1_000, 800, 300, 2_000, 20, 100, 50);
+        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(99L, rules, List.of(
+                unit("hero", TeamSide.A, 0, 1_000_000, 1, 1_000),
+                unit("dummy", TeamSide.B, 0, 1_000_000, 1, 1_000))));
+        assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.RAGE_FULL && "hero".equals(it.actorId())));
+        assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.RAGE_SKILL_CAST_START && "hero".equals(it.actorId())));
+        assertTrue(result.events().stream().allMatch(it -> it.rageAfter() >= 0 && it.rageAfter() <= 100));
     }
 
-    private static BattleAbility ability(String id, BattleAbilityKind kind, int energyDelta) {
-        return new BattleAbility(id, kind, DamageChannel.PHYSICAL, 1_000, energyDelta, "vfx/techniques/" + id);
+    @Test
+    void equalTimestampActionsUseStableActorOrdering() {
+        BattleRuleset rules = new BattleRuleset("tie-test", 0, 1_000, 0, 2_000,
+                1_000, 1_000, 400, 2_000, 15, 100, 50);
+        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(100L, rules, List.of(
+                unit("alpha", TeamSide.A, 0, 100_000, 1, 1_000),
+                unit("beta", TeamSide.B, 0, 100_000, 1, 1_000))));
+        List<BattleEvent> ready = result.events().stream().filter(it -> it.type() == BattleEventType.ACTION_READY && it.timestampMs() == 1_000).toList();
+        assertEquals(2, ready.size());
+        assertEquals("alpha", ready.get(0).actorId());
+        assertEquals("beta", ready.get(1).actorId());
     }
 
-    private static BattleUnitSeed unit(String id, TeamSide side, int slot, long hp, long patk, long catk, long pdef, long cdef, int speed, int crit, DamageChannel channel) {
-        return new BattleUnitSeed(id, side, slot, hp, patk, catk, pdef, cdef, speed, crit, crit, channel);
+    private static long basicStarts(BattleResult result, String actor) {
+        return result.events().stream().filter(it -> it.type() == BattleEventType.BASIC_ATTACK_START && actor.equals(it.actorId())).count();
+    }
+
+    private static BattleUnitSeed unit(String id, TeamSide side, int slot, long hp, long attack, int speed) {
+        return new BattleUnitSeed(id, side, slot, hp, attack, attack, 0, 0, speed, 0, 0,
+                DamageChannel.PHYSICAL, BattleAbilitySet.basicOnly(DamageChannel.PHYSICAL));
     }
 }

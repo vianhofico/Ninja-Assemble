@@ -1,0 +1,2 @@
+ruleset_id,reference_speed,base_interval_ms,min_interval_ms,max_interval_ms,speed_formula,action_lock_policy,tie_break_policy,max_battle_duration_ms,ai_decision_interval_ms,status,evidence_ref,notes
+experimental-realtime-timing-v1,1000,1500,450,3000,CLAMP(base_interval_ms*reference_speed/effective_speed),MAX(cast_complete+recovery,next_basic_ready),timestamp>event_priority>actor_stable_order>sequence,120000,50,EXPERIMENTAL,,Continuous-time architecture; exact speed curve requires balance/parity evidence

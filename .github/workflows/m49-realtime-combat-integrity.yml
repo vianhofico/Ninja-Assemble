@@ -1,0 +1,30 @@
+name: m49-realtime-combat-integrity
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  realtime-combat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate continuous-time combat contract
+        run: python scripts/validate-realtime-combat.py
+      - name: Validate structured effect timing schema
+        run: python scripts/validate-structured-effects.py
+      - name: Validate ability and Rage protocol
+        run: python scripts/validate-ability-protocol.py
+      - name: Validate passive event/time lifecycle
+        run: python scripts/validate-passive-lifecycle.py
+      - name: Validate technique mapping coverage
+        run: python scripts/validate-technique-effect-coverage.py
+      - name: Ensure deprecated combat-time fields are absent from Unity runtime
+        run: |
+          if grep -R -n -E 'durationTurns|DurationTurns|remainingTurns|ROUND_START|ROUND_END|TURN_START|TURN_END|TURN_SKIPPED' client-unity/Assets/Scripts/Game; then
+            echo 'Deprecated turn/round Unity combat contract remains' >&2
+            exit 1
+          fi
+          echo 'UNITY_REALTIME_CONTRACT_OK'

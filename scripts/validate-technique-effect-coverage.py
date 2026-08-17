@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate M25 technique effect mapping coverage without deriving mechanics from prose fields."""
+"""Validate full technique effect mapping coverage without deriving mechanics from prose fields."""
 from __future__ import annotations
 
 import csv
@@ -22,13 +22,18 @@ def main() -> int:
                 if technique_id in techniques:
                     raise SystemExit(f"duplicate technique id: {technique_id}")
                 techniques[technique_id] = row
-
     if len(techniques) != 120:
         raise SystemExit(f"expected 120 technique definitions, got {len(techniques)}")
 
     grouped: dict[str, list[int]] = defaultdict(list)
     with OVERRIDES.open(encoding="utf-8", newline="") as handle:
-        for row in csv.DictReader(handle):
+        reader = csv.DictReader(handle)
+        if "duration_turns" in (reader.fieldnames or []):
+            raise SystemExit("deprecated duration_turns column remains")
+        for required in ("duration_ms", "tick_interval_ms"):
+            if required not in (reader.fieldnames or []):
+                raise SystemExit(f"missing {required}")
+        for row in reader:
             technique_id = row["technique_id"].strip()
             if technique_id not in techniques:
                 raise SystemExit(f"override references unknown technique: {technique_id}")
@@ -40,29 +45,30 @@ def main() -> int:
 
     for technique_id, indexes in grouped.items():
         ordered = sorted(indexes)
-        if ordered != list(range(len(ordered))):
-            raise SystemExit(f"non-contiguous effect indexes for {technique_id}: {ordered}")
+        if ordered != list(range(1, len(ordered) + 1)):
+            raise SystemExit(f"non-contiguous one-based effect indexes for {technique_id}: {ordered}")
 
     source = RESOLVER.read_text(encoding="utf-8")
-    forbidden = ["nameEn()", "nameVi()", "descriptionEn()", "descriptionVi()"]
+    forbidden = ["nameEn()", "nameVi()", "descriptionEn()", "descriptionVi()", "durationTurns"]
     leaked = [token for token in forbidden if token in source]
     if leaked:
-        raise SystemExit(f"resolver must not derive gameplay from prose fields: {leaked}")
+        raise SystemExit(f"resolver must not derive gameplay from prose/turn fields: {leaked}")
     required = [
         "MappingStatus.RUNTIME", "MappingStatus.DEFERRED_PASSIVE", "KIND_BASIC", "TAG_HEAL_ULTIMATE",
-        "TAG_BURST_ULTIMATE", "TAG_POISON", "TAG_GENJUTSU", "TAG_MIND", "TAG_KAMUI", "ACTIVE_DEFAULT"
+        "TAG_BURST_ULTIMATE", "TAG_POISON", "TAG_GENJUTSU", "TAG_MIND", "TAG_KAMUI", "ACTIVE_DEFAULT",
+        "durationMs", "tickIntervalMs"
     ]
     missing = [token for token in required if token not in source]
     if missing:
-        raise SystemExit(f"resolver missing fallback coverage contracts: {missing}")
+        raise SystemExit(f"resolver missing coverage contracts: {missing}")
 
     test_source = TEST.read_text(encoding="utf-8")
-    if "all120TechniquesHaveAnExplicitRuntimeOrDeferredMappingState" not in test_source:
+    if "allTechniquesHaveAnExplicitRuntimeOrDeferredMappingState" not in test_source:
         raise SystemExit("missing Java full-catalog mapping coverage test")
 
     executable = sum(1 for row in techniques.values() if row["kind"] != "PASSIVE")
     passive = len(techniques) - executable
-    print(f"TECHNIQUE_EFFECT_COVERAGE_OK techniques={len(techniques)} executable={executable} passive_deferred={passive} curated={len(grouped)}")
+    print(f"TECHNIQUE_EFFECT_COVERAGE_OK techniques={len(techniques)} executable={executable} passive_deferred={passive} curated={len(grouped)} timing=milliseconds")
     return 0
 
 

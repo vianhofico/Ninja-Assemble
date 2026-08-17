@@ -20,14 +20,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+/** Resolves technique effects using real-time duration semantics only. */
 public final class TechniqueEffectResolver {
     public static final String VERSION = ReferenceProfiles.TECHNIQUE_MAPPING;
     private static final String RESOURCE = "/game-data/skills/technique-effects.csv";
     private final Map<String, List<SkillEffectDefinition>> overrides;
 
-    public TechniqueEffectResolver() {
-        overrides = loadOverrides();
-    }
+    public TechniqueEffectResolver() { overrides = loadOverrides(); }
 
     public Resolution resolve(HeroContentCatalogService.TechniqueView technique) {
         if (technique == null) throw new IllegalArgumentException("technique is required");
@@ -35,7 +34,7 @@ public final class TechniqueEffectResolver {
         if (curated != null && !curated.isEmpty()) return new Resolution(technique.id(), MappingStatus.RUNTIME, "CURATED_ID", curated);
 
         String kind = technique.kind().toUpperCase(Locale.ROOT);
-        if ("PASSIVE".equals(kind)) return new Resolution(technique.id(), MappingStatus.DEFERRED_PASSIVE, "PASSIVE_LIFECYCLE_PENDING", List.of());
+        if ("PASSIVE".equals(kind)) return new Resolution(technique.id(), MappingStatus.DEFERRED_PASSIVE, "PASSIVE_LIFECYCLE", List.of());
 
         DamageChannel channel = DamageChannel.valueOf(technique.channel());
         Set<String> tags = Set.of(technique.tags().isBlank() ? new String[0] : technique.tags().toLowerCase(Locale.ROOT).split("\\|"));
@@ -45,32 +44,29 @@ public final class TechniqueEffectResolver {
             effects.add(damage(TargetSelector.FRONTMOST_ENEMY, channel, 10_000));
             return new Resolution(technique.id(), MappingStatus.RUNTIME, "KIND_BASIC", effects);
         }
-
         if ("ULTIMATE".equals(kind)) {
             if (tags.contains("heal")) {
-                effects.add(new SkillEffectDefinition(EffectType.HEAL, TargetSelector.ALL_ALLIES, channel, 18_000, 0, null, 10_000, 0));
-                effects.add(new SkillEffectDefinition(EffectType.CLEANSE, TargetSelector.ALL_ALLIES, null, 0, 0, null, 10_000, 0));
+                effects.add(new SkillEffectDefinition(EffectType.HEAL, TargetSelector.ALL_ALLIES, channel, 18_000, 0, null, 10_000));
+                effects.add(new SkillEffectDefinition(EffectType.CLEANSE, TargetSelector.ALL_ALLIES, null, 0, 0, null, 10_000));
                 return new Resolution(technique.id(), MappingStatus.RUNTIME, "TAG_HEAL_ULTIMATE", effects);
             }
             effects.add(damage(TargetSelector.ALL_ENEMIES, channel, 18_000));
             return new Resolution(technique.id(), MappingStatus.RUNTIME, tags.contains("burst") ? "TAG_BURST_ULTIMATE" : "KIND_ULTIMATE", effects);
         }
-
         if (tags.contains("poison")) {
             effects.add(damage(TargetSelector.ALL_ENEMIES, channel, 6_000));
-            effects.add(new SkillEffectDefinition(EffectType.STATUS, TargetSelector.ALL_ENEMIES, channel, 2_000, 0, "POISON", 10_000, 3));
+            effects.add(status(TargetSelector.ALL_ENEMIES, channel, 2_000, "POISON", 10_000, 6_000, 1_000));
             return new Resolution(technique.id(), MappingStatus.RUNTIME, "TAG_POISON", effects);
         }
         if (tags.contains("genjutsu") || tags.contains("mind")) {
             effects.add(damage(TargetSelector.FRONTMOST_ENEMY, channel, 6_000));
-            effects.add(new SkillEffectDefinition(EffectType.STATUS, TargetSelector.FRONTMOST_ENEMY, channel, 0, 0, "STUN", 10_000, 1));
+            effects.add(status(TargetSelector.FRONTMOST_ENEMY, channel, 0, "STUN", 10_000, 2_500, 0));
             return new Resolution(technique.id(), MappingStatus.RUNTIME, tags.contains("genjutsu") ? "TAG_GENJUTSU" : "TAG_MIND", effects);
         }
         if (tags.contains("kamui")) {
             effects.add(damage(TargetSelector.LOWEST_HP_ENEMY, channel, 15_000));
             return new Resolution(technique.id(), MappingStatus.RUNTIME, "TAG_KAMUI", effects);
         }
-
         effects.add(damage(TargetSelector.FRONTMOST_ENEMY, channel, 12_500));
         return new Resolution(technique.id(), MappingStatus.RUNTIME, "ACTIVE_DEFAULT", effects);
     }
@@ -78,7 +74,12 @@ public final class TechniqueEffectResolver {
     public int curatedTechniqueCount() { return overrides.size(); }
 
     private static SkillEffectDefinition damage(TargetSelector target, DamageChannel channel, int coefficientBps) {
-        return new SkillEffectDefinition(EffectType.DAMAGE, target, channel, coefficientBps, 0, null, 10_000, 0);
+        return new SkillEffectDefinition(EffectType.DAMAGE, target, channel, coefficientBps, 0, null, 10_000);
+    }
+
+    private static SkillEffectDefinition status(TargetSelector target, DamageChannel channel, int coefficientBps,
+                                                String status, int chanceBps, long durationMs, long tickIntervalMs) {
+        return new SkillEffectDefinition(EffectType.STATUS, target, channel, coefficientBps, 0, status, chanceBps, durationMs, tickIntervalMs);
     }
 
     private static Map<String, List<SkillEffectDefinition>> loadOverrides() {
@@ -92,25 +93,18 @@ public final class TechniqueEffectResolver {
                     if (header) { header = false; continue; }
                     if (line.isBlank()) continue;
                     String[] cells = line.split(",", -1);
-                    if (cells.length != 14) throw new IllegalStateException("invalid technique effect override row: " + line);
-                    if (!VERSION.equals(cells[10]) || !"EXPERIMENTAL_RUNTIME".equals(cells[11])) continue;
+                    if (cells.length != 15) throw new IllegalStateException("invalid real-time technique effect row: " + line);
+                    if (!VERSION.equals(cells[11]) || !"EXPERIMENTAL_RUNTIME".equals(cells[12])) continue;
                     SkillEffectDefinition effect = new SkillEffectDefinition(
-                            EffectType.valueOf(cells[2]),
-                            TargetSelector.valueOf(cells[3]),
+                            EffectType.valueOf(cells[2]), TargetSelector.valueOf(cells[3]),
                             cells[4].isBlank() ? null : DamageChannel.valueOf(cells[4]),
-                            integer(cells[5]),
-                            longValue(cells[6]),
-                            cells[7].isBlank() ? null : cells[7],
-                            integer(cells[8]),
-                            integer(cells[9]));
+                            integer(cells[5]), longValue(cells[6]), cells[7].isBlank() ? null : cells[7],
+                            integer(cells[8]), longValue(cells[9]), longValue(cells[10]));
                     grouped.computeIfAbsent(cells[0], ignored -> new ArrayList<>()).add(new IndexedEffect(integer(cells[1]), effect));
                 }
             }
             Map<String, List<SkillEffectDefinition>> result = new HashMap<>();
-            grouped.forEach((id, values) -> result.put(id, values.stream()
-                    .sorted(Comparator.comparingInt(IndexedEffect::index))
-                    .map(IndexedEffect::effect)
-                    .toList()));
+            grouped.forEach((id, values) -> result.put(id, values.stream().sorted(Comparator.comparingInt(IndexedEffect::index)).map(IndexedEffect::effect).toList()));
             return Map.copyOf(result);
         } catch (IOException e) {
             throw new IllegalStateException("cannot read technique effect overrides", e);

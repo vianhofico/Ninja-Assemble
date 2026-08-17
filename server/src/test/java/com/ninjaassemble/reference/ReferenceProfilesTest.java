@@ -16,6 +16,8 @@ class ReferenceProfilesTest {
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.STRUCTURED_EFFECTS));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.TECHNIQUE_MAPPING));
         assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.PASSIVE_LIFECYCLE));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.REALTIME_TIMING));
+        assertEquals(ReferenceConfidence.EXPERIMENTAL, ReferenceProfiles.confidence(ReferenceProfiles.RAGE_RULES));
     }
 
     @Test
