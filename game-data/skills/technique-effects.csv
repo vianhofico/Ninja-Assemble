@@ -8,23 +8,19 @@ chakra-drain,1,RAGE,FRONTMOST_ENEMY,,0,-20,,10000,0,0,experimental-technique-map
 chakra-drain,2,RAGE,SELF,,0,20,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Transfer drained Rage to caster
 chakra-scalpel,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,13000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Medical precision finisher
 chidori,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,15000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Precision lightning finisher
-clone-barrage,1,DAMAGE,ALL_ENEMIES,PHYSICAL,7500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Clone multi-target pressure
-crystal-wave,1,DAMAGE,ALL_ENEMIES,CHAKRA,8000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Crystal area pressure
+shadow-clone-rush,1,DAMAGE,ALL_ENEMIES,PHYSICAL,7500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Canonical runtime ID for clone multi-target pressure
 eight-gates,1,STATUS,SELF,PHYSICAL,4500,0,ATK_UP,10000,10000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Ten-second high-risk taijutsu power window
-flying-raijin,1,DAMAGE,LOWEST_HP_ENEMY,PHYSICAL,16000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Space-time assassination finisher
 gentle-fist,1,DAMAGE,FRONTMOST_ENEMY,PHYSICAL,10000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Frontline chakra-point pressure
-healing-jutsu,1,HEAL,LOWEST_HP_ALLY,CHAKRA,11000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Focused ally heal
+mystical-palm,1,HEAL,LOWEST_HP_ALLY,CHAKRA,11000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Canonical runtime medical heal
 kamui,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,17000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,High-value space-time finisher
 kamui-phase,1,STATUS,SELF,CHAKRA,4500,0,DEF_UP,10000,4000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Brief phasing defense window
-katsuyu-heal,1,HEAL,ALL_ALLIES,CHAKRA,8500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Team sustain
-katsuyu-heal,2,CLEANSE,ALL_ALLIES,,0,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Team cleanse
 lightning-armor,1,STATUS,SELF,PHYSICAL,3200,0,SPEED_UP,10000,8000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Eight-second lightning speed window
 lightning-armor,2,STATUS,SELF,PHYSICAL,3000,0,DEF_UP,10000,8000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Eight-second lightning defense window
 mass-healing,1,HEAL,ALL_ALLIES,CHAKRA,13000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Large team heal
 mass-healing,2,CLEANSE,ALL_ALLIES,,0,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Large team cleanse
 mind-destruction,1,DAMAGE,FRONTMOST_ENEMY,CHAKRA,7000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Mind pressure hit
 mind-destruction,2,STATUS,FRONTMOST_ENEMY,CHAKRA,0,0,SILENCE,8000,3000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Three-second skill lock without blocking basics
-particle-dismantle,1,DAMAGE,ALL_ENEMIES,CHAKRA,15000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Particle Style area burst
+dust-release,1,DAMAGE,ALL_ENEMIES,CHAKRA,15000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Canonical runtime Particle Style area burst
 poison-cloud,1,DAMAGE,ALL_ENEMIES,CHAKRA,5000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Poison cloud impact
 poison-cloud,2,STATUS,ALL_ENEMIES,CHAKRA,2500,0,POISON,10000,6000,1000,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Six-second poison cloud with one-second ticks
 rasengan,1,DAMAGE,FRONTMOST_ENEMY,CHAKRA,14000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Signature single-target chakra burst
@@ -35,7 +31,6 @@ sand-shield,2,STATUS,SELF,CHAKRA,1800,0,DEF_UP,10000,5000,0,experimental-techniq
 shadow-neck-bind,1,DAMAGE,FRONTMOST_ENEMY,PHYSICAL,8500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Shadow bind strike
 shadow-neck-bind,2,STATUS,FRONTMOST_ENEMY,CHAKRA,0,0,STUN,8500,2000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Two-second control window
 shadow-possession,1,STATUS,FRONTMOST_ENEMY,CHAKRA,0,0,STUN,10000,2500,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Signature 2.5-second immobilization
-summoning-gamabunta,1,DAMAGE,ALL_ENEMIES,PHYSICAL,15500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Large summon impact
 tailed-cloak,1,STATUS,SELF,CHAKRA,4000,0,ATK_UP,10000,10000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Ten-second temporary cloak power window
 tsukuyomi,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,12000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Genjutsu burst
 tsukuyomi,2,STATUS,LOWEST_HP_ENEMY,CHAKRA,0,0,STUN,10000,3000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Three-second high-value genjutsu control
