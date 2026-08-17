@@ -31,7 +31,7 @@ namespace NinjaAssemble.EditorTools
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
             {
                 throw new BuildFailedException(
-                    "Android must be the active build target. In batch mode launch Unity with -buildTarget Android.");
+                    "Android must be the active build target. In batch mode launch Unity/GameCI with targetPlatform Android.");
             }
 
             MobileSceneBuilder.GenerateCompleteSceneShell();
@@ -43,6 +43,7 @@ namespace NinjaAssemble.EditorTools
 
             ConfigurePlayerSettings();
             ApplyVersionFromEnvironment();
+            ConfigureSigning(release);
 
             string buildRoot = Path.GetFullPath(Path.Combine(Application.dataPath, "../../builds/android"));
             Directory.CreateDirectory(buildRoot);
@@ -60,6 +61,7 @@ namespace NinjaAssemble.EditorTools
             };
 
             BuildReport report = BuildPipeline.BuildPlayer(options);
+            WriteBuildMetadata(report, release, output, scenes);
             if (report.summary.result != BuildResult.Succeeded)
             {
                 throw new BuildFailedException(
@@ -98,6 +100,75 @@ namespace NinjaAssemble.EditorTools
                     throw new BuildFailedException("NINJA_ANDROID_VERSION_CODE must be a positive integer.");
                 PlayerSettings.Android.bundleVersionCode = parsed;
             }
+        }
+
+        private static void ConfigureSigning(bool release)
+        {
+            if (!release)
+            {
+                PlayerSettings.Android.useCustomKeystore = false;
+                return;
+            }
+
+            string relative = RequireEnvironment("NINJA_ANDROID_KEYSTORE_RELATIVE");
+            string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
+            string keystore = Path.GetFullPath(Path.Combine(projectRoot, relative));
+            string rootPrefix = projectRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            if (!keystore.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+                throw new BuildFailedException("Release keystore must be materialized inside the Unity project workspace.");
+            if (!File.Exists(keystore)) throw new BuildFailedException("Release keystore file does not exist: " + keystore);
+
+            PlayerSettings.Android.useCustomKeystore = true;
+            PlayerSettings.Android.keystoreName = keystore;
+            PlayerSettings.Android.keystorePass = RequireEnvironment("NINJA_ANDROID_KEYSTORE_PASS");
+            PlayerSettings.Android.keyaliasName = RequireEnvironment("NINJA_ANDROID_KEYALIAS_NAME");
+            PlayerSettings.Android.keyaliasPass = RequireEnvironment("NINJA_ANDROID_KEYALIAS_PASS");
+        }
+
+        private static string RequireEnvironment(string name)
+        {
+            string value = Environment.GetEnvironmentVariable(name);
+            if (string.IsNullOrWhiteSpace(value)) throw new BuildFailedException(name + " is required for release Android signing.");
+            return value.Trim();
+        }
+
+        private static void WriteBuildMetadata(BuildReport report, bool release, string output, string[] scenes)
+        {
+            string buildRoot = Path.GetDirectoryName(output) ?? throw new BuildFailedException("Invalid Android build output path.");
+            string metadataPath = Path.Combine(buildRoot, "build-metadata.json");
+            var metadata = new BuildMetadata
+            {
+                artifactType = release ? "AAB" : "APK",
+                result = report.summary.result.ToString(),
+                unityVersion = Application.unityVersion,
+                applicationId = ApplicationId,
+                bundleVersion = PlayerSettings.bundleVersion,
+                versionCode = PlayerSettings.Android.bundleVersionCode,
+                gitCommit = Environment.GetEnvironmentVariable("NINJA_BUILD_COMMIT") ?? string.Empty,
+                outputFile = Path.GetFileName(output),
+                totalSizeBytes = report.summary.totalSize.ToString(),
+                durationSeconds = report.summary.totalTime.TotalSeconds,
+                sceneCount = scenes.Length,
+                builtAtUtc = DateTime.UtcNow.ToString("O")
+            };
+            File.WriteAllText(metadataPath, JsonUtility.ToJson(metadata, true));
+        }
+
+        [Serializable]
+        private sealed class BuildMetadata
+        {
+            public string artifactType;
+            public string result;
+            public string unityVersion;
+            public string applicationId;
+            public string bundleVersion;
+            public int versionCode;
+            public string gitCommit;
+            public string outputFile;
+            public string totalSizeBytes;
+            public double durationSeconds;
+            public int sceneCount;
+            public string builtAtUtc;
         }
     }
 }
