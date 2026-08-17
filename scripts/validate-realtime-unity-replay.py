@@ -14,9 +14,9 @@ FILES = {
 }
 
 REQUIRED_MARKERS = {
-    "dtos": ["RealtimeBattleEventDto", "RealtimeBattleResultDto", "timestampMs", "durationMs", "realtimeBattle"],
-    "compat": ["Promote(PlayBattleDto result)", "Project(BattleResultDto fallback", "Array.Sort(events, CompareEvents)", "realtime = true"],
-    "store": ["RealtimeBattleDtoCompatibility.Promote"],
+    "dtos": ["RealtimeBattleEventDto", "RealtimeBattleResultDto", "timestampMs", "durationMs", "realtimeBattle", "ArenaBattleDto", "ShadowSquadBattleDto"],
+    "compat": ["Promote(PlayBattleDto result)", "Promote(ArenaBattleDto result)", "Promote(ShadowArenaBattleDto result)", "Project(BattleResultDto fallback", "Array.Sort(events, CompareEvents)", "realtime = true"],
+    "store": ["RealtimeBattleDtoCompatibility.Promote(await api.PlayCampaignStageAsync", "RealtimeBattleDtoCompatibility.Promote(await api.FightArenaAsync", "RealtimeBattleDtoCompatibility.Promote(await api.FightShadowArenaAsync"],
     "event": ["TimestampMs", "DurationMs", "IsRealtime"],
     "adapter": ["TimestampMs = item.timestampMs", "DurationMs = item.durationMs", "battle.realtime || item.realtime"],
     "timeline": ["PlaybackSpeed", "item.TimestampMs - previousRealtimeTimestampMs", 'case "CAST_START"', 'case "STATUS_EXPIRED"', "if (!item.IsRealtime) actor.PlayAbility"],
@@ -41,7 +41,7 @@ def main() -> int:
         print("REALTIME_UNITY_REPLAY_WALLCLOCK_BLOCKING")
         return 1
 
-    print("REALTIME_UNITY_REPLAY_OK dto=1 promote=1 timestamp_player=1 legacy_fallback=1")
+    print("REALTIME_UNITY_REPLAY_OK campaign=1 arena=1 shadow=1 timestamp_player=1 legacy_fallback=1")
     return 0
 
 
