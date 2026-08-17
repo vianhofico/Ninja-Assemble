@@ -35,6 +35,7 @@ public final class ExperimentalAbilityProfile {
         TechniqueEffectResolver.Resolution resolution = effects.resolve(technique);
         if (resolution.status() != TechniqueEffectResolver.MappingStatus.RUNTIME || resolution.effects().isEmpty())
             throw new IllegalStateException("executable technique has no runtime effect mapping: " + technique.id());
+        AbilityTiming timing = timing(kind);
         return new BattleAbility(
                 technique.id(),
                 kind,
@@ -42,6 +43,21 @@ public final class ExperimentalAbilityProfile {
                 coefficientBps,
                 energyDelta,
                 "vfx/techniques/" + technique.id(),
-                resolution.effects());
+                resolution.effects(),
+                timing.cooldownMs(),
+                timing.castTimeMs(),
+                timing.recoveryMs());
     }
+
+    private static AbilityTiming timing(BattleAbilityKind kind) {
+        return switch (kind) {
+            case BASIC -> new AbilityTiming(0L, 0L, 150L);
+            case SKILL1 -> new AbilityTiming(5_000L, 300L, 250L);
+            case SKILL2 -> new AbilityTiming(7_000L, 300L, 250L);
+            case ULTIMATE -> new AbilityTiming(10_000L, 550L, 400L);
+            case PASSIVE -> new AbilityTiming(0L, 0L, 0L);
+        };
+    }
+
+    private record AbilityTiming(long cooldownMs, long castTimeMs, long recoveryMs) {}
 }
