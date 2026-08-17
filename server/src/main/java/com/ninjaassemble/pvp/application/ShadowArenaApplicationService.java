@@ -3,11 +3,11 @@ package com.ninjaassemble.pvp.application;
 import com.ninjaassemble.battle.domain.BattleRules;
 import com.ninjaassemble.battle.domain.ShadowArenaSeries;
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
 import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
@@ -52,7 +52,7 @@ public final class ShadowArenaApplicationService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleEngine engine = new RealtimeBattleEngine();
     private final ShadowArenaMatchResolver seriesResolver = new ShadowArenaMatchResolver();
 
     public ShadowArenaApplicationService(PlayerService players, HeroOwnershipService ownership,
@@ -133,7 +133,7 @@ public final class ShadowArenaApplicationService {
             List<OwnedHeroView> opponentSquad = opponentRoster.subList(squadIndex * 5, squadIndex * 5 + 5);
             long squadSeed = waveSeeds.nextLong();
             SquadBuild build = buildSquadBattle(playerSquad, opponentSquad, squadIndex);
-            BattleResult battle = engine.simulate(new BattleRequest(squadSeed, ruleset, build.units()));
+            BattleResult battle = engine.simulate(new RealtimeBattleRequest(squadSeed, ruleset, build.units()));
             SquadDecision decision = squadDecision(battle, build.participants(), playerSquad, opponentSquad);
             wins.add(decision.playerWon());
             squadBattles.add(new ShadowSquadBattleView(squadIndex + 1, squadSeed, decision.playerWon(), decision.tiebreak(), build.participants(), battle));
