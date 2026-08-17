@@ -1,0 +1,22 @@
+name: Realtime Content Timing
+
+on:
+  pull_request:
+    paths:
+      - 'game-data/skills/**'
+      - 'server/src/main/java/com/ninjaassemble/play/domain/**'
+      - 'server/src/test/java/com/ninjaassemble/play/domain/**'
+      - 'scripts/validate-realtime-content-timing.py'
+      - '.github/workflows/realtime-content-timing.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-content-timing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate explicit realtime skill timing
+        run: python scripts/validate-realtime-content-timing.py
