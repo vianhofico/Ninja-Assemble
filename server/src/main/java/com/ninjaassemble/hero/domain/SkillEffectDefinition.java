@@ -19,7 +19,9 @@ public record SkillEffectDefinition(
 ) {
     public SkillEffectDefinition {
         if (type == null || target == null) throw new IllegalArgumentException("effect type/target required");
-        if (coefficientBps < 0 || flatAmount < 0) throw new IllegalArgumentException("effect values cannot be negative");
+        if (coefficientBps < 0) throw new IllegalArgumentException("coefficient cannot be negative");
+        if (flatAmount < 0 && type != EffectType.RAGE && type != EffectType.ENERGY)
+            throw new IllegalArgumentException("negative flat amount is only valid for resource drain");
         if (chanceBps < 0 || chanceBps > 10_000) throw new IllegalArgumentException("invalid effect chance");
         if (durationMs < 0) throw new IllegalArgumentException("durationMs cannot be negative");
         if (tickIntervalMs < 0) throw new IllegalArgumentException("tickIntervalMs cannot be negative");
@@ -27,7 +29,6 @@ public record SkillEffectDefinition(
         if (durationMs > 0 && status == null && type == EffectType.STATUS) throw new IllegalArgumentException("timed status requires status id");
     }
 
-    /** Compatibility constructor for instant effects only. Persistent callers must pass explicit milliseconds. */
     public SkillEffectDefinition(EffectType type, TargetSelector target, DamageChannel channel, int coefficientBps,
                                  long flatAmount, String status, int chanceBps) {
         this(type, target, channel, coefficientBps, flatAmount, status, chanceBps, 0L, 0L);

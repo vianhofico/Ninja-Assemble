@@ -37,6 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayableBattleService {
     public static final String DEFAULT_STAGE_ID = "c1-s1";
     public static final String WAVE_RULES_VERSION = "full-recovery-between-waves-v1";
+    public static final String STAR_RULES_VERSION = "realtime-duration-stars-v1";
+    private static final long THREE_STAR_MAX_MS_PER_WAVE = 15_000L;
+    private static final long TWO_STAR_MAX_MS_PER_WAVE = 30_000L;
     private final PlayerService players;
     private final FormationService formations;
     private final EnergyService energy;
@@ -84,7 +87,7 @@ public class PlayableBattleService {
         SplittableRandom waveSeedSource = new SplittableRandom(masterSeed);
         BattleRuleset ruleset = BattleRuleset.experimentalV1();
         List<CampaignWaveResult> waveResults = new ArrayList<>();
-        int totalRounds = 0;
+        long totalDurationMs = 0;
 
         for (WaveDefinition wave : stage.waves()) {
             long waveSeed = waveSeedSource.nextLong();
@@ -99,7 +102,7 @@ public class PlayableBattleService {
                         unit.side(), unit.slot(), unit.maxHp()));
             }
             BattleResult waveBattle = engine.simulate(new BattleRequest(waveSeed, ruleset, units));
-            totalRounds += waveBattle.rounds();
+            totalDurationMs = Math.addExact(totalDurationMs, waveBattle.durationMs());
             waveResults.add(new CampaignWaveResult(wave.index(), waveSeed, List.copyOf(participants), waveBattle));
             if (waveBattle.outcome() != BattleOutcome.TEAM_A) break;
         }
@@ -107,7 +110,7 @@ public class PlayableBattleService {
         CampaignWaveResult lastWave = waveResults.get(waveResults.size() - 1);
         boolean won = waveResults.size() == stage.waves().size() && lastWave.battle().outcome() == BattleOutcome.TEAM_A;
         UUID battleId = UUID.randomUUID();
-        int stars = won ? stars(totalRounds, stage.waves().size()) : 0;
+        int stars = won ? stars(totalDurationMs, stage.waves().size()) : 0;
         boolean firstClear = false;
         long playerExpReward = 0;
         long goldReward = 0;
@@ -169,9 +172,10 @@ public class PlayableBattleService {
         }
     }
 
-    private static int stars(int totalRounds, int waveCount) {
-        if (totalRounds <= 5 * waveCount) return 3;
-        if (totalRounds <= 10 * waveCount) return 2;
+    /** Independent real-time campaign objective; these thresholds are not a turn-to-second conversion. */
+    private static int stars(long totalDurationMs, int waveCount) {
+        if (totalDurationMs <= THREE_STAR_MAX_MS_PER_WAVE * waveCount) return 3;
+        if (totalDurationMs <= TWO_STAR_MAX_MS_PER_WAVE * waveCount) return 2;
         return 1;
     }
 

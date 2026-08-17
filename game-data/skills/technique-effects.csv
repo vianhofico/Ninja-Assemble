@@ -4,8 +4,8 @@ acid-spray,2,STATUS,ALL_ENEMIES,CHAKRA,3000,0,POISON,8500,7000,1000,experimental
 amaterasu,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,11000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Single-target black flame burst
 amaterasu,2,STATUS,LOWEST_HP_ENEMY,CHAKRA,2000,0,BURN,10000,6000,1000,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Six-second black flame with one-second ticks
 body-flicker,1,STATUS,SELF,PHYSICAL,2500,0,SPEED_UP,10000,5000,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Mobility buff needs meaningful real-time window
-chakra-absorption,1,DAMAGE,FRONTMOST_ENEMY,CHAKRA,7000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Drain hit baseline
-chakra-absorption,2,RAGE,SELF,,0,25,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Legacy energy gain now feeds Rage runtime
+chakra-drain,1,RAGE,FRONTMOST_ENEMY,,0,-20,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Drain twenty Rage from the front target
+chakra-drain,2,RAGE,SELF,,0,20,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Transfer drained Rage to caster
 chakra-scalpel,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,13000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Medical precision finisher
 chidori,1,DAMAGE,LOWEST_HP_ENEMY,CHAKRA,15000,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Precision lightning finisher
 clone-barrage,1,DAMAGE,ALL_ENEMIES,PHYSICAL,7500,0,,10000,0,0,experimental-technique-mapping-v1,EXPERIMENTAL_RUNTIME,,Clone multi-target pressure
