@@ -16,14 +16,14 @@ def require(path: str, *tokens: str) -> str:
 
 
 def main() -> int:
-    version = require("client-unity/ProjectSettings/ProjectVersion.txt", "m_EditorVersion: 6000.0.42f1")
+    require("client-unity/ProjectSettings/ProjectVersion.txt", "m_EditorVersion: 6000.0.42f1")
     automation = require(
         "client-unity/Assets/Editor/MobileBuildAutomation.cs",
         "BuildAndroidDevelopment", "BuildAndroidRelease", "BuildTarget.Android",
         "ScriptingImplementation.IL2CPP", "AndroidArchitecture.ARM64",
         '".apk"', '".aab"', "ConfigureSigning", "CommandLineValue",
         "build-metadata.json", "ninjaBuildCommit")
-    shell = require(
+    require(
         "scripts/build-mobile.sh",
         "BuildAndroidDevelopment", "BuildAndroidRelease", "-buildTarget Android")
     workflow = require(
@@ -33,6 +33,10 @@ def main() -> int:
         "androidExportType: androidPackage", "androidExportType: androidAppBundle",
         "NinjaAssemble.apk", "NinjaAssemble.aab", "actions/upload-artifact@v4",
         "ANDROID_KEYSTORE_BASE64", "ANDROID_KEYSTORE_PASS", "ANDROID_KEYALIAS_NAME", "ANDROID_KEYALIAS_PASS")
+    evidence = require(
+        "game-data/release/mobile-device-evidence.csv",
+        "evidence_id", "git_sha", "artifact_ref", "device_model", "android_version", "device_class",
+        "smoke_pass", "performance_pass", "avg_fps", "p95_frame_ms", "max_memory_mb", "capture_ref")
 
     if "useCustomKeystore = false" not in automation:
         raise SystemExit("ANDROID_BUILD_INVALID development build must explicitly disable custom release keystore")
@@ -45,7 +49,9 @@ def main() -> int:
     if "release-aab" not in workflow or "development-apk" not in workflow:
         raise SystemExit("ANDROID_BUILD_INVALID workflow lanes missing")
 
-    print("ANDROID_BUILD_OK unity=6000.0.42f1 apk=pr aab=manual-signed il2cpp=1 arm64=1 metadata=1 gameci=v5")
+    rows = [line for line in evidence.splitlines() if line.strip()]
+    evidence_state = "header-only" if len(rows) == 1 else f"rows={len(rows)-1}"
+    print("ANDROID_BUILD_OK unity=6000.0.42f1 apk=pr aab=manual-signed il2cpp=1 arm64=1 metadata=1 gameci=v5 device_evidence=" + evidence_state)
     return 0
 
 
