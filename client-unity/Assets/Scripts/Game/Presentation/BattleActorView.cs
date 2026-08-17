@@ -139,7 +139,8 @@ namespace NinjaAssemble.Presentation
         public void ApplyDamage(long amount, bool critical)
         {
             if (amount > 0) CurrentHp = System.Math.Max(0L, CurrentHp - amount);
-            Trigger(critical ? "CriticalHit" : "Hit");
+            if (critical) TriggerWithFallback("CriticalHit", "Hit");
+            else Trigger("Hit");
             PlayClip(hitClip);
             UpdateHealthTarget();
         }
