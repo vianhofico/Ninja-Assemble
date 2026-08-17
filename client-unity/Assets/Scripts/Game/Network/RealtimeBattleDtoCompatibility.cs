@@ -3,8 +3,8 @@ using System;
 namespace NinjaAssemble.Network
 {
     /// <summary>
-    /// Promotes the additive server real-time replay into the existing BattleResultDto pipeline.
-    /// The legacy projection remains a fallback for older servers/other battle modes.
+    /// Promotes additive server real-time replays into the existing BattleResultDto presentation pipeline.
+    /// Legacy battle payloads remain a fallback for older servers/modes during staged cutover.
     /// </summary>
     public static class RealtimeBattleDtoCompatibility
     {
@@ -23,6 +23,25 @@ namespace NinjaAssemble.Network
                     wave.battle = Project(wave.battle, wave.realtimeBattle);
             }
 
+            return result;
+        }
+
+        public static ArenaBattleDto Promote(ArenaBattleDto result)
+        {
+            if (result == null) return null;
+            if (HasReplay(result.realtimeBattle))
+                result.battle = Project(result.battle, result.realtimeBattle);
+            return result;
+        }
+
+        public static ShadowArenaBattleDto Promote(ShadowArenaBattleDto result)
+        {
+            if (result == null) return null;
+            foreach (ShadowSquadBattleDto squad in result.squads ?? Array.Empty<ShadowSquadBattleDto>())
+            {
+                if (squad != null && HasReplay(squad.realtimeBattle))
+                    squad.battle = Project(squad.battle, squad.realtimeBattle);
+            }
             return result;
         }
 
