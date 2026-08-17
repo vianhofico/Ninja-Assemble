@@ -1,11 +1,13 @@
 package com.ninjaassemble.pvp.application;
 
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
-import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleCompatibilityAdapter;
+import com.ninjaassemble.battle.sim.RealtimeBattleExecutor;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
+import com.ninjaassemble.battle.sim.RealtimeBattleResult;
+import com.ninjaassemble.battle.sim.RealtimeBattleRuleset;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
@@ -44,7 +46,8 @@ public final class ArenaApplicationService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleExecutor engine = new RealtimeBattleExecutor();
+    private final RealtimeBattleRuleset ruleset = RealtimeBattleRuleset.experimentalV1();
 
     public ArenaApplicationService(PlayerService players, FormationService formations, ExperimentalCombatStatsResolver stats,
                                    WalletService wallet, JdbcTemplate jdbc, Clock clock) {
@@ -111,21 +114,21 @@ public final class ArenaApplicationService {
         addFormation(challengerFormation, TeamSide.A, "arena:A:", units, participants);
         addFormation(opponentFormation, TeamSide.B, "arena:B:", units, participants);
         long seed = secureRandom.nextLong();
-        BattleRuleset ruleset = BattleRuleset.experimentalV1();
-        BattleResult battle = engine.simulate(new BattleRequest(seed, ruleset, units));
+        RealtimeBattleResult realtimeBattle = engine.simulate(new RealtimeBattleRequest(seed, ruleset, units));
+        BattleResult compatibilityBattle = RealtimeBattleCompatibilityAdapter.project(realtimeBattle, ruleset);
 
         ArenaRatingProfile ratingProfile = ArenaRatingProfile.experimentalV1();
         ArenaRatingCalculator.RatingResult ratingResult;
-        if (training || battle.outcome() == BattleOutcome.DRAW) {
+        if (training || realtimeBattle.outcome() == BattleOutcome.DRAW) {
             ratingResult = new ArenaRatingCalculator.RatingResult(ratingBefore, ratingBefore, 0, ratingProfile.version());
         } else {
-            ratingResult = ArenaRatingCalculator.resolve(ratingBefore, battle.outcome() == BattleOutcome.TEAM_A, ratingProfile);
+            ratingResult = ArenaRatingCalculator.resolve(ratingBefore, realtimeBattle.outcome() == BattleOutcome.TEAM_A, ratingProfile);
             jdbc.update("update arena_profiles set rating = ?, updated_at = ? where player_id = ?",
                     ratingResult.after(), clock.instant(), playerId);
         }
 
         UUID battleId = UUID.randomUUID();
-        long arenaCoins = training ? 0 : battle.outcome() == BattleOutcome.TEAM_A ? WIN_COINS : LOSS_COINS;
+        long arenaCoins = training ? 0 : realtimeBattle.outcome() == BattleOutcome.TEAM_A ? WIN_COINS : LOSS_COINS;
         String rewardKey = arenaCoins > 0 ? "arena:" + battleId + ":coin" : null;
         if (arenaCoins > 0)
             wallet.mutate(playerId, Currency.ARENA_COIN, arenaCoins, "ARENA_BATTLE_REWARD", SEASON_ID, rewardKey);
@@ -135,7 +138,7 @@ public final class ArenaApplicationService {
                                           rating_profile_version, result, rating_before, rating_after, reward_grant_key, created_at)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, battleId, playerId, opponentPlayerId, snapshotId, seed, ruleset.version(), ratingProfile.version(),
-                battle.outcome().name(), ratingResult.before(), ratingResult.after(), rewardKey, clock.instant());
+                realtimeBattle.outcome().name(), ratingResult.before(), ratingResult.after(), rewardKey, clock.instant());
 
         return new ArenaBattleView(
                 battleId, SEASON_ID, training, opponentPlayerId, opponent.getDisplayName(), opponentRating, opponentPower,
@@ -143,7 +146,7 @@ public final class ArenaApplicationService {
                 arenaCoins, REWARD_PROFILE_VERSION,
                 ExperimentalCombatStatsResolver.VERSION, ExperimentalAbilityProfile.VERSION,
                 TechniqueEffectResolver.VERSION, PassiveEffectResolver.VERSION,
-                List.copyOf(participants), battle);
+                List.copyOf(participants), compatibilityBattle, realtimeBattle);
     }
 
     private long ensureProfile(UUID playerId) {
@@ -187,5 +190,5 @@ public final class ArenaApplicationService {
             long opponentRating, long opponentPower, long ratingBefore, long ratingAfter, long ratingDelta,
             String ratingProfileVersion, long arenaCoinReward, String rewardProfileVersion,
             String combatStatsVersion, String abilityProfileVersion, String techniqueMappingVersion, String passiveProfileVersion,
-            List<BattleParticipant> participants, BattleResult battle) {}
+            List<BattleParticipant> participants, BattleResult battle, RealtimeBattleResult realtimeBattle) {}
 }
