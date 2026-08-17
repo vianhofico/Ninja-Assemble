@@ -35,7 +35,11 @@ def main() -> int:
         print("LEGACY_COMBAT_PRODUCTION_REFERENCES", relative(production_refs))
         return 1
 
-    script_refs = occurrences(SCRIPTS_ROOT, "DeterministicBattleEngine.java", ".py")
+    self_path = Path(__file__).resolve()
+    script_refs = [
+        path for path in occurrences(SCRIPTS_ROOT, "DeterministicBattleEngine.java", ".py")
+        if path.resolve() != self_path
+    ]
     if script_refs:
         print("LEGACY_COMBAT_VALIDATOR_REFERENCES", relative(script_refs))
         return 1
