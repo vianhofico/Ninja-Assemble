@@ -30,9 +30,9 @@ class StructuredBattleEffectsTest {
 
     @Test
     void stunBlocksActionsUntilExactExpirationInsteadOfSkippingATurn() {
-        BattleAbility stun = basic("stun-seal", List.of(
-                timed(EffectType.STATUS, TargetSelector.FRONTMOST_ENEMY, DamageChannel.CHAKRA, 0, 0, "STUN", 2_500, 0)));
-        BattleUnitSeed controller = unit("controller", TeamSide.A, 0, 20_000, 10, 2_000, set(stun));
+        BattlePassive stunAtStart = new BattlePassive("stun-seal", PassiveTrigger.BATTLE_START,
+                List.of(timed(EffectType.STATUS, TargetSelector.FRONTMOST_ENEMY, DamageChannel.CHAKRA, 0, 0, "STUN", 2_500, 0)), true, 0);
+        BattleUnitSeed controller = unitWithPassives("controller", TeamSide.A, 0, 20_000, 10, 1_000, List.of(stunAtStart));
         BattleUnitSeed target = unit("target", TeamSide.B, 0, 20_000, 10, 1_000, null);
 
         BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(12L, shortRules(7_000), List.of(controller, target)));
@@ -40,6 +40,7 @@ class StructuredBattleEffectsTest {
         BattleEvent blocked = result.events().stream().filter(it -> it.type() == BattleEventType.ACTION_BLOCKED && "target".equals(it.actorId())).findFirst().orElseThrow();
         BattleEvent expired = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_EXPIRED && "STUN".equals(it.statusId())).findFirst().orElseThrow();
         assertEquals(2_500, applied.durationMs());
+        assertEquals(0L, applied.timestampMs());
         assertTrue(blocked.timestampMs() >= applied.timestampMs());
         assertEquals(applied.timestampMs() + 2_500, expired.timestampMs());
         assertTrue(result.events().stream().filter(it -> "target".equals(it.actorId()) && it.type() == BattleEventType.BASIC_ATTACK_START)
@@ -48,18 +49,19 @@ class StructuredBattleEffectsTest {
 
     @Test
     void burnTicksOnExplicitOneSecondClockAndTicksAtExpiryBoundary() {
-        BattleAbility burn = basic("burn-mark", List.of(
-                timed(EffectType.STATUS, TargetSelector.FRONTMOST_ENEMY, DamageChannel.CHAKRA, 0, 10, "BURN", 3_000, 1_000)));
-        BattleUnitSeed caster = unit("caster", TeamSide.A, 0, 50_000, 10, 2_000, set(burn));
+        BattlePassive burnAtStart = new BattlePassive("burn-mark", PassiveTrigger.BATTLE_START,
+                List.of(timed(EffectType.STATUS, TargetSelector.FRONTMOST_ENEMY, DamageChannel.CHAKRA, 0, 10, "BURN", 3_000, 1_000)), true, 0);
+        BattleUnitSeed caster = unitWithPassives("caster", TeamSide.A, 0, 50_000, 10, 1_000, List.of(burnAtStart));
         BattleUnitSeed target = unit("target", TeamSide.B, 0, 50_000, 10, 500, null);
 
         BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(13L, shortRules(5_000), List.of(caster, target)));
         BattleEvent applied = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_APPLIED && "BURN".equals(it.statusId())).findFirst().orElseThrow();
         List<Long> ticks = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_TICK && "BURN".equals(it.statusId()))
                 .map(BattleEvent::timestampMs).filter(it -> it <= applied.timestampMs() + 3_000).toList();
-        assertTrue(ticks.contains(applied.timestampMs() + 1_000));
-        assertTrue(ticks.contains(applied.timestampMs() + 2_000));
-        assertTrue(ticks.contains(applied.timestampMs() + 3_000));
+        assertEquals(0L, applied.timestampMs());
+        assertTrue(ticks.contains(1_000L));
+        assertTrue(ticks.contains(2_000L));
+        assertTrue(ticks.contains(3_000L));
     }
 
     @Test
@@ -106,5 +108,11 @@ class StructuredBattleEffectsTest {
     private static BattleUnitSeed unit(String id, TeamSide side, int slot, long hp, long attack, int speed, BattleAbilitySet abilities) {
         return new BattleUnitSeed(id, side, slot, hp, attack, attack, 0, 0, speed, 0, 0, DamageChannel.PHYSICAL,
                 abilities == null ? BattleAbilitySet.basicOnly(DamageChannel.PHYSICAL) : abilities);
+    }
+
+    private static BattleUnitSeed unitWithPassives(String id, TeamSide side, int slot, long hp, long attack, int speed,
+                                                   List<BattlePassive> passives) {
+        return new BattleUnitSeed(id, side, slot, hp, attack, attack, 0, 0, speed, 0, 0, DamageChannel.PHYSICAL,
+                BattleAbilitySet.basicOnly(DamageChannel.PHYSICAL), passives);
     }
 }
