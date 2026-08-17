@@ -1,11 +1,11 @@
 package com.ninjaassemble.pvp.application;
 
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
 import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
@@ -44,7 +44,7 @@ public final class ArenaApplicationService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleEngine engine = new RealtimeBattleEngine();
 
     public ArenaApplicationService(PlayerService players, FormationService formations, ExperimentalCombatStatsResolver stats,
                                    WalletService wallet, JdbcTemplate jdbc, Clock clock) {
@@ -112,7 +112,7 @@ public final class ArenaApplicationService {
         addFormation(opponentFormation, TeamSide.B, "arena:B:", units, participants);
         long seed = secureRandom.nextLong();
         BattleRuleset ruleset = BattleRuleset.experimentalV1();
-        BattleResult battle = engine.simulate(new BattleRequest(seed, ruleset, units));
+        BattleResult battle = engine.simulate(new RealtimeBattleRequest(seed, ruleset, units));
 
         ArenaRatingProfile ratingProfile = ArenaRatingProfile.experimentalV1();
         ArenaRatingCalculator.RatingResult ratingResult;
