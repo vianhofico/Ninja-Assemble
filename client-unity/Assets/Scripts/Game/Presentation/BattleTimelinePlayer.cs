@@ -47,10 +47,10 @@ namespace NinjaAssemble.Presentation
         public Coroutine Play(IReadOnlyList<BattlePresentationEvent> events)
         {
             if (events == null) throw new ArgumentNullException(nameof(events));
-            EnsurePlayableQualityLayer();
             if (playback != null) StopCoroutine(playback);
             paused = false;
             CurrentTimestampMs = 0;
+            EnsurePlayableQualityLayer();
             RefreshActorPresentationRates();
             playback = StartCoroutine(PlayRoutine(events));
             return playback;
