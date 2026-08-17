@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -12,6 +13,8 @@ HEROES = ROOT / "game-data/heroes/heroes.csv"
 AWAKENING_SKILLS = ROOT / "game-data/skills/awakening-skills.csv"
 EXPECTED_SLOTS = {"BASIC", "SKILL_1", "SKILL_2", "SKILL_3", "PASSIVE"}
 FORBIDDEN_TURN_TRIGGERS = {"TURN_START", "TURN_END", "ROUND_START", "ROUND_END"}
+FORBIDDEN_TIMING_WORDS_EN = re.compile(r"\b(?:turn|round)\b", re.IGNORECASE)
+FORBIDDEN_TIMING_WORDS_VI = re.compile(r"\blượt\b", re.IGNORECASE)
 REVIEWED_FIELDS = {
     "name_en", "name_vi", "ability_kind", "trigger_type", "target_selector", "effect_profile_id",
     "description_en", "description_vi", "canon_source", "canon_confidence", "counterplay", "balance_status",
@@ -46,7 +49,7 @@ def validate_ready(row: dict[str, str]) -> None:
         require_non_negative_int(row, field)
     if row["trigger_type"] in FORBIDDEN_TURN_TRIGGERS:
         raise SystemExit(f"{row['hero_id']}/{row['slot']} still uses turn/round trigger {row['trigger_type']}")
-    if "turn" in row["description_en"].lower() or "round" in row["description_en"].lower() or "lượt" in row["description_vi"].lower():
+    if FORBIDDEN_TIMING_WORDS_EN.search(row["description_en"]) or FORBIDDEN_TIMING_WORDS_VI.search(row["description_vi"]):
         raise SystemExit(f"{row['hero_id']}/{row['slot']} description still uses turn/round timing")
 
     if row["slot"] == "SKILL_1":
