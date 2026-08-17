@@ -25,6 +25,10 @@ def has_identifier(text: str, symbol: str) -> bool:
     return re.search(r"\b" + re.escape(symbol) + r"\b", text) is not None
 
 
+def has_standalone_filename(text: str, filename: str) -> bool:
+    return re.search(r"(?<![A-Za-z0-9_])" + re.escape(filename) + r"(?![A-Za-z0-9_])", text) is not None
+
+
 def main() -> int:
     for path in (REALTIME_ENGINE, REALTIME_REQUEST, RULES, EVENT, EFFECT):
         if not path.exists():
@@ -64,7 +68,7 @@ def main() -> int:
         if path.resolve() == SELF:
             continue
         text = path.read_text(encoding="utf-8")
-        leaked = [filename for filename in legacy_filenames if filename in text]
+        leaked = [filename for filename in legacy_filenames if has_standalone_filename(text, filename)]
         if leaked:
             return fail(f"validator still opens legacy combat file(s) {leaked} in {path.relative_to(ROOT)}")
 
