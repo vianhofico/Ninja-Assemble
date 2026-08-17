@@ -15,13 +15,14 @@ def require(path: str, *tokens: str) -> None:
 def main() -> int:
     require("server/src/main/resources/db/migration/V5__pvp_arena.sql",
             "arena_profiles", "arena_opponent_snapshots", "arena_battles")
-    require("server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java",
             "Authoritative deterministic continuous-time auto-combat simulation", "PriorityQueue<ScheduledEvent>", "timestampMs")
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java", "record RealtimeBattleRequest")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleRuleset.java",
             "maxBattleDurationMs", "attackIntervalMs", "experimental-realtime-v1-unverified-formula")
     require("server/src/main/java/com/ninjaassemble/pvp/application/ArenaApplicationService.java",
             "SEASON_ID", "ArenaRatingProfile.experimentalV1", "arena_opponent_snapshots", "arena_battles",
-            "DeterministicBattleEngine", "BattleRuleset.experimentalV1()", "battle.outcome()",
+            "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "battle.outcome()",
             "Currency.ARENA_COIN", "training ? 0", "ArenaOpponentView")
     require("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java",
             '"/arena"', '"/arena/{opponentPlayerId}/battle"')
@@ -34,7 +35,7 @@ def main() -> int:
             "ArenaStateDto Arena", "RecommendedArenaOpponent", "FightArenaAsync", "RefreshArenaAsync")
     require("client-unity/Assets/Scripts/Game/UI/MobileVerticalSliceController.cs",
             "ScreenId.Arena", "BuildArena", "PresentArenaBattle", "TRAIN MIRROR", "rating/reward unchanged")
-    print("PLAYABLE_ARENA_OK async_opponents=5 realtime=authoritative timestamp_replay=yes rating=experimental")
+    print("PLAYABLE_ARENA_OK async_opponents=5 realtime=RealtimeBattleEngine timestamp_replay=yes rating=experimental")
     return 0
 
 
