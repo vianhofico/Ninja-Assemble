@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Generate the authoritative M50 five-slot skill-design catalog.
 
-The explicit M47 Hero Version aliases remain migration provenance.  M50 converts them into
-BASIC / SKILL_1(Rage) / SKILL_2 / SKILL_3 / PASSIVE and then overlays reviewed per-Hero-Version
-design decisions from m50-skill-overrides.csv.  A structural candidate is never silently
+The explicit M47 Hero Version aliases remain migration provenance. M50 converts them into
+BASIC / SKILL_1(Rage) / SKILL_2 / SKILL_3 / PASSIVE and overlays reviewed per-Hero-Version
+batch files named m50-skill-overrides*.csv. A structural candidate is never silently
 promoted to READY: only an explicit override may advance review_status.
 """
 from __future__ import annotations
@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "game-data/skills/hero-version-skills.csv"
-OVERRIDES = ROOT / "game-data/skills/m50-skill-overrides.csv"
+OVERRIDE_DIR = ROOT / "game-data/skills"
 TECHNIQUE_RESOURCES = [ROOT / f"game-data/skills/technique-library-0{i}.csv" for i in range(1, 5)]
 FINAL_SLOTS = ("BASIC", "SKILL_1", "SKILL_2", "SKILL_3", "PASSIVE")
 LEGACY_REQUIRED = ("BASIC", "SKILL_1", "SKILL_2", "ULTIMATE", "PASSIVE")
@@ -47,26 +47,26 @@ def read_techniques() -> dict[str, dict[str, str]]:
 
 
 def read_overrides() -> dict[tuple[str, str], dict[str, str]]:
-    if not OVERRIDES.exists():
-        return {}
     result: dict[tuple[str, str], dict[str, str]] = {}
-    with OVERRIDES.open(encoding="utf-8", newline="") as handle:
-        reader = csv.DictReader(handle)
-        required = set(OVERRIDE_KEY_FIELDS) | {"review_status"}
-        if not reader.fieldnames or not required.issubset(reader.fieldnames):
-            raise SystemExit(f"M50 override schema missing fields: {sorted(required - set(reader.fieldnames or []))}")
-        unknown = set(reader.fieldnames) - (set(OVERRIDE_KEY_FIELDS) | set(OVERRIDABLE_FIELDS))
-        if unknown:
-            raise SystemExit(f"M50 override schema has unknown fields: {sorted(unknown)}")
-        for row in reader:
-            if not any((value or "").strip() for value in row.values()):
-                continue
-            key = (row["hero_id"].strip(), row["slot"].strip())
-            if key in result:
-                raise SystemExit(f"duplicate M50 override: {key[0]}/{key[1]}")
-            if key[1] not in FINAL_SLOTS:
-                raise SystemExit(f"unknown M50 override slot: {key[0]}/{key[1]}")
-            result[key] = row
+    paths = sorted(OVERRIDE_DIR.glob("m50-skill-overrides*.csv"))
+    for path in paths:
+        with path.open(encoding="utf-8", newline="") as handle:
+            reader = csv.DictReader(handle)
+            required = set(OVERRIDE_KEY_FIELDS) | {"review_status"}
+            if not reader.fieldnames or not required.issubset(reader.fieldnames):
+                raise SystemExit(f"{path.name} missing fields: {sorted(required - set(reader.fieldnames or []))}")
+            unknown = set(reader.fieldnames) - (set(OVERRIDE_KEY_FIELDS) | set(OVERRIDABLE_FIELDS))
+            if unknown:
+                raise SystemExit(f"{path.name} has unknown fields: {sorted(unknown)}")
+            for row in reader:
+                if not any((value or "").strip() for value in row.values()):
+                    continue
+                key = (row["hero_id"].strip(), row["slot"].strip())
+                if key in result:
+                    raise SystemExit(f"duplicate M50 override across batches: {key[0]}/{key[1]}")
+                if key[1] not in FINAL_SLOTS:
+                    raise SystemExit(f"unknown M50 override slot: {key[0]}/{key[1]}")
+                result[key] = row
     return result
 
 
@@ -82,7 +82,6 @@ def technique_defaults(techniques: dict[str, dict[str, str]], technique_id: str)
 
 
 def migrate(group: dict[str, dict[str, str]], techniques: dict[str, dict[str, str]]) -> list[dict[str, str]]:
-    # Structural migration only. Every row stays RESEARCH_REQUIRED unless an explicit M50 override reviews it.
     plan = [
         ("BASIC", "BASIC", "BASIC", "BASIC_AUTO", "false", "0", "15", "0", "0", "0", "180", "NONE"),
         ("SKILL_1", "ULTIMATE", "RAGE_SKILL", "RAGE_FULL", "true", "100", "0", "0", "0", "0", "650", "MINI_CINEMATIC"),
@@ -97,37 +96,23 @@ def migrate(group: dict[str, dict[str, str]], techniques: dict[str, dict[str, st
         defaults = technique_defaults(techniques, src["source_technique_id"])
         out.append({
             "skill_id": skill_id,
-            "hero_id": src["hero_id"],
-            "slot": slot,
-            "legacy_slot": legacy,
+            "hero_id": src["hero_id"], "slot": slot, "legacy_slot": legacy,
             "source_technique_id": src["source_technique_id"],
             "name_en": defaults["name_en"] or src["name_en"],
             "name_vi": defaults["name_vi"] or src["name_vi"],
             "channel": defaults["channel"] or src["channel"],
-            "ability_kind": kind,
-            "trigger_type": trigger,
-            "is_signature": signature,
-            "rage_cost": rage_cost,
-            "rage_gain": rage_gain,
-            "cooldown_ms": cooldown,
-            "cast_time_ms": cast,
-            "impact_ms": impact,
-            "recovery_ms": recovery,
+            "ability_kind": kind, "trigger_type": trigger, "is_signature": signature,
+            "rage_cost": rage_cost, "rage_gain": rage_gain, "cooldown_ms": cooldown,
+            "cast_time_ms": cast, "impact_ms": impact, "recovery_ms": recovery,
             "target_selector": "FRONTMOST_ENEMY" if slot != "PASSIVE" else "SELF",
-            "effect_profile_id": src["source_technique_id"],
-            "special_mechanic": "",
+            "effect_profile_id": src["source_technique_id"], "special_mechanic": "",
             "cinematic_mode": cinematic,
             "animation_key": f"skills/{src['hero_id']}/{slot.lower()}/animation",
             "vfx_key": f"skills/{src['hero_id']}/{slot.lower()}/vfx",
             "sfx_key": f"skills/{src['hero_id']}/{slot.lower()}/sfx",
-            "voice_line": "",
-            "description_en": "",
-            "description_vi": "",
-            "canon_source": "",
-            "canon_confidence": "UNREVIEWED",
-            "counterplay": "",
-            "balance_status": "EXPERIMENTAL",
-            "review_status": "RESEARCH_REQUIRED",
+            "voice_line": "", "description_en": "", "description_vi": "",
+            "canon_source": "", "canon_confidence": "UNREVIEWED", "counterplay": "",
+            "balance_status": "EXPERIMENTAL", "review_status": "RESEARCH_REQUIRED",
             "research_note": (
                 "Structural candidate generated from the explicit M47 alias. M50 must research the exact Hero Version, "
                 "confirm/replace the technique, define effects/targets/realtime timing/counterplay, write EN/VI descriptions, "
@@ -150,7 +135,6 @@ def apply_overrides(rows: list[dict[str, str]], overrides: dict[tuple[str, str],
             value = (override.get(field) or "").strip()
             if value:
                 row[field] = value
-        # Changing the source technique also refreshes names/channel unless the override explicitly supplied them.
         if (override.get("source_technique_id") or "").strip():
             defaults = technique_defaults(techniques, row["source_technique_id"])
             for field in ("name_en", "name_vi", "channel"):
@@ -193,13 +177,13 @@ def main() -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDNAMES)
-        writer.writeheader()
-        writer.writerows(rows)
+        writer.writeheader(); writer.writerows(rows)
 
     ready = sum(1 for row in rows if row["review_status"] == "READY_DESIGN")
     print(
         f"M50_SKILL_DESIGN_CANDIDATE_OK heroes={len(groups)} rows={len(rows)} "
-        f"rage_skills={len(groups)} overrides={len(overrides)} ready_design={ready}"
+        f"rage_skills={len(groups)} override_batches={len(list(OVERRIDE_DIR.glob('m50-skill-overrides*.csv')))} "
+        f"overrides={len(overrides)} ready_design={ready}"
     )
     return 0
 
