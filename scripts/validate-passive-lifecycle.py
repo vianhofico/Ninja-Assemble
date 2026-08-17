@@ -20,7 +20,7 @@ def main() -> int:
             "oncePerBattle", "thresholdBps", "intervalMs", "List<SkillEffectDefinition> effects")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleUnitSeed.java", "List<BattlePassive> passives")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleEventType.java", "PASSIVE_TRIGGER")
-    require("server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java",
             "triggerPassives", "processPassiveInterval", "firedPassives", "PassiveTrigger.HP_THRESHOLD", "PassiveTrigger.ALLY_KO")
     require("server/src/main/java/com/ninjaassemble/play/domain/PassiveEffectResolver.java",
             "ReferenceProfiles.PASSIVE_LIFECYCLE", "PassiveTrigger.TIME_INTERVAL", "3_000",
@@ -31,7 +31,7 @@ def main() -> int:
     require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs", "passiveProfileVersion", "triggerId")
     require("client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs", 'case "PASSIVE_TRIGGER"', "actor.PlayPassive()")
     require("game-data/reference/balance-profiles.csv", "experimental-passive-lifecycle-v1,PASSIVE_LIFECYCLE,EXPERIMENTAL")
-    print("PASSIVE_LIFECYCLE_OK model=event_time interval_passives=true once_guard=true")
+    print("PASSIVE_LIFECYCLE_OK model=event_time engine=RealtimeBattleEngine interval_passives=true once_guard=true")
     return 0
 
 
