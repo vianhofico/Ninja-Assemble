@@ -44,7 +44,7 @@ public record BattleAbility(
 
     private static long defaultCast(BattleAbilityKind kind) {
         return switch (kind) {
-            case RAGE_SKILL, ULTIMATE -> 600L;
+            case RAGE_SKILL -> 600L;
             case AWAKENING_SKILL -> 800L;
             default -> 0L;
         };
@@ -54,13 +54,9 @@ public record BattleAbility(
         return switch (kind) {
             case BASIC -> 250L;
             case SKILL1, SKILL2 -> 450L;
-            case RAGE_SKILL, ULTIMATE -> 750L;
+            case RAGE_SKILL -> 750L;
             case AWAKENING_SKILL -> 900L;
             case PASSIVE, CONDITIONAL_SKILL -> 350L;
         };
     }
-
-    /** Temporary Java compatibility accessor for old consumers; the resource is Rage from M49 onward. */
-    @Deprecated(forRemoval = true)
-    public int energyDelta() { return rageDelta; }
 }
