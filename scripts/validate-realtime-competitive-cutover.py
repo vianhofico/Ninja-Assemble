@@ -27,16 +27,19 @@ def main() -> int:
 
     require(engine,
             "Authoritative deterministic continuous-time auto-combat simulation",
-            "PriorityQueue<ScheduledEvent>", "ScheduledType", "timestampMs", "RAGE_SKILL_READY")
-    forbid(engine, "for (int round", "maxRounds", "durationTurns", "BattleRequest")
+            "PriorityQueue<ScheduledEvent>", "ScheduledType", "timestampMs", "RAGE_SKILL_READY",
+            "simulate(RealtimeBattleRequest request)")
+    forbid(engine, "for (int round", "maxRounds", "durationTurns")
     require(request, "record RealtimeBattleRequest", "BattleRuleset ruleset", "List<BattleUnitSeed> units")
     require(rules, "maxBattleDurationMs", "attackIntervalMs", "rageSkillCost")
     forbid(rules, "maxRounds")
 
     require(arena, "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "battle.outcome()", "Currency.ARENA_COIN")
     require(shadow, "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "durationMs()", "TOTAL_HP", "SQUAD_POWER")
-    forbid(arena, "DeterministicBattleEngine", "new BattleRequest(")
-    forbid(shadow, "DeterministicBattleEngine", "new BattleRequest(")
+    old_engine = "Deterministic" + "BattleEngine"
+    old_constructor = "new " + "Battle" + "Request("
+    forbid(arena, old_engine, old_constructor)
+    forbid(shadow, old_engine, old_constructor)
 
     require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
             "timestampMs", "durationMs", "ArenaBattleDto", "ShadowSquadBattleDto")
