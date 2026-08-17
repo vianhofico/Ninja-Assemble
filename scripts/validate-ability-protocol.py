@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static contract checks for M23 deterministic ability/ultimate playback."""
+"""Static contract checks for deterministic realtime ability/ultimate playback."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,24 +20,29 @@ def main() -> int:
         "server/src/main/java/com/ninjaassemble/battle/sim/BattleUnitSeed.java",
         "BattleAbilitySet abilities", "BattleAbilitySet.basicOnly")
     require(
-        "server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
-        "nextAbility(", "ability.coefficientBps()", "ability.effectKey()", "energyAfter")
+        "server/src/main/java/com/ninjaassemble/battle/sim/RealtimeDeterministicBattleEngine.java",
+        "nextAbility(", "ability.coefficientBps()", "ability.effectKey()", "energyAfter",
+        "CAST_START", "CAST_COMPLETE", "cooldownReadyAtMs")
     require(
         "server/src/main/java/com/ninjaassemble/play/domain/ExperimentalAbilityProfile.java",
-        "ReferenceProfiles.ABILITY_CYCLE", "BattleAbilityKind.ULTIMATE", "22_000", "-100")
+        "ReferenceProfiles.ABILITY_CYCLE", "BattleAbilityKind.ULTIMATE", "22_000", "-100",
+        "timing.cooldownMs()", "timing.castTimeMs()", "timing.recoveryMs()")
     require(
-        "server/src/test/java/com/ninjaassemble/battle/sim/DeterministicBattleEngineTest.java",
-        "executableAbilityCycleBuildsEnergyThenUsesUltimate", "List.of(30, 65, 100, 0)")
+        "server/src/test/java/com/ninjaassemble/battle/sim/RealtimeDeterministicBattleEngineTest.java",
+        "sameSeedProducesExactlySameTimestampedReplay", "combatantsAdvanceOnIndependentSpeedBasedTimelines")
+    require(
+        "server/src/test/java/com/ninjaassemble/play/domain/ExperimentalAbilityTimingTest.java",
+        "productionAbilityCycleUsesExplicitRealtimeTimingForEverySlot")
     require(
         "client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
-        "abilityId", "abilityKind", "effectKey", "energyAfter")
+        "abilityId", "abilityKind", "effectKey", "energyAfter", "timestampMs")
     require(
         "client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs",
-        "PlayAbility(item.AbilityKind)", "SetEnergy(item.EnergyAfter)")
+        'case "CAST_START"', "PlayAbility(item.AbilityKind)", "SetEnergy(item.EnergyAfter)")
     require(
         "game-data/reference/balance-profiles.csv",
         "experimental-ability-cycle-v1,ABILITY_CYCLE,EXPERIMENTAL")
-    print("ABILITY_PROTOCOL_OK deterministic_cycle=basic>skill1>skill2>ultimate energy=30>65>100>0")
+    print("ABILITY_PROTOCOL_OK realtime deterministic_cycle=basic>skill1>skill2>ultimate explicit_timing=yes")
     return 0
 
 
