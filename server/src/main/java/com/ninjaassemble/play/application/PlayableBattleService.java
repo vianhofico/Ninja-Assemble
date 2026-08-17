@@ -1,11 +1,13 @@
 package com.ninjaassemble.play.application;
 
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
-import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleCompatibilityAdapter;
+import com.ninjaassemble.battle.sim.RealtimeBattleExecutor;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
+import com.ninjaassemble.battle.sim.RealtimeBattleResult;
+import com.ninjaassemble.battle.sim.RealtimeBattleRuleset;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.campaign.application.CampaignEnemyTeamService;
 import com.ninjaassemble.campaign.application.CampaignProgressService;
@@ -36,7 +38,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PlayableBattleService {
     public static final String DEFAULT_STAGE_ID = "c1-s1";
-    public static final String WAVE_RULES_VERSION = "full-recovery-between-waves-v1";
+    public static final String WAVE_RULES_VERSION = "full-recovery-between-waves-realtime-v2";
+
+    // Experimental migration thresholds. They are deliberately named as duration gates rather than rounds.
+    // Reference/parity evidence must replace these values before they are considered verified balance data.
+    static final long THREE_STAR_MAX_DURATION_PER_WAVE_MS = 20_000L;
+    static final long TWO_STAR_MAX_DURATION_PER_WAVE_MS = 40_000L;
+
     private final PlayerService players;
     private final FormationService formations;
     private final EnergyService energy;
@@ -48,7 +56,8 @@ public class PlayableBattleService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleExecutor engine = new RealtimeBattleExecutor();
+    private final RealtimeBattleRuleset ruleset = RealtimeBattleRuleset.experimentalV1();
 
     public PlayableBattleService(PlayerService players, FormationService formations, EnergyService energy,
                                  ExperimentalCombatStatsResolver stats, CampaignStageFlowService stageFlow,
@@ -82,9 +91,8 @@ public class PlayableBattleService {
 
         long masterSeed = secureRandom.nextLong();
         SplittableRandom waveSeedSource = new SplittableRandom(masterSeed);
-        BattleRuleset ruleset = BattleRuleset.experimentalV1();
         List<CampaignWaveResult> waveResults = new ArrayList<>();
-        int totalRounds = 0;
+        long totalDurationMs = 0L;
 
         for (WaveDefinition wave : stage.waves()) {
             long waveSeed = waveSeedSource.nextLong();
@@ -98,16 +106,20 @@ public class PlayableBattleService {
                         unit.id(), enemy.characterId(), enemy.displayName(), enemy.variant(), enemy.level(),
                         unit.side(), unit.slot(), unit.maxHp()));
             }
-            BattleResult waveBattle = engine.simulate(new BattleRequest(waveSeed, ruleset, units));
-            totalRounds += waveBattle.rounds();
-            waveResults.add(new CampaignWaveResult(wave.index(), waveSeed, List.copyOf(participants), waveBattle));
-            if (waveBattle.outcome() != BattleOutcome.TEAM_A) break;
+
+            RealtimeBattleResult realtimeBattle = engine.simulate(new RealtimeBattleRequest(waveSeed, ruleset, units));
+            BattleResult compatibilityBattle = RealtimeBattleCompatibilityAdapter.project(realtimeBattle, ruleset);
+            totalDurationMs = Math.addExact(totalDurationMs, realtimeBattle.durationMs());
+            waveResults.add(new CampaignWaveResult(
+                    wave.index(), waveSeed, List.copyOf(participants), compatibilityBattle, realtimeBattle));
+            if (realtimeBattle.outcome() != BattleOutcome.TEAM_A) break;
         }
 
         CampaignWaveResult lastWave = waveResults.get(waveResults.size() - 1);
-        boolean won = waveResults.size() == stage.waves().size() && lastWave.battle().outcome() == BattleOutcome.TEAM_A;
+        boolean won = waveResults.size() == stage.waves().size()
+                && lastWave.realtimeBattle().outcome() == BattleOutcome.TEAM_A;
         UUID battleId = UUID.randomUUID();
-        int stars = won ? stars(totalRounds, stage.waves().size()) : 0;
+        int stars = won ? starsForDuration(totalDurationMs, stage.waves().size()) : 0;
         boolean firstClear = false;
         long playerExpReward = 0;
         long goldReward = 0;
@@ -132,7 +144,8 @@ public class PlayableBattleService {
         jdbc.update("""
                 insert into campaign_runs(id, player_id, stage_id, battle_seed, ruleset_version, result, reward_grant_key, started_at, completed_at)
                 values (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, battleId, playerId, stage.id(), masterSeed, ruleset.version(), won ? BattleOutcome.TEAM_A.name() : lastWave.battle().outcome().name(),
+                """, battleId, playerId, stage.id(), masterSeed, ruleset.version(),
+                won ? BattleOutcome.TEAM_A.name() : lastWave.realtimeBattle().outcome().name(),
                 rewardKey, clock.instant(), clock.instant());
 
         return new PlayBattleResult(
@@ -154,7 +167,8 @@ public class PlayableBattleService {
                 PassiveEffectResolver.VERSION,
                 List.copyOf(waveResults),
                 lastWave.participants(),
-                lastWave.battle());
+                lastWave.battle(),
+                lastWave.realtimeBattle());
     }
 
     private void addPlayerFormation(FormationService.FormationView formation, List<BattleUnitSeed> units, List<BattleParticipant> participants) {
@@ -169,14 +183,28 @@ public class PlayableBattleService {
         }
     }
 
-    private static int stars(int totalRounds, int waveCount) {
-        if (totalRounds <= 5 * waveCount) return 3;
-        if (totalRounds <= 10 * waveCount) return 2;
+    static int starsForDuration(long totalDurationMs, int waveCount) {
+        if (totalDurationMs < 0 || waveCount <= 0) throw new IllegalArgumentException("invalid campaign duration/wave count");
+        if (totalDurationMs <= Math.multiplyExact(THREE_STAR_MAX_DURATION_PER_WAVE_MS, waveCount)) return 3;
+        if (totalDurationMs <= Math.multiplyExact(TWO_STAR_MAX_DURATION_PER_WAVE_MS, waveCount)) return 2;
         return 1;
     }
 
-    public record CampaignWaveResult(int waveIndex, long waveSeed, List<BattleParticipant> participants, BattleResult battle) {}
+    /**
+     * `battle` is a legacy projection for existing Unity builds. `realtimeBattle` is authoritative.
+     */
+    public record CampaignWaveResult(
+            int waveIndex,
+            long waveSeed,
+            List<BattleParticipant> participants,
+            BattleResult battle,
+            RealtimeBattleResult realtimeBattle
+    ) {}
 
+    /**
+     * Existing response properties remain intact; `realtimeBattle` is additive so old Unity clients can ignore it
+     * while M49 migrates playback to timestamped events.
+     */
     public record PlayBattleResult(
             UUID battleId,
             String stageId,
@@ -196,6 +224,7 @@ public class PlayableBattleService {
             String passiveProfileVersion,
             List<CampaignWaveResult> waves,
             List<BattleParticipant> participants,
-            BattleResult battle
+            BattleResult battle,
+            RealtimeBattleResult realtimeBattle
     ) {}
 }
