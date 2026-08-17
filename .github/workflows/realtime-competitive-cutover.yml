@@ -1,0 +1,25 @@
+name: Realtime Competitive Cutover
+
+on:
+  pull_request:
+    paths:
+      - 'server/src/main/java/com/ninjaassemble/pvp/application/**'
+      - 'client-unity/Assets/Scripts/Game/Network/**'
+      - 'client-unity/Assets/Scripts/Game/Playable/**'
+      - 'scripts/validate-realtime-competitive-cutover.py'
+      - 'scripts/validate-realtime-unity-replay.py'
+      - '.github/workflows/realtime-competitive-cutover.yml'
+  workflow_dispatch:
+
+jobs:
+  validate-cutover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate competitive realtime cutover
+        run: python scripts/validate-realtime-competitive-cutover.py
+      - name: Validate Unity realtime replay integration
+        run: python scripts/validate-realtime-unity-replay.py
