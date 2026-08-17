@@ -58,13 +58,15 @@ namespace NinjaAssemble.Playable
         public async Task<ArenaBattleDto> FightArenaAsync(string opponentPlayerId)
         {
             if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
-            ArenaBattleDto result = await api.FightArenaAsync(PlayerId, opponentPlayerId); await Task.WhenAll(RefreshArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
+            ArenaBattleDto result = RealtimeBattleDtoCompatibility.Promote(await api.FightArenaAsync(PlayerId, opponentPlayerId));
+            await Task.WhenAll(RefreshArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync());
+            return result;
         }
         public async Task<ShadowArenaBattleDto> FightShadowArenaAsync(string opponentPlayerId)
         {
             if (ShadowArena?.eligible != true) throw new InvalidOperationException("Shadow Arena requires 15 owned ninja");
             if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
-            ShadowArenaBattleDto result = await api.FightShadowArenaAsync(PlayerId, opponentPlayerId);
+            ShadowArenaBattleDto result = RealtimeBattleDtoCompatibility.Promote(await api.FightShadowArenaAsync(PlayerId, opponentPlayerId));
             await Task.WhenAll(RefreshShadowArenaAsync(), RefreshShopAsync());
             return result;
         }
