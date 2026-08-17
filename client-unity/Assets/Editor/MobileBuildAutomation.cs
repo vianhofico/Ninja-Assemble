@@ -42,7 +42,7 @@ namespace NinjaAssemble.EditorTools
             if (scenes.Length == 0) throw new BuildFailedException("No enabled mobile scenes were generated.");
 
             ConfigurePlayerSettings();
-            ApplyVersionFromEnvironment();
+            ApplyVersion();
             ConfigureSigning(release);
 
             string buildRoot = Path.GetFullPath(Path.Combine(Application.dataPath, "../../builds/android"));
@@ -87,17 +87,23 @@ namespace NinjaAssemble.EditorTools
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
         }
 
-        private static void ApplyVersionFromEnvironment()
+        private static void ApplyVersion()
         {
-            string version = Environment.GetEnvironmentVariable("NINJA_BUILD_VERSION");
+            string version = FirstNonBlank(
+                Environment.GetEnvironmentVariable("NINJA_BUILD_VERSION"),
+                CommandLineValue("buildVersion"),
+                CommandLineValue("ninjaBuildVersion"));
             if (!string.IsNullOrWhiteSpace(version)) PlayerSettings.bundleVersion = version.Trim();
 
-            string code = Environment.GetEnvironmentVariable("NINJA_ANDROID_VERSION_CODE");
+            string code = FirstNonBlank(
+                Environment.GetEnvironmentVariable("NINJA_ANDROID_VERSION_CODE"),
+                CommandLineValue("androidVersionCode"),
+                CommandLineValue("ninjaAndroidVersionCode"));
             if (!string.IsNullOrWhiteSpace(code))
             {
                 int parsed;
                 if (!int.TryParse(code, out parsed) || parsed <= 0)
-                    throw new BuildFailedException("NINJA_ANDROID_VERSION_CODE must be a positive integer.");
+                    throw new BuildFailedException("Android versionCode must be a positive integer.");
                 PlayerSettings.Android.bundleVersionCode = parsed;
             }
         }
@@ -110,9 +116,13 @@ namespace NinjaAssemble.EditorTools
                 return;
             }
 
-            string relative = RequireEnvironment("NINJA_ANDROID_KEYSTORE_RELATIVE");
+            string configuredPath = RequireValue("Android keystore",
+                Environment.GetEnvironmentVariable("NINJA_ANDROID_KEYSTORE_RELATIVE"),
+                CommandLineValue("androidKeystoreName"));
             string projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            string keystore = Path.GetFullPath(Path.Combine(projectRoot, relative));
+            string keystore = Path.IsPathRooted(configuredPath)
+                ? Path.GetFullPath(configuredPath)
+                : Path.GetFullPath(Path.Combine(projectRoot, configuredPath));
             string rootPrefix = projectRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar;
             if (!keystore.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
                 throw new BuildFailedException("Release keystore must be materialized inside the Unity project workspace.");
@@ -120,22 +130,55 @@ namespace NinjaAssemble.EditorTools
 
             PlayerSettings.Android.useCustomKeystore = true;
             PlayerSettings.Android.keystoreName = keystore;
-            PlayerSettings.Android.keystorePass = RequireEnvironment("NINJA_ANDROID_KEYSTORE_PASS");
-            PlayerSettings.Android.keyaliasName = RequireEnvironment("NINJA_ANDROID_KEYALIAS_NAME");
-            PlayerSettings.Android.keyaliasPass = RequireEnvironment("NINJA_ANDROID_KEYALIAS_PASS");
+            PlayerSettings.Android.keystorePass = RequireValue("Android keystore password",
+                Environment.GetEnvironmentVariable("NINJA_ANDROID_KEYSTORE_PASS"),
+                CommandLineValue("androidKeystorePass"));
+            PlayerSettings.Android.keyaliasName = RequireValue("Android key alias",
+                Environment.GetEnvironmentVariable("NINJA_ANDROID_KEYALIAS_NAME"),
+                CommandLineValue("androidKeyaliasName"));
+            PlayerSettings.Android.keyaliasPass = RequireValue("Android key alias password",
+                Environment.GetEnvironmentVariable("NINJA_ANDROID_KEYALIAS_PASS"),
+                CommandLineValue("androidKeyaliasPass"));
         }
 
-        private static string RequireEnvironment(string name)
+        private static string RequireValue(string label, params string[] values)
         {
-            string value = Environment.GetEnvironmentVariable(name);
-            if (string.IsNullOrWhiteSpace(value)) throw new BuildFailedException(name + " is required for release Android signing.");
+            string value = FirstNonBlank(values);
+            if (string.IsNullOrWhiteSpace(value)) throw new BuildFailedException(label + " is required for release Android signing.");
             return value.Trim();
+        }
+
+        private static string FirstNonBlank(params string[] values)
+        {
+            if (values == null) return null;
+            foreach (string value in values)
+                if (!string.IsNullOrWhiteSpace(value)) return value;
+            return null;
+        }
+
+        private static string CommandLineValue(string key)
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            string expected = "-" + key;
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i] ?? string.Empty;
+                if (string.Equals(arg, expected, StringComparison.OrdinalIgnoreCase))
+                    return i + 1 < args.Length ? args[i + 1] : string.Empty;
+                string prefix = expected + "=";
+                if (arg.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return arg.Substring(prefix.Length);
+            }
+            return null;
         }
 
         private static void WriteBuildMetadata(BuildReport report, bool release, string output, string[] scenes)
         {
             string buildRoot = Path.GetDirectoryName(output) ?? throw new BuildFailedException("Invalid Android build output path.");
             string metadataPath = Path.Combine(buildRoot, "build-metadata.json");
+            string commit = FirstNonBlank(
+                Environment.GetEnvironmentVariable("NINJA_BUILD_COMMIT"),
+                CommandLineValue("ninjaBuildCommit"),
+                Environment.GetEnvironmentVariable("GITHUB_SHA")) ?? string.Empty;
             var metadata = new BuildMetadata
             {
                 artifactType = release ? "AAB" : "APK",
@@ -144,7 +187,7 @@ namespace NinjaAssemble.EditorTools
                 applicationId = ApplicationId,
                 bundleVersion = PlayerSettings.bundleVersion,
                 versionCode = PlayerSettings.Android.bundleVersionCode,
-                gitCommit = Environment.GetEnvironmentVariable("NINJA_BUILD_COMMIT") ?? string.Empty,
+                gitCommit = commit,
                 outputFile = Path.GetFileName(output),
                 totalSizeBytes = report.summary.totalSize.ToString(),
                 durationSeconds = report.summary.totalTime.TotalSeconds,
