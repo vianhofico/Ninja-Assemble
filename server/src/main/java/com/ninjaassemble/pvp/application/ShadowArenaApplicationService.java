@@ -3,11 +3,13 @@ package com.ninjaassemble.pvp.application;
 import com.ninjaassemble.battle.domain.BattleRules;
 import com.ninjaassemble.battle.domain.ShadowArenaSeries;
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
-import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleCompatibilityAdapter;
+import com.ninjaassemble.battle.sim.RealtimeBattleExecutor;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
+import com.ninjaassemble.battle.sim.RealtimeBattleResult;
+import com.ninjaassemble.battle.sim.RealtimeBattleRuleset;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.economy.domain.Currency;
@@ -39,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public final class ShadowArenaApplicationService {
     public static final String SEASON_ID = "shadow-s1-experimental";
-    public static final String SERIES_RULES_VERSION = "bo3-hp-power-tiebreak-v1";
+    public static final String SERIES_RULES_VERSION = "bo3-hp-power-tiebreak-realtime-v2";
     public static final String REWARD_PROFILE_VERSION = "shadow-reward-design-v1";
     private static final long INITIAL_RATING = 1_000;
     private static final long WIN_COINS = 50;
@@ -52,7 +54,8 @@ public final class ShadowArenaApplicationService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleExecutor engine = new RealtimeBattleExecutor();
+    private final RealtimeBattleRuleset ruleset = RealtimeBattleRuleset.experimentalV1();
     private final ShadowArenaMatchResolver seriesResolver = new ShadowArenaMatchResolver();
 
     public ShadowArenaApplicationService(PlayerService players, HeroOwnershipService ownership,
@@ -124,7 +127,6 @@ public final class ShadowArenaApplicationService {
         long opponentRating = training ? ratingBefore : ensureProfile(opponentPlayerId, opponentRoster);
         long masterSeed = secureRandom.nextLong();
         SplittableRandom waveSeeds = new SplittableRandom(masterSeed);
-        BattleRuleset ruleset = BattleRuleset.experimentalV1();
         List<Boolean> wins = new ArrayList<>();
         List<ShadowSquadBattleView> squadBattles = new ArrayList<>();
         ShadowArenaSeries.SeriesWinner winner = ShadowArenaSeries.SeriesWinner.UNDECIDED;
@@ -133,10 +135,13 @@ public final class ShadowArenaApplicationService {
             List<OwnedHeroView> opponentSquad = opponentRoster.subList(squadIndex * 5, squadIndex * 5 + 5);
             long squadSeed = waveSeeds.nextLong();
             SquadBuild build = buildSquadBattle(playerSquad, opponentSquad, squadIndex);
-            BattleResult battle = engine.simulate(new BattleRequest(squadSeed, ruleset, build.units()));
-            SquadDecision decision = squadDecision(battle, build.participants(), playerSquad, opponentSquad);
+            RealtimeBattleResult realtimeBattle = engine.simulate(new RealtimeBattleRequest(squadSeed, ruleset, build.units()));
+            BattleResult compatibilityBattle = RealtimeBattleCompatibilityAdapter.project(realtimeBattle, ruleset);
+            SquadDecision decision = squadDecision(realtimeBattle, build.participants(), playerSquad, opponentSquad);
             wins.add(decision.playerWon());
-            squadBattles.add(new ShadowSquadBattleView(squadIndex + 1, squadSeed, decision.playerWon(), decision.tiebreak(), build.participants(), battle));
+            squadBattles.add(new ShadowSquadBattleView(
+                    squadIndex + 1, squadSeed, decision.playerWon(), decision.tiebreak(),
+                    build.participants(), compatibilityBattle, realtimeBattle));
             winner = seriesResolver.resolve(wins);
         }
         if (winner == ShadowArenaSeries.SeriesWinner.UNDECIDED) throw new IllegalStateException("Shadow Arena series failed to resolve after three squads");
@@ -191,7 +196,7 @@ public final class ShadowArenaApplicationService {
         }
     }
 
-    private static SquadDecision squadDecision(BattleResult battle, List<BattleParticipant> participants, List<OwnedHeroView> playerSquad, List<OwnedHeroView> opponentSquad) {
+    private static SquadDecision squadDecision(RealtimeBattleResult battle, List<BattleParticipant> participants, List<OwnedHeroView> playerSquad, List<OwnedHeroView> opponentSquad) {
         if (battle.outcome() == BattleOutcome.TEAM_A) return new SquadDecision(true, "NONE");
         if (battle.outcome() == BattleOutcome.TEAM_B) return new SquadDecision(false, "NONE");
         long playerHp = remainingHp(battle, participants, TeamSide.A);
@@ -203,7 +208,7 @@ public final class ShadowArenaApplicationService {
         return new SquadDecision(true, "PLAYER_SEED_ORDER");
     }
 
-    private static long remainingHp(BattleResult battle, List<BattleParticipant> participants, TeamSide side) {
+    private static long remainingHp(RealtimeBattleResult battle, List<BattleParticipant> participants, TeamSide side) {
         return participants.stream().filter(it -> it.side() == side).mapToLong(it -> battle.finalHp().getOrDefault(it.battleUnitId(), 0L)).sum();
     }
     private static List<OwnedHeroView> roster(List<OwnedHeroView> owned) { return List.copyOf(owned.subList(0, BattleRules.SHADOW_ROSTER_SIZE)); }
@@ -225,7 +230,14 @@ public final class ShadowArenaApplicationService {
         return "{\"version\":\"shadow-roster-auto-v1\",\"squads\":" + squads + "}";
     }
     private static String squadResultsJson(long masterSeed, ArenaRatingCalculator.RatingResult rating, List<ShadowSquadBattleView> battles) {
-        String rows = battles.stream().map(value -> "{\"squad\":" + value.squadIndex() + ",\"seed\":" + value.seed() + ",\"playerWon\":" + value.playerWon() + ",\"tiebreak\":\"" + value.tiebreak() + "\",\"outcome\":\"" + value.battle().outcome().name() + "\",\"rounds\":" + value.battle().rounds() + "}").collect(Collectors.joining(",", "[", "]"));
+        String rows = battles.stream().map(value -> "{\"squad\":" + value.squadIndex()
+                + ",\"seed\":" + value.seed()
+                + ",\"playerWon\":" + value.playerWon()
+                + ",\"tiebreak\":\"" + value.tiebreak()
+                + "\",\"outcome\":\"" + value.realtimeBattle().outcome().name()
+                + "\",\"durationMs\":" + value.realtimeBattle().durationMs()
+                + ",\"rulesetVersion\":\"" + escape(value.realtimeBattle().rulesetVersion()) + "\"}")
+                .collect(Collectors.joining(",", "[", "]"));
         return "{\"masterSeed\":" + masterSeed + ",\"seriesRulesVersion\":\"" + SERIES_RULES_VERSION + "\",\"ratingBefore\":" + rating.before() + ",\"ratingAfter\":" + rating.after() + ",\"squads\":" + rows + "}";
     }
     private static String escape(String value) { return value.replace("\\", "\\\\").replace("\"", "\\\""); }
@@ -235,6 +247,8 @@ public final class ShadowArenaApplicationService {
     private record SquadDecision(boolean playerWon, String tiebreak) {}
     public record ShadowArenaState(String seasonId, boolean eligible, int ownedCount, int requiredCount, int missingCount, long rating, String ratingProfileVersion, String seriesRulesVersion, String rewardProfileVersion, List<ShadowOpponentView> opponents) {}
     public record ShadowOpponentView(UUID playerId, String displayName, long rating, long totalPower, boolean training) {}
-    public record ShadowSquadBattleView(int squadIndex, long seed, boolean playerWon, String tiebreak, List<BattleParticipant> participants, BattleResult battle) {}
+    public record ShadowSquadBattleView(
+            int squadIndex, long seed, boolean playerWon, String tiebreak,
+            List<BattleParticipant> participants, BattleResult battle, RealtimeBattleResult realtimeBattle) {}
     public record ShadowArenaBattleView(UUID battleId, String seasonId, boolean training, UUID opponentPlayerId, long opponentRating, long opponentPower, long masterSeed, String winner, long ratingBefore, long ratingAfter, long ratingDelta, String ratingProfileVersion, String seriesRulesVersion, long shadowCoinReward, String rewardProfileVersion, String combatStatsVersion, String abilityProfileVersion, String techniqueMappingVersion, String passiveProfileVersion, List<ShadowSquadBattleView> squads) {}
 }
