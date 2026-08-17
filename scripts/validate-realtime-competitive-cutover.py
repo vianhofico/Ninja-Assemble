@@ -19,7 +19,8 @@ def forbid(path: str, *tokens: str) -> None:
 
 
 def main() -> int:
-    engine = "server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java"
+    engine = "server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java"
+    request = "server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java"
     rules = "server/src/main/java/com/ninjaassemble/battle/sim/BattleRuleset.java"
     arena = "server/src/main/java/com/ninjaassemble/pvp/application/ArenaApplicationService.java"
     shadow = "server/src/main/java/com/ninjaassemble/pvp/application/ShadowArenaApplicationService.java"
@@ -27,19 +28,22 @@ def main() -> int:
     require(engine,
             "Authoritative deterministic continuous-time auto-combat simulation",
             "PriorityQueue<ScheduledEvent>", "ScheduledType", "timestampMs", "RAGE_SKILL_READY")
-    forbid(engine, "for (int round", "maxRounds", "durationTurns")
+    forbid(engine, "for (int round", "maxRounds", "durationTurns", "BattleRequest")
+    require(request, "record RealtimeBattleRequest", "BattleRuleset ruleset", "List<BattleUnitSeed> units")
     require(rules, "maxBattleDurationMs", "attackIntervalMs", "rageSkillCost")
     forbid(rules, "maxRounds")
 
-    require(arena, "DeterministicBattleEngine", "BattleRuleset.experimentalV1()", "battle.outcome()", "Currency.ARENA_COIN")
-    require(shadow, "DeterministicBattleEngine", "BattleRuleset.experimentalV1()", "durationMs()", "TOTAL_HP", "SQUAD_POWER")
+    require(arena, "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "battle.outcome()", "Currency.ARENA_COIN")
+    require(shadow, "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "durationMs()", "TOTAL_HP", "SQUAD_POWER")
+    forbid(arena, "DeterministicBattleEngine", "new BattleRequest(")
+    forbid(shadow, "DeterministicBattleEngine", "new BattleRequest(")
 
     require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
             "timestampMs", "durationMs", "ArenaBattleDto", "ShadowSquadBattleDto")
     require("client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs",
             "Time.unscaledDeltaTime", "SetPlaybackSpeed")
 
-    print("REALTIME_COMPETITIVE_OK shared_core=1 arena=1 shadow=1 timestamp_replay=1")
+    print("REALTIME_COMPETITIVE_OK shared_core=RealtimeBattleEngine arena=1 shadow=1 timestamp_replay=1")
     return 0
 
 
