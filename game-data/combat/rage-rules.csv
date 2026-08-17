@@ -1,0 +1,2 @@
+ruleset_id,max_rage,initial_rage,default_basic_gain,rage_on_damage_taken,rage_on_kill,rage_on_crit,rage_on_ally_ko,rage_skill_cost,rage_full_cast_mode,status,evidence_ref,notes
+experimental-rage-v1,100,0,15,0,0,0,0,100,NEXT_VALID_ACTION,EXPERIMENTAL,,Architecture locked; exact gains require parity evidence

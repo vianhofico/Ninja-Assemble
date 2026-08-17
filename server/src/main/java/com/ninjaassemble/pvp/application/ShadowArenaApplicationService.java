@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public final class ShadowArenaApplicationService {
     public static final String SEASON_ID = "shadow-s1-experimental";
-    public static final String SERIES_RULES_VERSION = "bo3-hp-power-tiebreak-v1";
+    public static final String SERIES_RULES_VERSION = "bo3-hp-power-realtime-v2";
     public static final String REWARD_PROFILE_VERSION = "shadow-reward-design-v1";
     private static final long INITIAL_RATING = 1_000;
     private static final long WIN_COINS = 50;
@@ -225,7 +225,7 @@ public final class ShadowArenaApplicationService {
         return "{\"version\":\"shadow-roster-auto-v1\",\"squads\":" + squads + "}";
     }
     private static String squadResultsJson(long masterSeed, ArenaRatingCalculator.RatingResult rating, List<ShadowSquadBattleView> battles) {
-        String rows = battles.stream().map(value -> "{\"squad\":" + value.squadIndex() + ",\"seed\":" + value.seed() + ",\"playerWon\":" + value.playerWon() + ",\"tiebreak\":\"" + value.tiebreak() + "\",\"outcome\":\"" + value.battle().outcome().name() + "\",\"rounds\":" + value.battle().rounds() + "}").collect(Collectors.joining(",", "[", "]"));
+        String rows = battles.stream().map(value -> "{\"squad\":" + value.squadIndex() + ",\"seed\":" + value.seed() + ",\"playerWon\":" + value.playerWon() + ",\"tiebreak\":\"" + value.tiebreak() + "\",\"outcome\":\"" + value.battle().outcome().name() + "\",\"durationMs\":" + value.battle().durationMs() + "}").collect(Collectors.joining(",", "[", "]"));
         return "{\"masterSeed\":" + masterSeed + ",\"seriesRulesVersion\":\"" + SERIES_RULES_VERSION + "\",\"ratingBefore\":" + rating.before() + ",\"ratingAfter\":" + rating.after() + ",\"squads\":" + rows + "}";
     }
     private static String escape(String value) { return value.replace("\\", "\\\\").replace("\"", "\\\""); }

@@ -6,423 +6,567 @@ import com.ninjaassemble.hero.domain.SkillEffectDefinition;
 import com.ninjaassemble.hero.domain.TargetSelector;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Set;
-import java.util.SplittableRandom;
 
+/**
+ * Authoritative deterministic continuous-time auto-combat simulation.
+ *
+ * <p>There is intentionally no global turn/round loop. Every actor owns an independent action timeline and the
+ * simulator advances directly to the next scheduled logical event. "Simultaneous" combat is represented by one
+ * stable priority queue, not by Java threads.</p>
+ */
 public final class DeterministicBattleEngine {
+    private static final int MAX_RAGE = 100;
     private static final Set<String> DOT_STATUSES = Set.of("BURN", "POISON", "BLEED");
-    private static final Set<String> CONTROL_STATUSES = Set.of("STUN", "SILENCE");
+    private static final Set<String> NEGATIVE_STATUSES = Set.of("STUN", "SILENCE", "BURN", "POISON", "BLEED", "ATK_DOWN", "DEF_DOWN", "SPEED_DOWN");
+    private static final Set<String> POSITIVE_STATUSES = Set.of("ATK_UP", "DEF_UP", "SPEED_UP");
 
     public BattleResult simulate(BattleRequest request) {
-        SplittableRandom random = new SplittableRandom(request.seed());
-        List<State> states = request.units().stream().map(State::new).toList();
-        EventSink sink = new EventSink();
-        sink.emit(BattleEventType.BATTLE_START, 0, null, null, 0, false, null, null, null, -1, null, null, 0);
+        if (request == null || request.ruleset() == null || request.units() == null || request.units().isEmpty()) {
+            throw new IllegalArgumentException("battle request/ruleset/units required");
+        }
+        Context ctx = new Context(request.seed(), request.ruleset(), request.units());
+        ctx.emit(0, BattleEventType.BATTLE_START, null, null, 0, false, null, null, null, 0, null, null, 0, null);
 
-        states.stream().sorted(Comparator.comparing(State::side).thenComparingInt(State::slot))
-                .forEach(owner -> triggerPassives(owner, PassiveTrigger.BATTLE_START, states, request.ruleset(), random, 0, sink));
-
-        int completedRounds = 0;
-        for (int round = 1; round <= request.ruleset().maxRounds(); round++) {
-            if (winner(states) != null) break;
-            completedRounds = round;
-            sink.emit(BattleEventType.ROUND_START, round, null, null, 0, false, null, null, null, -1, null, null, 0);
-            List<State> order = states.stream().filter(State::alive)
-                    .sorted(Comparator.comparingInt(State::speed).reversed().thenComparing(State::side).thenComparingInt(State::slot))
-                    .toList();
-
-            for (State actor : order) {
-                if (!actor.alive() || winner(states) != null) continue;
-                processTurnStart(actor, states, request.ruleset(), random, round, sink);
-                if (!actor.alive()) {
-                    actor.advanceStatuses();
-                    continue;
+        for (UnitState unit : ctx.units.values()) {
+            ctx.triggerPassives(PassiveTrigger.BATTLE_START, unit, null, 0, false);
+        }
+        for (UnitState unit : ctx.units.values()) {
+            for (BattlePassive passive : unit.seed.passives()) {
+                if (passive.trigger() == PassiveTrigger.TIME_INTERVAL) {
+                    ctx.schedule(new ScheduledEvent(passive.intervalMs(), ScheduledType.PASSIVE_INTERVAL, unit.stableOrder(), ctx.nextScheduleSequence(), unit.seed.id(), null, passive.id(), 0));
                 }
+            }
+            ctx.initializeCooldowns(unit);
+            ctx.scheduleAction(unit, ctx.ruleset.attackIntervalMs(ctx.effectiveSpeed(unit)), 0);
+        }
 
-                triggerPassives(actor, PassiveTrigger.TURN_START, states, request.ruleset(), random, round, sink);
-                triggerPassives(actor, PassiveTrigger.SELF_LOW_HP, states, request.ruleset(), random, round, sink);
-
-                if (actor.hasStatus("STUN")) {
-                    sink.emit(BattleEventType.TURN_SKIPPED, round, actor.id(), actor.id(), 0, false,
-                            null, null, null, actor.energy, "STATUS", "STUN", actor.statusDuration("STUN"));
-                    actor.advanceStatuses();
-                    continue;
-                }
-
-                boolean silenced = actor.hasStatus("SILENCE");
-                BattleAbility ability = actor.nextAbility(silenced);
-                int energyAfter = actor.applyEnergy(ability.energyDelta());
-                List<SkillEffectDefinition> effects = ability.effects().isEmpty() ? List.of(fallbackDamage(ability)) : ability.effects();
-                State primaryTarget = firstTarget(effects, states, actor, random, false);
-                sink.emit(BattleEventType.ATTACK, round, actor.id(), primaryTarget == null ? null : primaryTarget.id(), 0, false,
-                        ability.id(), ability.kind(), ability.effectKey(), energyAfter, null, null, 0);
-
-                for (SkillEffectDefinition effect : effects) {
-                    applyEffect(effect, ability, actor, states, request.ruleset(), random, round, sink, false);
-                    if (winner(states) != null) break;
-                }
-                actor.advanceStatuses();
+        long currentTimeMs = 0;
+        while (!ctx.queue.isEmpty()) {
+            ScheduledEvent scheduled = ctx.queue.poll();
+            if (scheduled.timestampMs > ctx.ruleset.maxBattleDurationMs()) {
+                currentTimeMs = ctx.ruleset.maxBattleDurationMs();
+                break;
+            }
+            currentTimeMs = scheduled.timestampMs;
+            ctx.currentTimeMs = currentTimeMs;
+            ctx.processScheduled(scheduled);
+            BattleOutcome terminal = ctx.terminalOutcome();
+            if (terminal != null) {
+                ctx.emit(currentTimeMs, BattleEventType.BATTLE_END, null, null, 0, false, null, null, null, 0, terminal.name(), null, 0, null);
+                return ctx.result(terminal, currentTimeMs);
             }
         }
 
-        BattleOutcome outcome = outcome(states);
-        sink.emit(BattleEventType.BATTLE_END, completedRounds, null, null, 0, false, null, null, null, -1, null, null, 0);
-        Map<String, Long> hp = new LinkedHashMap<>();
-        states.stream().sorted(Comparator.comparing(State::side).thenComparingInt(State::slot)).forEach(it -> hp.put(it.id(), it.hp));
-        return new BattleResult(request.seed(), request.ruleset().version(), outcome, completedRounds, List.copyOf(sink.events), Map.copyOf(hp));
+        BattleOutcome timeout = ctx.resolveTimeout();
+        ctx.emit(currentTimeMs, BattleEventType.BATTLE_END, null, null, 0, false, null, null, null, 0, "TIMEOUT:" + timeout.name(), null, 0, null);
+        return ctx.result(timeout, currentTimeMs);
     }
 
-    private static SkillEffectDefinition fallbackDamage(BattleAbility ability) {
-        return new SkillEffectDefinition(EffectType.DAMAGE, TargetSelector.FRONTMOST_ENEMY, ability.channel(),
-                ability.coefficientBps(), 0, null, 10_000, 0);
-    }
+    private enum ScheduledType { ACTION_READY, CAST_COMPLETE, STATUS_TICK, STATUS_EXPIRE, PASSIVE_INTERVAL }
 
-    private static void processTurnStart(State actor, List<State> states, BattleRuleset rules, SplittableRandom random,
-                                         int round, EventSink sink) {
-        for (StatusState status : List.copyOf(actor.statuses.values())) {
-            if (!DOT_STATUSES.contains(status.id) || status.tickAmount <= 0 || !actor.alive()) continue;
-            DamageResult damage = actor.damage(status.tickAmount);
-            if (damage.shieldAbsorbed > 0) {
-                sink.emit(BattleEventType.SHIELD_ABSORB, round, actor.id(), actor.id(), damage.shieldAbsorbed, false,
-                        null, null, null, actor.energy, "STATUS", status.id, status.remainingTurns);
-            }
-            sink.emit(BattleEventType.STATUS_TICK, round, actor.id(), actor.id(), damage.hpDamage, false,
-                    null, null, null, actor.energy, "STATUS", status.id, status.remainingTurns);
-            if (actor.alive()) {
-                triggerPassives(actor, PassiveTrigger.AFTER_DAMAGE_TAKEN, states, rules, random, round, sink);
-                triggerPassives(actor, PassiveTrigger.SELF_LOW_HP, states, rules, random, round, sink);
-            } else {
-                sink.emit(BattleEventType.KO, round, actor.id(), actor.id(), 0, false,
-                        null, null, null, actor.energy, "STATUS", status.id, status.remainingTurns);
-                triggerAllyKo(actor, states, rules, random, round, sink);
-            }
-        }
-    }
+    private record ScheduledEvent(long timestampMs, ScheduledType type, String stableOrder, long sequence,
+                                  String actorId, String targetId, String payload, long token) {}
 
-    private static void triggerPassives(State owner, PassiveTrigger trigger, List<State> states, BattleRuleset rules,
-                                        SplittableRandom random, int round, EventSink sink) {
-        if (!owner.alive()) return;
-        for (BattlePassive passive : owner.seed.passives()) {
-            if (passive.trigger() != trigger) continue;
-            if (passive.oncePerBattle() && owner.firedPassives.contains(passive.id())) continue;
-            if (trigger == PassiveTrigger.SELF_LOW_HP) {
-                int threshold = passive.thresholdBps();
-                if (threshold <= 0 || owner.hp * 10_000L > owner.seed.maxHp() * (long) threshold) continue;
-            }
-            if (passive.oncePerBattle()) owner.firedPassives.add(passive.id());
-            BattleAbility wrapper = new BattleAbility(
-                    passive.id(), BattleAbilityKind.PASSIVE, owner.seed.primaryChannel(), 10_000, 0,
-                    "vfx/passives/" + passive.id(), passive.effects());
-            sink.emitPassive(round, owner.id(), passive.id(), trigger, owner.energy);
-            for (SkillEffectDefinition effect : passive.effects()) {
-                applyEffect(effect, wrapper, owner, states, rules, random, round, sink, true);
-            }
-        }
-    }
-
-    private static void triggerAllyKo(State defeated, List<State> states, BattleRuleset rules, SplittableRandom random,
-                                      int round, EventSink sink) {
-        states.stream().filter(State::alive).filter(it -> it.side() == defeated.side()).filter(it -> it != defeated)
-                .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id))
-                .forEach(owner -> triggerPassives(owner, PassiveTrigger.ALLY_KO, states, rules, random, round, sink));
-    }
-
-    private static State firstTarget(List<SkillEffectDefinition> effects, List<State> states, State actor,
-                                     SplittableRandom random, boolean consumeRandom) {
-        for (SkillEffectDefinition effect : effects) {
-            List<State> resolved = targets(effect, states, actor, random, consumeRandom);
-            if (!resolved.isEmpty()) return resolved.get(0);
-        }
-        return null;
-    }
-
-    private static void applyEffect(SkillEffectDefinition effect, BattleAbility ability, State actor, List<State> states,
-                                    BattleRuleset rules, SplittableRandom random, int round, EventSink sink,
-                                    boolean passiveContext) {
-        List<State> resolved = targets(effect, states, actor, random, true);
-        for (State target : resolved) {
-            switch (effect.type()) {
-                case DAMAGE -> applyDamage(effect, ability, actor, target, states, rules, random, round, sink, passiveContext);
-                case HEAL -> applyHeal(effect, ability, actor, target, round, sink);
-                case SHIELD -> applyShield(effect, ability, actor, target, round, sink);
-                case ENERGY -> applyEnergy(effect, ability, actor, target, round, sink);
-                case STATUS -> applyStatus(effect, ability, actor, target, random, round, sink);
-                case CLEANSE -> applyCleanse(ability, actor, target, round, sink, true);
-                case DISPEL -> applyCleanse(ability, actor, target, round, sink, false);
-                case REVIVE -> applyRevive(effect, ability, actor, target, round, sink);
-            }
-        }
-    }
-
-    private static void applyDamage(SkillEffectDefinition effect, BattleAbility ability, State actor, State target,
-                                    List<State> states, BattleRuleset rules, SplittableRandom random, int round,
-                                    EventSink sink, boolean passiveContext) {
-        DamageChannel channel = effect.channel() == null ? ability.channel() : effect.channel();
-        int coefficient = effect.coefficientBps() > 0 ? effect.coefficientBps() : ability.coefficientBps();
-        boolean critical = rollCritical(random, actor.seed, channel);
-        long damage = damage(actor, target, channel, coefficient, effect.flatAmount(), rules, critical);
-        DamageResult applied = target.damage(damage);
-        if (applied.shieldAbsorbed > 0) {
-            sink.emit(BattleEventType.SHIELD_ABSORB, round, actor.id(), target.id(), applied.shieldAbsorbed, critical,
-                    ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
-        }
-        sink.emit(BattleEventType.DAMAGE, round, actor.id(), target.id(), applied.hpDamage, critical,
-                ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
-        if (!target.alive()) {
-            sink.emit(BattleEventType.KO, round, actor.id(), target.id(), 0, false,
-                    ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
-        }
-
-        if (!passiveContext && applied.hpDamage > 0) {
-            if (actor.alive()) triggerPassives(actor, PassiveTrigger.AFTER_DAMAGE_DEALT, states, rules, random, round, sink);
-            if (target.alive()) {
-                triggerPassives(target, PassiveTrigger.AFTER_DAMAGE_TAKEN, states, rules, random, round, sink);
-                triggerPassives(target, PassiveTrigger.SELF_LOW_HP, states, rules, random, round, sink);
-            } else {
-                triggerAllyKo(target, states, rules, random, round, sink);
-            }
-        }
-    }
-
-    private static void applyHeal(SkillEffectDefinition effect, BattleAbility ability, State actor, State target, int round, EventSink sink) {
-        if (!target.alive()) return;
-        long requested = scaledAmount(actor, effect.channel() == null ? ability.channel() : effect.channel(), effect.coefficientBps(), effect.flatAmount());
-        long applied = target.heal(requested);
-        sink.emit(BattleEventType.HEAL, round, actor.id(), target.id(), applied, false,
-                ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
-    }
-
-    private static void applyShield(SkillEffectDefinition effect, BattleAbility ability, State actor, State target, int round, EventSink sink) {
-        if (!target.alive()) return;
-        long amount = scaledAmount(actor, effect.channel() == null ? ability.channel() : effect.channel(), effect.coefficientBps(), effect.flatAmount());
-        long applied = target.addShield(amount);
-        sink.emit(BattleEventType.SHIELD, round, actor.id(), target.id(), applied, false,
-                ability.id(), ability.kind(), ability.effectKey(), actor.energy, effect.type().name(), null, 0);
-    }
-
-    private static void applyEnergy(SkillEffectDefinition effect, BattleAbility ability, State actor, State target, int round, EventSink sink) {
-        int requested = Math.toIntExact(Math.max(-100, Math.min(100, effect.flatAmount())));
-        int before = target.energy;
-        int after = target.applyEnergy(requested);
-        sink.emit(BattleEventType.ENERGY, round, actor.id(), target.id(), after - before, false,
-                ability.id(), ability.kind(), ability.effectKey(), after, effect.type().name(), null, 0);
-    }
-
-    private static void applyStatus(SkillEffectDefinition effect, BattleAbility ability, State actor, State target,
-                                    SplittableRandom random, int round, EventSink sink) {
-        if (!target.alive() || effect.status() == null || effect.status().isBlank()) return;
-        int chance = effect.chanceBps() == 0 ? 10_000 : effect.chanceBps();
-        if (random.nextInt(10_000) >= chance) return;
-        String statusId = normalizeStatus(effect.status());
-        int duration = Math.max(1, effect.durationTurns());
-        long tickAmount = DOT_STATUSES.contains(statusId)
-                ? scaledAmount(actor, effect.channel() == null ? ability.channel() : effect.channel(), effect.coefficientBps(), effect.flatAmount())
-                : 0;
-        int modifierBps = DOT_STATUSES.contains(statusId) || CONTROL_STATUSES.contains(statusId) ? 0 : effect.coefficientBps();
-        target.applyStatus(new StatusState(statusId, duration, tickAmount, modifierBps, isNegativeStatus(statusId)));
-        sink.emit(BattleEventType.STATUS_APPLIED, round, actor.id(), target.id(), 0, false,
-                ability.id(), ability.kind(), ability.effectKey(), target.energy, effect.type().name(), statusId, duration);
-    }
-
-    private static void applyCleanse(BattleAbility ability, State actor, State target, int round, EventSink sink, boolean negative) {
-        for (String removed : target.removeStatuses(negative)) {
-            sink.emit(BattleEventType.STATUS_CLEANSED, round, actor.id(), target.id(), 0, false,
-                    ability.id(), ability.kind(), ability.effectKey(), target.energy,
-                    negative ? EffectType.CLEANSE.name() : EffectType.DISPEL.name(), removed, 0);
-        }
-    }
-
-    private static void applyRevive(SkillEffectDefinition effect, BattleAbility ability, State actor, State target, int round, EventSink sink) {
-        if (target.alive()) return;
-        long amount = effect.flatAmount() > 0 ? effect.flatAmount()
-                : Math.max(1, target.seed.maxHp() * Math.max(1, effect.coefficientBps()) / 10_000);
-        long restored = target.revive(amount);
-        sink.emit(BattleEventType.REVIVE, round, actor.id(), target.id(), restored, false,
-                ability.id(), ability.kind(), ability.effectKey(), target.energy, effect.type().name(), null, 0);
-    }
-
-    private static List<State> targets(SkillEffectDefinition effect, List<State> states, State actor,
-                                       SplittableRandom random, boolean consumeRandom) {
-        boolean revive = effect.type() == EffectType.REVIVE;
-        return switch (effect.target()) {
-            case SELF -> List.of(actor);
-            case FRONTMOST_ENEMY -> first(states.stream().filter(it -> it.side() != actor.side() && it.alive())
-                    .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id)).toList());
-            case LOWEST_HP_ENEMY -> first(states.stream().filter(it -> it.side() != actor.side() && it.alive())
-                    .sorted(Comparator.comparingDouble(State::hpRatio).thenComparing(State::id)).toList());
-            case RANDOM_ENEMY -> {
-                List<State> values = states.stream().filter(it -> it.side() != actor.side() && it.alive())
-                        .sorted(Comparator.comparing(State::id)).toList();
-                yield consumeRandom ? randomOne(values, random) : first(values);
-            }
-            case ALL_ENEMIES -> states.stream().filter(it -> it.side() != actor.side() && it.alive())
-                    .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id)).toList();
-            case LOWEST_HP_ALLY -> first(states.stream().filter(it -> it.side() == actor.side() && (revive ? !it.alive() : it.alive()))
-                    .sorted(Comparator.comparingDouble(State::hpRatio).thenComparing(State::id)).toList());
-            case ALL_ALLIES -> states.stream().filter(it -> it.side() == actor.side() && (revive ? !it.alive() : it.alive()))
-                    .sorted(Comparator.comparingInt(State::slot).thenComparing(State::id)).toList();
-        };
-    }
-
-    private static List<State> first(List<State> values) { return values.isEmpty() ? List.of() : List.of(values.get(0)); }
-
-    private static List<State> randomOne(List<State> values, SplittableRandom random) {
-        return values.isEmpty() ? List.of() : List.of(values.get(random.nextInt(values.size())));
-    }
-
-    private static boolean rollCritical(SplittableRandom random, BattleUnitSeed actor, DamageChannel channel) {
-        int chance = channel == DamageChannel.PHYSICAL ? actor.physicalCritBps() : actor.chakraCritBps();
-        return random.nextInt(10_000) < chance;
-    }
-
-    private static long damage(State actor, State target, DamageChannel channel, int coefficientBps, long flatAmount,
-                               BattleRuleset rules, boolean critical) {
-        long attack = actor.attack(channel);
-        long defense = target.defense(channel);
-        long raw = Math.max(1, Math.multiplyExact(attack, coefficientBps) / 10_000 + flatAmount);
-        long mitigated = Math.max(1, raw * rules.defenseScale() / (rules.defenseScale() + Math.max(0, defense)));
-        return critical ? Math.max(1, mitigated * rules.criticalMultiplierBps() / 10_000) : mitigated;
-    }
-
-    private static long scaledAmount(State actor, DamageChannel channel, int coefficientBps, long flatAmount) {
-        long scaled = coefficientBps <= 0 ? 0 : Math.multiplyExact(actor.attack(channel), coefficientBps) / 10_000;
-        return Math.max(0, scaled + flatAmount);
-    }
-
-    private static String normalizeStatus(String value) { return value.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_'); }
-
-    private static boolean isNegativeStatus(String status) {
-        return CONTROL_STATUSES.contains(status) || DOT_STATUSES.contains(status) || status.endsWith("_DOWN") || status.startsWith("DEBUFF_");
-    }
-
-    private static TeamSide winner(List<State> states) {
-        boolean a = states.stream().anyMatch(it -> it.alive() && it.side() == TeamSide.A);
-        boolean b = states.stream().anyMatch(it -> it.alive() && it.side() == TeamSide.B);
-        if (a == b) return null;
-        return a ? TeamSide.A : TeamSide.B;
-    }
-
-    private static BattleOutcome outcome(List<State> states) {
-        TeamSide winner = winner(states);
-        return winner == TeamSide.A ? BattleOutcome.TEAM_A : winner == TeamSide.B ? BattleOutcome.TEAM_B : BattleOutcome.DRAW;
-    }
-
-    private static final class EventSink {
+    private static final class Context {
+        private final long seed;
+        private final BattleRuleset ruleset;
+        private final Random random;
+        private final Map<String, UnitState> units = new LinkedHashMap<>();
         private final List<BattleEvent> events = new ArrayList<>();
-        private long sequence;
+        private final PriorityQueue<ScheduledEvent> queue;
+        private final Map<TeamSide, Long> damageDealt = new HashMap<>();
+        private long scheduleSequence;
+        private int eventSequence;
+        private long currentTimeMs;
 
-        private void emit(BattleEventType type, int round, String actorId, String targetId, long amount, boolean critical,
-                          String abilityId, BattleAbilityKind abilityKind, String effectKey, int energyAfter,
-                          String effectType, String statusId, int durationTurns) {
-            events.add(new BattleEvent(sequence++, type, round, actorId, targetId, amount, critical,
-                    abilityId, abilityKind, effectKey, energyAfter, effectType, statusId, durationTurns));
+        private Context(long seed, BattleRuleset ruleset, List<BattleUnitSeed> seeds) {
+            this.seed = seed;
+            this.ruleset = ruleset;
+            this.random = new Random(seed);
+            this.queue = new PriorityQueue<>(Comparator
+                    .comparingLong(ScheduledEvent::timestampMs)
+                    .thenComparingInt(it -> scheduledPriority(it.type()))
+                    .thenComparing(ScheduledEvent::stableOrder)
+                    .thenComparingLong(ScheduledEvent::sequence));
+            for (BattleUnitSeed seedUnit : seeds) {
+                if (units.putIfAbsent(seedUnit.id(), new UnitState(seedUnit)) != null) throw new IllegalArgumentException("duplicate unit id: " + seedUnit.id());
+            }
+            if (units.values().stream().noneMatch(it -> it.seed.side() == TeamSide.A) || units.values().stream().noneMatch(it -> it.seed.side() == TeamSide.B)) {
+                throw new IllegalArgumentException("both teams require at least one unit");
+            }
         }
 
-        private void emitPassive(int round, String ownerId, String passiveId, PassiveTrigger trigger, int energyAfter) {
-            events.add(new BattleEvent(sequence++, BattleEventType.PASSIVE_TRIGGER, round, ownerId, ownerId, 0, false,
-                    passiveId, BattleAbilityKind.PASSIVE, "vfx/passives/" + passiveId, energyAfter,
-                    "PASSIVE", null, 0, trigger.name()));
+        private static int scheduledPriority(ScheduledType type) {
+            return switch (type) {
+                case STATUS_TICK -> 10;
+                case STATUS_EXPIRE -> 20;
+                case CAST_COMPLETE -> 30;
+                case PASSIVE_INTERVAL -> 40;
+                case ACTION_READY -> 50;
+            };
+        }
+
+        private long nextScheduleSequence() { return ++scheduleSequence; }
+        private void schedule(ScheduledEvent event) { queue.add(event); }
+
+        private void initializeCooldowns(UnitState unit) {
+            BattleAbilitySet abilities = unit.seed.abilities();
+            unit.cooldownReadyAt.put(abilities.skill1().id(), abilities.skill1().cooldownMs());
+            unit.cooldownReadyAt.put(abilities.skill2().id(), abilities.skill2().cooldownMs());
+            unit.cooldownReadyAt.put(abilities.rageSkill().id(), 0L);
+        }
+
+        private void scheduleAction(UnitState unit, long timestampMs, long minimumTimestamp) {
+            if (!unit.alive()) return;
+            long when = Math.max(timestampMs, Math.max(minimumTimestamp, unit.actionLockUntilMs));
+            long token = ++unit.actionGeneration;
+            unit.nextActionAtMs = when;
+            schedule(new ScheduledEvent(when, ScheduledType.ACTION_READY, unit.stableOrder(), nextScheduleSequence(), unit.seed.id(), null, null, token));
+        }
+
+        private void processScheduled(ScheduledEvent event) {
+            UnitState actor = units.get(event.actorId());
+            switch (event.type()) {
+                case ACTION_READY -> {
+                    if (actor == null || !actor.alive() || event.token() != actor.actionGeneration) return;
+                    processActionReady(actor, event.timestampMs());
+                }
+                case CAST_COMPLETE -> {
+                    if (actor == null || !actor.alive() || event.token() != actor.castGeneration || actor.castingAbility == null) return;
+                    BattleAbility ability = actor.castingAbility;
+                    actor.castingAbility = null;
+                    emit(event.timestampMs(), BattleEventType.CAST_COMPLETE, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, 0, null);
+                    executeAbility(actor, ability, event.timestampMs());
+                }
+                case STATUS_TICK -> processStatusTick(event);
+                case STATUS_EXPIRE -> processStatusExpire(event);
+                case PASSIVE_INTERVAL -> processPassiveInterval(actor, event);
+            }
+        }
+
+        private void processActionReady(UnitState actor, long now) {
+            expireLazy(actor, now);
+            if (!actor.alive()) return;
+            if (actor.hasStatus("STUN", now)) {
+                long resume = Math.max(now + ruleset.aiDecisionIntervalMs(), actor.statuses.get("STUN").expiresAtMs);
+                emit(now, BattleEventType.ACTION_BLOCKED, actor.seed.id(), null, 0, false, null, null, null, actor.rage, null, "STUN", Math.max(0, resume - now), null);
+                scheduleAction(actor, resume, resume);
+                return;
+            }
+            if (now < actor.actionLockUntilMs) {
+                scheduleAction(actor, actor.actionLockUntilMs, actor.actionLockUntilMs);
+                return;
+            }
+
+            emit(now, BattleEventType.ACTION_READY, actor.seed.id(), null, 0, false, null, null, null, actor.rage, null, null, 0, null);
+            triggerPassives(PassiveTrigger.BEFORE_ACTION, actor, null, now, false);
+            boolean silenced = actor.hasStatus("SILENCE", now);
+            BattleAbility ability = chooseAbility(actor, now, silenced);
+            if (ability == null) {
+                scheduleAction(actor, now + ruleset.aiDecisionIntervalMs(), now);
+                return;
+            }
+            if (ability.kind() != BattleAbilityKind.BASIC && ability.kind() != BattleAbilityKind.RAGE_SKILL) {
+                actor.cooldownReadyAt.put(ability.id(), now + ability.cooldownMs());
+            }
+            if (ability.kind() == BattleAbilityKind.RAGE_SKILL) {
+                emit(now, BattleEventType.RAGE_SKILL_READY, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, 0, null);
+            }
+            triggerPassives(ability.kind() == BattleAbilityKind.RAGE_SKILL ? PassiveTrigger.RAGE_SKILL_CAST : PassiveTrigger.SKILL_CAST,
+                    actor, null, now, false);
+
+            actor.actionLockUntilMs = now + ability.castTimeMs() + ability.recoveryMs();
+            if (ability.castTimeMs() > 0) {
+                actor.castingAbility = ability;
+                long token = ++actor.castGeneration;
+                BattleEventType type = ability.kind() == BattleAbilityKind.RAGE_SKILL ? BattleEventType.RAGE_SKILL_CAST_START : BattleEventType.CAST_START;
+                emit(now, type, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, ability.castTimeMs(), null);
+                schedule(new ScheduledEvent(now + ability.castTimeMs(), ScheduledType.CAST_COMPLETE, actor.stableOrder(), nextScheduleSequence(), actor.seed.id(), null, ability.id(), token));
+            } else {
+                executeAbility(actor, ability, now);
+            }
+            long next = now + ruleset.attackIntervalMs(effectiveSpeed(actor));
+            scheduleAction(actor, Math.max(next, actor.actionLockUntilMs), actor.actionLockUntilMs);
+            triggerPassives(PassiveTrigger.AFTER_ACTION, actor, null, now, false);
+        }
+
+        private BattleAbility chooseAbility(UnitState actor, long now, boolean silenced) {
+            BattleAbilitySet set = actor.seed.abilities();
+            if (!silenced && actor.rage >= ruleset.rageSkillCost()) return set.rageSkill();
+            if (!silenced && cooldownReady(actor, set.skill2(), now)) return set.skill2();
+            if (!silenced && cooldownReady(actor, set.skill1(), now)) return set.skill1();
+            return set.basic();
+        }
+
+        private boolean cooldownReady(UnitState actor, BattleAbility ability, long now) {
+            return now >= actor.cooldownReadyAt.getOrDefault(ability.id(), 0L);
+        }
+
+        private void executeAbility(UnitState actor, BattleAbility ability, long now) {
+            if (!actor.alive()) return;
+            BattleEventType opening = ability.kind() == BattleAbilityKind.BASIC ? BattleEventType.BASIC_ATTACK_START : BattleEventType.ABILITY;
+            emit(now, opening, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, 0, null);
+            for (SkillEffectDefinition effect : ability.effects()) {
+                List<UnitState> targets = resolveTargets(actor, effect.target(), effect.type());
+                for (UnitState target : targets) applyEffect(actor, target, ability, effect, now, false);
+            }
+            int delta = ability.rageDelta();
+            if (ability.kind() == BattleAbilityKind.BASIC && delta == 0) delta = ruleset.defaultBasicRageGain();
+            if (delta != 0) changeRage(actor, delta, now, ability);
+            if (ability.kind() == BattleAbilityKind.BASIC) {
+                emit(now, BattleEventType.BASIC_ATTACK_END, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, 0, null);
+            } else if (ability.kind() == BattleAbilityKind.RAGE_SKILL) {
+                emit(now, BattleEventType.RAGE_SKILL_CAST_END, actor.seed.id(), null, 0, false, ability.id(), ability.kind(), ability.effectKey(), actor.rage, null, null, 0, null);
+            }
+        }
+
+        private void applyEffect(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now, boolean passiveChain) {
+            if (target == null) return;
+            switch (effect.type()) {
+                case DAMAGE -> applyDamage(source, target, ability, effect, now, passiveChain);
+                case HEAL -> applyHeal(source, target, ability, effect, now);
+                case SHIELD -> applyShield(source, target, ability, effect, now);
+                case RAGE, ENERGY -> changeRage(target, (int) Math.min(Integer.MAX_VALUE, effect.flatAmount()), now, ability);
+                case STATUS -> applyStatus(source, target, ability, effect, now, passiveChain);
+                case CLEANSE -> removeStatuses(source, target, true, now, BattleEventType.STATUS_CLEANSED);
+                case DISPEL -> removeStatuses(source, target, false, now, BattleEventType.STATUS_REMOVED);
+                case REVIVE -> applyRevive(source, target, ability, effect, now);
+            }
+        }
+
+        private void applyDamage(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now, boolean passiveChain) {
+            if (!source.alive() || !target.alive()) return;
+            if (!passiveChain) triggerPassives(PassiveTrigger.BEFORE_DAMAGE, source, target, now, true);
+            DamageRoll roll = damage(source, target, ability, effect);
+            long remaining = roll.amount;
+            if (target.shield > 0) {
+                long absorbed = Math.min(target.shield, remaining);
+                target.shield -= absorbed;
+                remaining -= absorbed;
+                emit(now, BattleEventType.SHIELD_ABSORB, source.seed.id(), target.seed.id(), absorbed, false, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, 0, null);
+            }
+            long applied = Math.min(target.hp, Math.max(0, remaining));
+            target.hp -= applied;
+            source.damageDealt += applied;
+            damageDealt.merge(source.seed.side(), applied, Long::sum);
+            BattleEventType hitType = ability.kind() == BattleAbilityKind.BASIC ? BattleEventType.BASIC_ATTACK_HIT
+                    : ability.kind() == BattleAbilityKind.RAGE_SKILL ? BattleEventType.RAGE_SKILL_HIT : BattleEventType.DAMAGE;
+            emit(now, hitType, source.seed.id(), target.seed.id(), applied, roll.critical, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, 0, null);
+            if (hitType != BattleEventType.DAMAGE) {
+                emit(now, BattleEventType.DAMAGE, source.seed.id(), target.seed.id(), applied, roll.critical, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, 0, null);
+            }
+            if (roll.critical && !passiveChain) triggerPassives(PassiveTrigger.CRITICAL, source, target, now, true);
+            if (!passiveChain) {
+                triggerPassives(PassiveTrigger.AFTER_DAMAGE_DEALT, source, target, now, true);
+                triggerPassives(PassiveTrigger.AFTER_DAMAGE_TAKEN, target, source, now, true);
+                triggerHpThreshold(target, now);
+            }
+            if (target.hp <= 0) handleKo(source, target, now, passiveChain);
+        }
+
+        private void applyHeal(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now) {
+            if (!target.alive()) return;
+            long amount = scaledAmount(source, effect, ability);
+            long applied = Math.min(amount, target.seed.maxHp() - target.hp);
+            if (applied <= 0) return;
+            target.hp += applied;
+            emit(now, BattleEventType.HEAL, source.seed.id(), target.seed.id(), applied, false, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, 0, null);
+        }
+
+        private void applyShield(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now) {
+            if (!target.alive()) return;
+            long amount = scaledAmount(source, effect, ability);
+            target.shield = Math.addExact(target.shield, amount);
+            emit(now, BattleEventType.SHIELD, source.seed.id(), target.seed.id(), amount, false, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, effect.durationMs(), null);
+        }
+
+        private void applyRevive(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now) {
+            if (target.alive()) return;
+            long coefficient = effect.coefficientBps() > 0 ? effect.coefficientBps() : 3_000;
+            long hp = Math.max(1, target.seed.maxHp() * coefficient / 10_000 + effect.flatAmount());
+            target.hp = Math.min(target.seed.maxHp(), hp);
+            target.shield = 0;
+            target.statuses.clear();
+            target.rage = 0;
+            emit(now, BattleEventType.REVIVE, source.seed.id(), target.seed.id(), target.hp, false, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), null, 0, null);
+            scheduleAction(target, now + ruleset.attackIntervalMs(effectiveSpeed(target)), now);
+        }
+
+        private void applyStatus(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect, long now, boolean passiveChain) {
+            if (!target.alive() || effect.status() == null || effect.status().isBlank()) return;
+            if (effect.chanceBps() < 10_000 && random.nextInt(10_000) >= effect.chanceBps()) return;
+            if (effect.durationMs() <= 0) return;
+            long expiresAt = now + effect.durationMs();
+            long tickAmount = 0;
+            if (effect.tickIntervalMs() > 0 || DOT_STATUSES.contains(effect.status())) tickAmount = scaledAmount(source, effect, ability);
+            long interval = effect.tickIntervalMs();
+            StatusState state = new StatusState(effect.status(), source.seed.id(), now, expiresAt,
+                    interval > 0 ? now + interval : 0, interval, tickAmount, effect.coefficientBps(), NEGATIVE_STATUSES.contains(effect.status()));
+            target.statuses.put(effect.status(), state);
+            emit(now, BattleEventType.STATUS_APPLIED, source.seed.id(), target.seed.id(), 0, false, ability.id(), ability.kind(), ability.effectKey(), source.rage, effect.type().name(), effect.status(), effect.durationMs(), null);
+            if ("STUN".equals(effect.status()) && target.castingAbility != null) {
+                BattleAbility interrupted = target.castingAbility;
+                target.castingAbility = null;
+                target.castGeneration++;
+                emit(now, BattleEventType.INTERRUPT, source.seed.id(), target.seed.id(), 0, false, interrupted.id(), interrupted.kind(), interrupted.effectKey(), target.rage, null, "STUN", effect.durationMs(), null);
+            }
+            if (interval > 0) {
+                schedule(new ScheduledEvent(now + interval, ScheduledType.STATUS_TICK, target.stableOrder(), nextScheduleSequence(), source.seed.id(), target.seed.id(), effect.status(), state.appliedAtMs));
+            }
+            schedule(new ScheduledEvent(expiresAt, ScheduledType.STATUS_EXPIRE, target.stableOrder(), nextScheduleSequence(), source.seed.id(), target.seed.id(), effect.status(), state.appliedAtMs));
+            if ("SPEED_UP".equals(effect.status()) || "SPEED_DOWN".equals(effect.status())) rescheduleForSpeedChange(target, now);
+            if (!passiveChain) triggerPassives(PassiveTrigger.STATUS_APPLIED, target, source, now, true);
+        }
+
+        private void processStatusTick(ScheduledEvent event) {
+            UnitState target = units.get(event.targetId());
+            UnitState source = units.get(event.actorId());
+            if (target == null || source == null || !target.alive()) return;
+            StatusState state = target.statuses.get(event.payload());
+            if (state == null || state.appliedAtMs != event.token() || event.timestampMs() > state.expiresAtMs) return;
+            long applied = Math.min(target.hp, Math.max(0, state.tickAmount));
+            target.hp -= applied;
+            source.damageDealt += applied;
+            damageDealt.merge(source.seed.side(), applied, Long::sum);
+            emit(event.timestampMs(), BattleEventType.STATUS_TICK, source.seed.id(), target.seed.id(), applied, false, null, null, null, target.rage, "STATUS", state.statusId, Math.max(0, state.expiresAtMs - event.timestampMs()), null);
+            if (target.hp <= 0) handleKo(source, target, event.timestampMs(), true);
+            long next = event.timestampMs() + state.tickIntervalMs;
+            if (state.tickIntervalMs > 0 && next <= state.expiresAtMs && target.alive()) {
+                schedule(new ScheduledEvent(next, ScheduledType.STATUS_TICK, target.stableOrder(), nextScheduleSequence(), source.seed.id(), target.seed.id(), state.statusId, state.appliedAtMs));
+            }
+        }
+
+        private void processStatusExpire(ScheduledEvent event) {
+            UnitState target = units.get(event.targetId());
+            if (target == null) return;
+            StatusState state = target.statuses.get(event.payload());
+            if (state == null || state.appliedAtMs != event.token()) return;
+            target.statuses.remove(event.payload());
+            emit(event.timestampMs(), BattleEventType.STATUS_EXPIRED, event.actorId(), target.seed.id(), 0, false, null, null, null, target.rage, null, state.statusId, 0, null);
+            if ("SPEED_UP".equals(state.statusId) || "SPEED_DOWN".equals(state.statusId)) rescheduleForSpeedChange(target, event.timestampMs());
+        }
+
+        private void expireLazy(UnitState unit, long now) {
+            List<String> expired = unit.statuses.values().stream().filter(it -> now >= it.expiresAtMs).map(it -> it.statusId).toList();
+            for (String id : expired) unit.statuses.remove(id);
+        }
+
+        private void removeStatuses(UnitState source, UnitState target, boolean negative, long now, BattleEventType eventType) {
+            List<String> ids = target.statuses.values().stream().filter(it -> it.negative == negative).map(it -> it.statusId).toList();
+            for (String id : ids) {
+                StatusState removed = target.statuses.remove(id);
+                emit(now, eventType, source.seed.id(), target.seed.id(), 0, false, null, null, null, target.rage, null, id, 0, null);
+                if (removed != null && ("SPEED_UP".equals(id) || "SPEED_DOWN".equals(id))) rescheduleForSpeedChange(target, now);
+            }
+        }
+
+        private void processPassiveInterval(UnitState actor, ScheduledEvent event) {
+            if (actor == null || !actor.alive()) return;
+            BattlePassive passive = actor.seed.passives().stream().filter(it -> it.id().equals(event.payload()) && it.trigger() == PassiveTrigger.TIME_INTERVAL).findFirst().orElse(null);
+            if (passive == null) return;
+            triggerPassive(actor, passive, null, event.timestampMs(), true);
+            schedule(new ScheduledEvent(event.timestampMs() + passive.intervalMs(), ScheduledType.PASSIVE_INTERVAL, actor.stableOrder(), nextScheduleSequence(), actor.seed.id(), null, passive.id(), 0));
+        }
+
+        private void triggerHpThreshold(UnitState unit, long now) {
+            for (BattlePassive passive : unit.seed.passives()) {
+                if (passive.trigger() != PassiveTrigger.HP_THRESHOLD || passive.thresholdBps() <= 0) continue;
+                long hpBps = unit.hp * 10_000 / unit.seed.maxHp();
+                if (hpBps <= passive.thresholdBps()) triggerPassive(unit, passive, null, now, true);
+            }
+        }
+
+        private void triggerPassives(PassiveTrigger trigger, UnitState owner, UnitState contextTarget, long now, boolean reactionChain) {
+            for (BattlePassive passive : owner.seed.passives()) {
+                if (passive.trigger() == trigger) triggerPassive(owner, passive, contextTarget, now, reactionChain);
+            }
+        }
+
+        private void triggerPassive(UnitState owner, BattlePassive passive, UnitState contextTarget, long now, boolean reactionChain) {
+            if (!owner.alive()) return;
+            if (passive.oncePerBattle() && owner.firedPassives.contains(passive.id())) return;
+            if (passive.oncePerBattle()) owner.firedPassives.add(passive.id());
+            emit(now, BattleEventType.PASSIVE_TRIGGER, owner.seed.id(), contextTarget == null ? null : contextTarget.seed.id(), 0, false,
+                    passive.id(), null, "vfx/passives/" + passive.id(), owner.rage, null, null, 0, passive.trigger().name());
+            BattleAbility wrapper = new BattleAbility(passive.id(), BattleAbilityKind.BASIC, owner.seed.primaryChannel(), 10_000, 0,
+                    "vfx/passives/" + passive.id(), passive.effects(), 0, 0, 0);
+            for (SkillEffectDefinition effect : passive.effects()) {
+                for (UnitState target : resolveTargets(owner, effect.target(), effect.type())) applyEffect(owner, target, wrapper, effect, now, true);
+            }
+        }
+
+        private void handleKo(UnitState killer, UnitState target, long now, boolean passiveChain) {
+            if (target.koEmitted) return;
+            target.koEmitted = true;
+            target.castingAbility = null;
+            target.castGeneration++;
+            emit(now, BattleEventType.KO, killer == null ? null : killer.seed.id(), target.seed.id(), 0, false, null, null, null, killer == null ? 0 : killer.rage, null, null, 0, null);
+            if (!passiveChain) {
+                for (UnitState ally : units.values()) if (ally.alive() && ally.seed.side() == target.seed.side() && ally != target) triggerPassives(PassiveTrigger.ALLY_KO, ally, target, now, true);
+                for (UnitState enemy : units.values()) if (enemy.alive() && enemy.seed.side() != target.seed.side()) triggerPassives(PassiveTrigger.ENEMY_KO, enemy, target, now, true);
+            }
+        }
+
+        private void changeRage(UnitState target, int delta, long now, BattleAbility ability) {
+            int before = target.rage;
+            target.rage = Math.max(0, Math.min(MAX_RAGE, target.rage + delta));
+            int changed = target.rage - before;
+            if (changed == 0) return;
+            emit(now, BattleEventType.RAGE_GAIN, target.seed.id(), target.seed.id(), changed, false,
+                    ability == null ? null : ability.id(), ability == null ? null : ability.kind(), ability == null ? null : ability.effectKey(), target.rage, "RAGE", null, 0, null);
+            if (before < MAX_RAGE && target.rage == MAX_RAGE) {
+                emit(now, BattleEventType.RAGE_FULL, target.seed.id(), target.seed.id(), 0, false,
+                        target.seed.abilities().rageSkill().id(), BattleAbilityKind.RAGE_SKILL, target.seed.abilities().rageSkill().effectKey(), target.rage, "RAGE", null, 0, null);
+            }
+        }
+
+        private void rescheduleForSpeedChange(UnitState target, long now) {
+            if (!target.alive() || target.castingAbility != null) return;
+            long next = now + ruleset.attackIntervalMs(effectiveSpeed(target));
+            scheduleAction(target, next, now);
+        }
+
+        private List<UnitState> resolveTargets(UnitState actor, TargetSelector selector, EffectType effectType) {
+            List<UnitState> alliesLiving = units.values().stream().filter(UnitState::alive).filter(it -> it.seed.side() == actor.seed.side()).sorted(UnitState.ORDER).toList();
+            List<UnitState> enemiesLiving = units.values().stream().filter(UnitState::alive).filter(it -> it.seed.side() != actor.seed.side()).sorted(UnitState.ORDER).toList();
+            return switch (selector) {
+                case SELF -> List.of(actor);
+                case FRONTMOST_ENEMY -> enemiesLiving.isEmpty() ? List.of() : List.of(enemiesLiving.get(0));
+                case LOWEST_HP_ENEMY -> pickLowestHp(enemiesLiving);
+                case RANDOM_ENEMY -> enemiesLiving.isEmpty() ? List.of() : List.of(enemiesLiving.get(random.nextInt(enemiesLiving.size())));
+                case ALL_ENEMIES -> enemiesLiving;
+                case LOWEST_HP_ALLY -> {
+                    if (effectType == EffectType.REVIVE) {
+                        List<UnitState> dead = units.values().stream().filter(it -> !it.alive()).filter(it -> it.seed.side() == actor.seed.side()).sorted(UnitState.ORDER).toList();
+                        yield dead.isEmpty() ? pickLowestHp(alliesLiving) : List.of(dead.get(0));
+                    }
+                    yield pickLowestHp(alliesLiving);
+                }
+                case ALL_ALLIES -> alliesLiving;
+            };
+        }
+
+        private List<UnitState> pickLowestHp(List<UnitState> candidates) {
+            return candidates.stream().min(Comparator.<UnitState>comparingDouble(it -> (double) it.hp / it.seed.maxHp()).thenComparing(UnitState.ORDER)).map(List::of).orElseGet(List::of);
+        }
+
+        private DamageRoll damage(UnitState source, UnitState target, BattleAbility ability, SkillEffectDefinition effect) {
+            DamageChannel channel = effect.channel() == null ? ability.channel() : effect.channel();
+            long attack = effectiveAttack(source, channel);
+            long defense = effectiveDefense(target, channel);
+            int coefficient = effect.coefficientBps() > 0 ? effect.coefficientBps() : ability.coefficientBps();
+            long raw = Math.max(1, attack * coefficient / 10_000 + effect.flatAmount());
+            long mitigated = Math.max(1, raw * ruleset.flatDefenseScale() / (ruleset.flatDefenseScale() + defense));
+            int variance = ruleset.varianceBps() == 0 ? 0 : random.nextInt(ruleset.varianceBps() * 2 + 1) - ruleset.varianceBps();
+            long amount = Math.max(1, mitigated * (10_000L + variance) / 10_000L);
+            int unitCrit = channel == DamageChannel.PHYSICAL ? source.seed.physicalCritBps() : source.seed.chakraCritBps();
+            boolean critical = random.nextInt(10_000) < Math.min(10_000, ruleset.critChanceBps() + unitCrit);
+            if (critical) amount = Math.max(1, amount * 15_000L / 10_000L);
+            return new DamageRoll(amount, critical);
+        }
+
+        private long scaledAmount(UnitState source, SkillEffectDefinition effect, BattleAbility ability) {
+            DamageChannel channel = effect.channel() == null ? ability.channel() : effect.channel();
+            long attack = effectiveAttack(source, channel);
+            int coefficient = effect.coefficientBps() > 0 ? effect.coefficientBps() : ability.coefficientBps();
+            return Math.max(0, attack * coefficient / 10_000 + effect.flatAmount());
+        }
+
+        private long effectiveAttack(UnitState unit, DamageChannel channel) {
+            long base = channel == DamageChannel.PHYSICAL ? unit.seed.physicalAttack() : unit.seed.chakraAttack();
+            int modifier = statusModifier(unit, "ATK_UP", "ATK_DOWN");
+            return Math.max(0, base * Math.max(0, 10_000L + modifier) / 10_000L);
+        }
+
+        private long effectiveDefense(UnitState unit, DamageChannel channel) {
+            long base = channel == DamageChannel.PHYSICAL ? unit.seed.physicalDefense() : unit.seed.chakraDefense();
+            int modifier = statusModifier(unit, "DEF_UP", "DEF_DOWN");
+            return Math.max(0, base * Math.max(0, 10_000L + modifier) / 10_000L);
+        }
+
+        private int effectiveSpeed(UnitState unit) {
+            int modifier = statusModifier(unit, "SPEED_UP", "SPEED_DOWN");
+            return (int) Math.max(1, unit.seed.speed() * Math.max(1, 10_000L + modifier) / 10_000L);
+        }
+
+        private int statusModifier(UnitState unit, String positive, String negative) {
+            int value = 0;
+            StatusState up = unit.statuses.get(positive);
+            if (up != null && currentTimeMs < up.expiresAtMs) value += up.modifierBps;
+            StatusState down = unit.statuses.get(negative);
+            if (down != null && currentTimeMs < down.expiresAtMs) value -= down.modifierBps;
+            return value;
+        }
+
+        private BattleOutcome terminalOutcome() {
+            boolean a = units.values().stream().anyMatch(it -> it.alive() && it.seed.side() == TeamSide.A);
+            boolean b = units.values().stream().anyMatch(it -> it.alive() && it.seed.side() == TeamSide.B);
+            if (a && b) return null;
+            if (a) return BattleOutcome.TEAM_A;
+            if (b) return BattleOutcome.TEAM_B;
+            return BattleOutcome.DRAW;
+        }
+
+        private BattleOutcome resolveTimeout() {
+            int aliveA = living(TeamSide.A), aliveB = living(TeamSide.B);
+            if (aliveA != aliveB) return aliveA > aliveB ? BattleOutcome.TEAM_A : BattleOutcome.TEAM_B;
+            long hpA = hpRatioScore(TeamSide.A), hpB = hpRatioScore(TeamSide.B);
+            if (hpA != hpB) return hpA > hpB ? BattleOutcome.TEAM_A : BattleOutcome.TEAM_B;
+            long dmgA = damageDealt.getOrDefault(TeamSide.A, 0L), dmgB = damageDealt.getOrDefault(TeamSide.B, 0L);
+            if (dmgA != dmgB) return dmgA > dmgB ? BattleOutcome.TEAM_A : BattleOutcome.TEAM_B;
+            return BattleOutcome.DRAW;
+        }
+
+        private int living(TeamSide side) { return (int) units.values().stream().filter(it -> it.alive() && it.seed.side() == side).count(); }
+        private long hpRatioScore(TeamSide side) { return units.values().stream().filter(it -> it.seed.side() == side).mapToLong(it -> it.hp * 10_000L / it.seed.maxHp()).sum(); }
+
+        private void emit(long timestampMs, BattleEventType type, String actorId, String targetId, long amount, boolean critical,
+                          String abilityId, BattleAbilityKind abilityKind, String effectKey, int rageAfter,
+                          String effectType, String statusId, long durationMs, String triggerId) {
+            events.add(new BattleEvent(eventSequence++, timestampMs, type, actorId, targetId, amount, critical,
+                    abilityId, abilityKind, effectKey, Math.max(0, Math.min(MAX_RAGE, rageAfter)), effectType, statusId, durationMs, triggerId));
+        }
+
+        private BattleResult result(BattleOutcome outcome, long durationMs) {
+            Map<String, Long> finalHp = new LinkedHashMap<>();
+            units.forEach((id, state) -> finalHp.put(id, state.hp));
+            return new BattleResult(seed, ruleset.version(), outcome, durationMs, List.copyOf(events), Map.copyOf(finalHp));
         }
     }
 
-    private static final class State {
+    private static final class UnitState {
+        private static final Comparator<UnitState> ORDER = Comparator.comparingInt((UnitState it) -> it.seed.slot()).thenComparing(it -> it.seed.id());
         private final BattleUnitSeed seed;
-        private final Map<String, StatusState> statuses = new LinkedHashMap<>();
+        private final Map<String, StatusState> statuses = new HashMap<>();
+        private final Map<String, Long> cooldownReadyAt = new HashMap<>();
         private final Set<String> firedPassives = new HashSet<>();
         private long hp;
         private long shield;
-        private int energy;
-        private int comboStep;
+        private int rage;
+        private long nextActionAtMs;
+        private long actionLockUntilMs;
+        private long actionGeneration;
+        private long castGeneration;
+        private BattleAbility castingAbility;
+        private boolean koEmitted;
+        private long damageDealt;
 
-        private State(BattleUnitSeed seed) { this.seed = seed; this.hp = seed.maxHp(); }
+        private UnitState(BattleUnitSeed seed) { this.seed = seed; this.hp = seed.maxHp(); }
         private boolean alive() { return hp > 0; }
-        private String id() { return seed.id(); }
-        private TeamSide side() { return seed.side(); }
-        private int slot() { return seed.slot(); }
-        private double hpRatio() { return seed.maxHp() <= 0 ? 0 : (double) hp / seed.maxHp(); }
-        private int speed() { return (int) Math.max(1, modified(seed.speed(), "SPEED")); }
-        private long attack(DamageChannel channel) { return modified(channel == DamageChannel.PHYSICAL ? seed.physicalAttack() : seed.chakraAttack(), "ATK"); }
-        private long defense(DamageChannel channel) { return modified(channel == DamageChannel.PHYSICAL ? seed.physicalDefense() : seed.chakraDefense(), "DEF"); }
-
-        private long modified(long base, String stat) {
-            int delta = 0;
-            for (StatusState status : statuses.values()) {
-                if (status.id.equals(stat + "_UP")) delta += status.modifierBps;
-                if (status.id.equals(stat + "_DOWN")) delta -= status.modifierBps;
-            }
-            return Math.max(0, base * Math.max(0, 10_000L + delta) / 10_000L);
-        }
-
-        private BattleAbility nextAbility(boolean silenced) {
-            if (silenced) return seed.abilities().basic();
-            if (energy >= 100) { comboStep = 0; return seed.abilities().ultimate(); }
-            BattleAbility ability = switch (comboStep) {
-                case 0 -> seed.abilities().basic();
-                case 1 -> seed.abilities().skill1();
-                default -> seed.abilities().skill2();
-            };
-            comboStep = (comboStep + 1) % 3;
-            return ability;
-        }
-
-        private int applyEnergy(int delta) { energy = Math.max(0, Math.min(100, energy + delta)); return energy; }
-        private boolean hasStatus(String id) { return statuses.containsKey(id); }
-        private int statusDuration(String id) { StatusState value = statuses.get(id); return value == null ? 0 : value.remainingTurns; }
-        private void applyStatus(StatusState status) { statuses.merge(status.id, status, StatusState::stronger); }
-
-        private void advanceStatuses() {
-            List<String> expired = new ArrayList<>();
-            for (Map.Entry<String, StatusState> entry : statuses.entrySet()) {
-                StatusState status = entry.getValue();
-                status.remainingTurns--;
-                if (status.remainingTurns <= 0) expired.add(entry.getKey());
-            }
-            expired.forEach(statuses::remove);
-        }
-
-        private List<String> removeStatuses(boolean negative) {
-            List<String> removed = statuses.values().stream().filter(it -> it.negative == negative).map(it -> it.id).toList();
-            removed.forEach(statuses::remove);
-            return removed;
-        }
-
-        private DamageResult damage(long value) {
-            long incoming = Math.max(0, value);
-            long absorbed = Math.min(shield, incoming);
-            shield -= absorbed;
-            long remaining = incoming - absorbed;
-            long hpDamage = Math.min(hp, remaining);
-            hp -= hpDamage;
-            return new DamageResult(hpDamage, absorbed);
-        }
-
-        private long heal(long value) { long applied = Math.min(seed.maxHp() - hp, Math.max(0, value)); hp += applied; return applied; }
-        private long addShield(long value) { long applied = Math.max(0, value); shield = Math.addExact(shield, applied); return applied; }
-        private long revive(long value) { if (alive()) return 0; hp = Math.min(seed.maxHp(), Math.max(1, value)); statuses.clear(); shield = 0; return hp; }
+        private boolean hasStatus(String status, long now) { StatusState state = statuses.get(status); return state != null && now < state.expiresAtMs; }
+        private String stableOrder() { return seed.side().ordinal() + ":" + String.format("%02d", seed.slot()) + ":" + seed.id(); }
     }
 
-    private static final class StatusState {
-        private final String id;
-        private int remainingTurns;
-        private final long tickAmount;
-        private final int modifierBps;
-        private final boolean negative;
-
-        private StatusState(String id, int remainingTurns, long tickAmount, int modifierBps, boolean negative) {
-            this.id = id; this.remainingTurns = remainingTurns; this.tickAmount = tickAmount; this.modifierBps = modifierBps; this.negative = negative;
-        }
-
-        private static StatusState stronger(StatusState oldValue, StatusState newValue) {
-            return new StatusState(oldValue.id, Math.max(oldValue.remainingTurns, newValue.remainingTurns),
-                    Math.max(oldValue.tickAmount, newValue.tickAmount), Math.max(oldValue.modifierBps, newValue.modifierBps),
-                    oldValue.negative || newValue.negative);
-        }
-    }
-
-    private record DamageResult(long hpDamage, long shieldAbsorbed) {}
+    private record StatusState(String statusId, String sourceId, long appliedAtMs, long expiresAtMs, long nextTickAtMs,
+                               long tickIntervalMs, long tickAmount, int modifierBps, boolean negative) {}
+    private record DamageRoll(long amount, boolean critical) {}
 }

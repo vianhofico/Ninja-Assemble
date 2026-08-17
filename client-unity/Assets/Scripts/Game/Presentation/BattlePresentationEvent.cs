@@ -5,9 +5,9 @@ namespace NinjaAssemble.Presentation
     [Serializable]
     public sealed class BattlePresentationEvent
     {
-        public long Sequence;
+        public int Sequence;
+        public long TimestampMs;
         public string Type;
-        public int Round;
         public string ActorId;
         public string TargetId;
         public long Amount;
@@ -15,10 +15,10 @@ namespace NinjaAssemble.Presentation
         public string AbilityId;
         public string AbilityKind;
         public string EffectKey;
-        public int EnergyAfter;
+        public int RageAfter;
         public string EffectType;
         public string StatusId;
-        public int DurationTurns;
+        public long DurationMs;
         public string TriggerId;
     }
 }

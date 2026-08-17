@@ -12,15 +12,19 @@ namespace NinjaAssemble.Presentation
             var result = new List<BattlePresentationEvent>();
             if (battle.events == null) return result;
 
-            Array.Sort(battle.events, (a, b) => a.sequence.CompareTo(b.sequence));
+            Array.Sort(battle.events, (a, b) =>
+            {
+                int time = a.timestampMs.CompareTo(b.timestampMs);
+                return time != 0 ? time : a.sequence.CompareTo(b.sequence);
+            });
             foreach (BattleEventDto item in battle.events)
             {
                 if (item == null) continue;
                 result.Add(new BattlePresentationEvent
                 {
                     Sequence = item.sequence,
+                    TimestampMs = item.timestampMs,
                     Type = item.type ?? string.Empty,
-                    Round = item.round,
                     ActorId = item.actorId ?? string.Empty,
                     TargetId = item.targetId ?? string.Empty,
                     Amount = item.amount,
@@ -28,10 +32,10 @@ namespace NinjaAssemble.Presentation
                     AbilityId = item.abilityId ?? string.Empty,
                     AbilityKind = item.abilityKind ?? string.Empty,
                     EffectKey = item.effectKey ?? string.Empty,
-                    EnergyAfter = item.energyAfter,
+                    RageAfter = item.rageAfter,
                     EffectType = item.effectType ?? string.Empty,
                     StatusId = item.statusId ?? string.Empty,
-                    DurationTurns = item.durationTurns,
+                    DurationMs = item.durationMs,
                     TriggerId = item.triggerId ?? string.Empty
                 });
             }

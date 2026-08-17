@@ -11,16 +11,20 @@ public final class ReferenceProfiles {
     public static final String STRUCTURED_EFFECTS = "experimental-structured-effects-v1";
     public static final String TECHNIQUE_MAPPING = "experimental-technique-mapping-v1";
     public static final String PASSIVE_LIFECYCLE = "experimental-passive-lifecycle-v1";
+    public static final String REALTIME_TIMING = "experimental-realtime-timing-v1";
+    public static final String RAGE_RULES = "experimental-rage-v1";
 
-    private static final Map<String, ReferenceConfidence> CONFIDENCE = Map.of(
-            COMBAT_STATS, ReferenceConfidence.EXPERIMENTAL,
-            DAMAGE_FORMULA, ReferenceConfidence.EXPERIMENTAL,
-            COMPLETE_ROSTER_SUMMON, ReferenceConfidence.EXPERIMENTAL,
-            HERO_LEVEL_COST, ReferenceConfidence.EXPERIMENTAL,
-            ABILITY_CYCLE, ReferenceConfidence.EXPERIMENTAL,
-            STRUCTURED_EFFECTS, ReferenceConfidence.EXPERIMENTAL,
-            TECHNIQUE_MAPPING, ReferenceConfidence.EXPERIMENTAL,
-            PASSIVE_LIFECYCLE, ReferenceConfidence.EXPERIMENTAL
+    private static final Map<String, ReferenceConfidence> CONFIDENCE = Map.ofEntries(
+            Map.entry(COMBAT_STATS, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(DAMAGE_FORMULA, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(COMPLETE_ROSTER_SUMMON, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(HERO_LEVEL_COST, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(ABILITY_CYCLE, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(STRUCTURED_EFFECTS, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(TECHNIQUE_MAPPING, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(PASSIVE_LIFECYCLE, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(REALTIME_TIMING, ReferenceConfidence.EXPERIMENTAL),
+            Map.entry(RAGE_RULES, ReferenceConfidence.EXPERIMENTAL)
     );
 
     private ReferenceProfiles() {}

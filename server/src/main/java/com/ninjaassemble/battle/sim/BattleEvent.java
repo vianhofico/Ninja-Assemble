@@ -1,9 +1,10 @@
 package com.ninjaassemble.battle.sim;
 
+/** Immutable presentation/audit event emitted from authoritative logical simulation time. */
 public record BattleEvent(
-        long sequence,
+        int sequence,
+        long timestampMs,
         BattleEventType type,
-        int round,
         String actorId,
         String targetId,
         long amount,
@@ -11,25 +12,23 @@ public record BattleEvent(
         String abilityId,
         BattleAbilityKind abilityKind,
         String effectKey,
-        int energyAfter,
+        int rageAfter,
         String effectType,
         String statusId,
-        int durationTurns,
+        long durationMs,
         String triggerId
 ) {
-    public BattleEvent(long sequence, BattleEventType type, int round, String actorId, String targetId, long amount, boolean critical) {
-        this(sequence, type, round, actorId, targetId, amount, critical, null, null, null, -1, null, null, 0, null);
+    public BattleEvent {
+        if (sequence < 0 || timestampMs < 0 || type == null) throw new IllegalArgumentException("invalid event identity/time");
+        if (rageAfter < 0 || rageAfter > 100) throw new IllegalArgumentException("rageAfter outside 0..100");
+        if (durationMs < 0) throw new IllegalArgumentException("durationMs cannot be negative");
     }
 
-    public BattleEvent(long sequence, BattleEventType type, int round, String actorId, String targetId, long amount, boolean critical,
-                       String abilityId, BattleAbilityKind abilityKind, String effectKey, int energyAfter) {
-        this(sequence, type, round, actorId, targetId, amount, critical, abilityId, abilityKind, effectKey, energyAfter, null, null, 0, null);
+    public static BattleEvent simple(int sequence, long timestampMs, BattleEventType type, String actorId, String targetId) {
+        return new BattleEvent(sequence, timestampMs, type, actorId, targetId, 0, false, null, null, null, 0, null, null, 0, null);
     }
 
-    public BattleEvent(long sequence, BattleEventType type, int round, String actorId, String targetId, long amount, boolean critical,
-                       String abilityId, BattleAbilityKind abilityKind, String effectKey, int energyAfter,
-                       String effectType, String statusId, int durationTurns) {
-        this(sequence, type, round, actorId, targetId, amount, critical, abilityId, abilityKind, effectKey, energyAfter,
-                effectType, statusId, durationTurns, null);
-    }
+    /** @deprecated Temporary DTO compatibility while Unity is migrated in this same milestone. */
+    @Deprecated(forRemoval = true)
+    public int energyAfter() { return rageAfter; }
 }

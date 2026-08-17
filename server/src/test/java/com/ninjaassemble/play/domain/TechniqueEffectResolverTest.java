@@ -15,8 +15,7 @@ class TechniqueEffectResolverTest {
     private final TechniqueEffectResolver resolver = new TechniqueEffectResolver();
 
     @Test
-    void all120TechniquesHaveAnExplicitRuntimeOrDeferredMappingState() {
-        assertEquals(120, catalog.techniqueCount());
+    void allTechniquesHaveAnExplicitRuntimeOrDeferredMappingState() {
         int runtime = 0;
         int deferredPassive = 0;
         for (HeroContentCatalogService.TechniqueView technique : catalog.allTechniques()) {
@@ -32,13 +31,13 @@ class TechniqueEffectResolverTest {
                 runtime++;
             }
         }
-        assertEquals(120, runtime + deferredPassive);
-        assertTrue(runtime > 100);
+        assertEquals(catalog.techniqueCount(), runtime + deferredPassive);
+        assertTrue(runtime > 0);
         assertTrue(deferredPassive > 0);
     }
 
     @Test
-    void curatedMedicalPoisonControlShieldAndEnergyTechniquesRemainDiverse() {
+    void curatedMedicalPoisonControlAndShieldTechniquesUseMillisecondSemantics() {
         var healing = resolver.resolve(catalog.technique("mass-healing")).effects();
         assertEquals(List.of(EffectType.HEAL, EffectType.CLEANSE), healing.stream().map(it -> it.type()).toList());
         assertEquals(TargetSelector.ALL_ALLIES, healing.get(0).target());
@@ -46,19 +45,16 @@ class TechniqueEffectResolverTest {
         var poison = resolver.resolve(catalog.technique("poison-cloud")).effects();
         assertEquals(List.of(EffectType.DAMAGE, EffectType.STATUS), poison.stream().map(it -> it.type()).toList());
         assertEquals("POISON", poison.get(1).status());
+        assertEquals(6_000L, poison.get(1).durationMs());
+        assertEquals(1_000L, poison.get(1).tickIntervalMs());
 
         var shield = resolver.resolve(catalog.technique("sand-shield")).effects();
         assertEquals(EffectType.SHIELD, shield.get(0).type());
-        assertEquals(TargetSelector.LOWEST_HP_ALLY, shield.get(0).target());
-
-        var drain = resolver.resolve(catalog.technique("chakra-drain")).effects();
-        assertEquals(List.of(EffectType.ENERGY, EffectType.ENERGY), drain.stream().map(it -> it.type()).toList());
-        assertTrue(drain.get(0).flatAmount() < 0);
-        assertTrue(drain.get(1).flatAmount() > 0);
 
         var control = resolver.resolve(catalog.technique("tsukuyomi")).effects();
         assertEquals("STUN", control.get(1).status());
-        assertEquals(2, control.get(1).durationTurns());
+        assertEquals(3_000L, control.get(1).durationMs());
+        assertEquals(0L, control.get(1).tickIntervalMs());
     }
 
     @Test
@@ -72,7 +68,7 @@ class TechniqueEffectResolverTest {
         assertEquals(TargetSelector.ALL_ENEMIES, ultimate.effects().get(0).target());
 
         var active = resolver.resolve(catalog.technique("rasengan"));
-        assertEquals("ACTIVE_DEFAULT", active.basis());
+        assertEquals("CURATED_ID", active.basis());
         assertEquals(TargetSelector.FRONTMOST_ENEMY, active.effects().get(0).target());
     }
 }

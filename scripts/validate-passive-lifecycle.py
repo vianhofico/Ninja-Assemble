@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static contract checks for M26 passive lifecycle execution."""
+"""Static contract checks for real-time passive lifecycle execution."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,26 +14,24 @@ def require(path: str, *tokens: str) -> None:
 
 def main() -> int:
     require("server/src/main/java/com/ninjaassemble/battle/sim/PassiveTrigger.java",
-            "BATTLE_START", "TURN_START", "AFTER_DAMAGE_TAKEN", "AFTER_DAMAGE_DEALT", "ALLY_KO", "SELF_LOW_HP")
+            "BATTLE_START", "TIME_INTERVAL", "BEFORE_ACTION", "AFTER_ACTION", "AFTER_DAMAGE_TAKEN",
+            "AFTER_DAMAGE_DEALT", "HP_THRESHOLD", "ALLY_KO", "STATUS_APPLIED", "SKILL_CAST", "RAGE_SKILL_CAST")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattlePassive.java",
-            "oncePerBattle", "thresholdBps", "List<SkillEffectDefinition> effects")
+            "oncePerBattle", "thresholdBps", "intervalMs", "List<SkillEffectDefinition> effects")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleUnitSeed.java", "List<BattlePassive> passives")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleEventType.java", "PASSIVE_TRIGGER")
     require("server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
-            "triggerPassives", "triggerAllyKo", "firedPassives", "BattleAbilityKind.PASSIVE", "consumeRandom ? randomOne(values, random) : first(values)")
+            "triggerPassives", "processPassiveInterval", "firedPassives", "PassiveTrigger.HP_THRESHOLD", "PassiveTrigger.ALLY_KO")
     require("server/src/main/java/com/ninjaassemble/play/domain/PassiveEffectResolver.java",
-            "ReferenceProfiles.PASSIVE_LIFECYCLE", "passive-jinchuriki", "passive-medical", "passive-sharingan",
-            "passive-swordsman", "passive-will-of-fire", "passive-rinnegan")
+            "ReferenceProfiles.PASSIVE_LIFECYCLE", "PassiveTrigger.TIME_INTERVAL", "3_000",
+            "passive-jinchuriki", "passive-medical", "passive-sharingan", "passive-swordsman", "passive-will-of-fire")
     require("server/src/test/java/com/ninjaassemble/battle/sim/PassiveLifecycleBattleTest.java",
-            "battleStartPassiveTriggersBeforeRoundOneAndCanGrantEnergy", "afterDamageTakenPassiveReactsWithoutRecursivePassiveChains",
-            "lowHpPassiveFiresOnlyOncePerBattle", "allyKoPassiveTriggersForLivingTeammate")
-    require("server/src/test/java/com/ninjaassemble/play/domain/PassiveEffectResolverTest.java",
-            "everyPassiveTechniqueResolvesToExecutableLifecycleEffects", "EnumSet.allOf(PassiveTrigger.class)")
+            "battleStartPassiveTriggersAtLogicalTimeZeroAndCanGrantRage", "periodicMedicalPassiveUsesThreeSecondIntervalNotTurnStart",
+            "afterDamageTakenPassiveReactsWithoutRecursivePassiveChains", "hpThresholdPassiveFiresOnlyOncePerBattle", "allyKoPassiveTriggersForLivingTeammate")
     require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs", "passiveProfileVersion", "triggerId")
     require("client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs", 'case "PASSIVE_TRIGGER"', "actor.PlayPassive()")
-    require("game-data/reference/balance-profiles.csv",
-            "experimental-passive-lifecycle-v1,PASSIVE_LIFECYCLE,EXPERIMENTAL")
-    print("PASSIVE_LIFECYCLE_OK triggers=6 once_guard=true random_preview_rng_safe=true")
+    require("game-data/reference/balance-profiles.csv", "experimental-passive-lifecycle-v1,PASSIVE_LIFECYCLE,EXPERIMENTAL")
+    print("PASSIVE_LIFECYCLE_OK model=event_time interval_passives=true once_guard=true")
     return 0
 
 
