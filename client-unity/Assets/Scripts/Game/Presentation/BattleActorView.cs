@@ -30,7 +30,8 @@ namespace NinjaAssemble.Presentation
         [SerializeField] private AudioSource audioSource;
         [SerializeField] private AudioClip attackClip;
         [SerializeField] private AudioClip skillClip;
-        [SerializeField] private AudioClip ultimateClip;
+        [FormerlySerializedAs("ultimateClip")]
+        [SerializeField] private AudioClip rageSkillClip;
         [SerializeField] private AudioClip passiveClip;
         [SerializeField] private AudioClip hitClip;
         [SerializeField] private AudioClip deathClip;
@@ -38,9 +39,21 @@ namespace NinjaAssemble.Presentation
 
         private string activeStatusId = string.Empty;
         private double statusRemainingMs;
+        private float targetHealth01 = 1f;
+        private float targetRage;
+        private int presentationSpeed = 1;
 
         public Transform HitAnchor => hitAnchor != null ? hitAnchor : transform;
         public bool IsAlive => CurrentHp > 0;
+
+        private void Update()
+        {
+            float rate = Mathf.Max(1f, presentationSpeed);
+            if (healthSlider != null)
+                healthSlider.value = Mathf.MoveTowards(healthSlider.value, targetHealth01, Time.unscaledDeltaTime * 3.8f * rate);
+            if (rageSlider != null)
+                rageSlider.value = Mathf.MoveTowards(rageSlider.value, targetRage, Time.unscaledDeltaTime * 150f * rate);
+        }
 
         public void Bind(string battleUnitId) => BattleUnitId = battleUnitId;
 
@@ -65,29 +78,46 @@ namespace NinjaAssemble.Presentation
             Rage = 0;
             activeStatusId = string.Empty;
             statusRemainingMs = 0;
+            targetHealth01 = 1f;
+            targetRage = 0f;
             if (nameLabel != null) nameLabel.text = string.IsNullOrWhiteSpace(displayName) ? (string.IsNullOrWhiteSpace(HeroId) ? CharacterId : HeroId) : displayName;
             if (levelLabel != null) levelLabel.text = "Lv." + Mathf.Max(1, level);
             RefreshStatusLabel();
-            UpdateHealthUi();
-            UpdateRageUi();
+            ConfigureSliderRanges();
+            SnapUiToTargets();
         }
 
         public void ConfigureUi(TMP_Text name, TMP_Text level, Slider hp)
         {
-            nameLabel = name; levelLabel = level; healthSlider = hp; UpdateHealthUi();
+            nameLabel = name;
+            levelLabel = level;
+            healthSlider = hp;
+            ConfigureSliderRanges();
+            SnapUiToTargets();
         }
         public void ConfigureStatusUi(TMP_Text status) { statusLabel = status; RefreshStatusLabel(); }
-        public void ConfigureEnergyUi(Slider energy) { rageSlider = energy; UpdateRageUi(); }
+        public void ConfigureEnergyUi(Slider energy) { rageSlider = energy; ConfigureSliderRanges(); SnapUiToTargets(); }
         public void PlayAttack() => PlayAbility("BASIC");
+
+        public void SetPresentationRate(int speed, bool paused)
+        {
+            presentationSpeed = Mathf.Clamp(speed, 1, 4);
+            if (animator != null) animator.speed = paused ? 0f : presentationSpeed;
+            if (audioSource != null)
+            {
+                audioSource.pitch = Mathf.Clamp(0.9f + (presentationSpeed - 1) * 0.15f, 0.9f, 1.35f);
+                if (paused) audioSource.Pause();
+                else audioSource.UnPause();
+            }
+        }
 
         public void PlayAbility(string abilityKind)
         {
             string kind = string.IsNullOrWhiteSpace(abilityKind) ? "BASIC" : abilityKind.ToUpperInvariant();
             switch (kind)
             {
-                case "AWAKENING_SKILL": TriggerWithFallback("AwakeningSkill", "Ultimate"); PlayClip(ultimateClip != null ? ultimateClip : skillClip); break;
-                case "ULTIMATE":
-                case "RAGE_SKILL": TriggerWithFallback("Ultimate", "Attack"); PlayClip(ultimateClip != null ? ultimateClip : skillClip); break;
+                case "AWAKENING_SKILL": TriggerWithFallback("AwakeningSkill", "RageSkill", "Ultimate"); PlayClip(rageSkillClip != null ? rageSkillClip : skillClip); break;
+                case "RAGE_SKILL": TriggerWithFallback("RageSkill", "Ultimate", "Attack"); PlayClip(rageSkillClip != null ? rageSkillClip : skillClip); break;
                 case "SKILL1": TriggerWithFallback("Skill1", "Attack"); PlayClip(skillClip != null ? skillClip : attackClip); break;
                 case "SKILL2": TriggerWithFallback("Skill2", "Attack"); PlayClip(skillClip != null ? skillClip : attackClip); break;
                 case "PASSIVE": PlayPassive(); break;
@@ -101,15 +131,19 @@ namespace NinjaAssemble.Presentation
         {
             if (value < 0) return;
             Rage = Mathf.Clamp(value, 0, 100);
-            UpdateRageUi();
+            targetRage = Rage;
+            if (rageSlider != null && rageSlider.targetGraphic != null)
+                rageSlider.targetGraphic.canvasRenderer.SetAlpha(Rage >= 100 ? 1f : 0.85f);
         }
 
         public void ApplyDamage(long amount, bool critical)
         {
             if (amount > 0) CurrentHp = System.Math.Max(0L, CurrentHp - amount);
-            Trigger(critical ? "CriticalHit" : "Hit"); PlayClip(hitClip); UpdateHealthUi();
+            Trigger(critical ? "CriticalHit" : "Hit");
+            PlayClip(hitClip);
+            UpdateHealthTarget();
         }
-        public void ApplyHeal(long amount) { if (amount <= 0 || !IsAlive) return; CurrentHp = System.Math.Min(MaxHp, CurrentHp + amount); TriggerWithFallback("Heal", "Hit"); UpdateHealthUi(); }
+        public void ApplyHeal(long amount) { if (amount <= 0 || !IsAlive) return; CurrentHp = System.Math.Min(MaxHp, CurrentHp + amount); TriggerWithFallback("Heal", "Hit"); UpdateHealthTarget(); }
         public void AddShield(long amount) { if (amount <= 0) return; Shield = System.Math.Max(0L, Shield + amount); TriggerWithFallback("Shield", "Hit"); }
         public void AbsorbShield(long amount) { if (amount <= 0) return; Shield = System.Math.Max(0L, Shield - amount); }
 
@@ -133,9 +167,9 @@ namespace NinjaAssemble.Presentation
             if (string.IsNullOrWhiteSpace(statusId) || activeStatusId == statusId) { activeStatusId = string.Empty; statusRemainingMs = 0; RefreshStatusLabel(); }
         }
 
-        public void Revive(long amount) { CurrentHp = System.Math.Min(MaxHp, System.Math.Max(1L, amount)); Shield = 0; TriggerWithFallback("Revive", "Hit"); UpdateHealthUi(); }
+        public void Revive(long amount) { CurrentHp = System.Math.Min(MaxHp, System.Math.Max(1L, amount)); Shield = 0; TriggerWithFallback("Revive", "Hit"); UpdateHealthTarget(); }
         public void PlayHit(bool critical) => ApplyDamage(0, critical);
-        public void PlayDeath() { CurrentHp = 0; UpdateHealthUi(); Trigger("Death"); PlayClip(deathClip); }
+        public void PlayDeath() { CurrentHp = 0; UpdateHealthTarget(); Trigger("Death"); PlayClip(deathClip); }
         public void PlayVictory() { if (!IsAlive) return; Trigger("Victory"); PlayClip(victoryClip); }
 
         private void RefreshStatusLabel()
@@ -150,14 +184,29 @@ namespace NinjaAssemble.Presentation
             else statusLabel.text = Awakened ? "AWAKENED" : string.Empty;
         }
 
-        private void UpdateHealthUi() { if (healthSlider == null) return; healthSlider.minValue = 0f; healthSlider.maxValue = 1f; healthSlider.value = MaxHp <= 0 ? 0f : Mathf.Clamp01((float)CurrentHp / MaxHp); }
-        private void UpdateRageUi()
+        private void UpdateHealthTarget() => targetHealth01 = MaxHp <= 0 ? 0f : Mathf.Clamp01((float)CurrentHp / MaxHp);
+
+        private void ConfigureSliderRanges()
         {
-            if (rageSlider == null) return;
-            rageSlider.minValue = 0f; rageSlider.maxValue = 100f; rageSlider.value = Rage;
-            if (rageSlider.targetGraphic != null) rageSlider.targetGraphic.canvasRenderer.SetAlpha(Rage >= 100 ? 1f : 0.85f);
+            if (healthSlider != null) { healthSlider.minValue = 0f; healthSlider.maxValue = 1f; }
+            if (rageSlider != null) { rageSlider.minValue = 0f; rageSlider.maxValue = 100f; }
         }
+
+        private void SnapUiToTargets()
+        {
+            UpdateHealthTarget();
+            targetRage = Rage;
+            if (healthSlider != null) healthSlider.value = targetHealth01;
+            if (rageSlider != null) rageSlider.value = targetRage;
+        }
+
         private void TriggerWithFallback(string primary, string fallback) { if (!TryTrigger(primary)) Trigger(fallback); }
+        private void TriggerWithFallback(string primary, string fallback, string finalFallback)
+        {
+            if (TryTrigger(primary)) return;
+            if (TryTrigger(fallback)) return;
+            Trigger(finalFallback);
+        }
         private bool TryTrigger(string trigger)
         {
             if (animator == null) return false;
