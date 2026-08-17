@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""M49 continuous-time combat contract gate.
+"""Continuous-time combat contract gate.
 
-Rejects turn/round timing concepts from authoritative runtime code/data while allowing unrelated prose/tests to be
-classified in the migration audit document.
+Rejects turn/round timing concepts from authoritative runtime code/data while validating the M53 canonical realtime
+engine/request names and preserving the original M49 scheduler invariants.
 """
 from __future__ import annotations
 
@@ -37,10 +37,17 @@ def main() -> int:
     if violations:
         fail("deprecated turn timing remains: " + ", ".join(violations[:20]))
 
-    engine = (ROOT / "server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java").read_text(encoding="utf-8")
+    engine_path = ROOT / "server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java"
+    request_path = ROOT / "server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java"
+    if not engine_path.exists() or not request_path.exists():
+        fail("canonical realtime engine/request files are missing")
+    engine = engine_path.read_text(encoding="utf-8")
+    request = request_path.read_text(encoding="utf-8")
     for token in ["PriorityQueue<ScheduledEvent>", "timestampMs", "maxBattleDurationMs", "attackIntervalMs", "RAGE_FULL", "RAGE_SKILL_READY"]:
         if token not in engine:
             fail(f"engine missing {token}")
+    if "record RealtimeBattleRequest" not in request or "BattleRuleset ruleset" not in request or "List<BattleUnitSeed> units" not in request:
+        fail("canonical realtime request contract is incomplete")
     if re.search(r"for\s*\([^\)]*round", engine, re.I):
         fail("authoritative round loop still present")
     if "Thread.sleep" in engine or "System.currentTimeMillis" in engine or "System.nanoTime" in engine:
@@ -59,7 +66,7 @@ def main() -> int:
         if not (ROOT / required).exists():
             fail(f"missing {required}")
 
-    print("M49_REALTIME_OK scheduler=event_queue timing=milliseconds resource=rage")
+    print("M49_REALTIME_OK scheduler=event_queue timing=milliseconds resource=rage engine=RealtimeBattleEngine")
     return 0
 
 
