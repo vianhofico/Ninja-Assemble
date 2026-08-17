@@ -43,7 +43,8 @@ namespace NinjaAssemble.Playable
         public async Task<PlayBattleDto> BattleCampaignAsync(string stageId)
         {
             if (string.IsNullOrWhiteSpace(stageId)) throw new ArgumentException("stageId is required", nameof(stageId));
-            PlayBattleDto result = await api.PlayCampaignStageAsync(PlayerId, stageId); Gold += result.goldReward; Diamond += result.diamondReward; Energy = Math.Max(0, Energy - result.energyCost);
+            PlayBattleDto result = RealtimeBattleDtoCompatibility.Promote(await api.PlayCampaignStageAsync(PlayerId, stageId));
+            Gold += result.goldReward; Diamond += result.diamondReward; Energy = Math.Max(0, Energy - result.energyCost);
             await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
         }
         public async Task RefreshCampaignAsync() { Campaign = await api.GetCampaignStagesAsync(PlayerId); if (Campaign != null) Energy = Campaign.energy; }
