@@ -29,6 +29,7 @@ class TechniqueEffectResolverTest {
             } else {
                 assertEquals(TechniqueEffectResolver.MappingStatus.RUNTIME, resolution.status());
                 assertFalse(resolution.effects().isEmpty());
+                assertTrue(resolution.effects().stream().allMatch(effect -> effect.durationTurns() == 0));
                 runtime++;
             }
         }
@@ -46,6 +47,8 @@ class TechniqueEffectResolverTest {
         var poison = resolver.resolve(catalog.technique("poison-cloud")).effects();
         assertEquals(List.of(EffectType.DAMAGE, EffectType.STATUS), poison.stream().map(it -> it.type()).toList());
         assertEquals("POISON", poison.get(1).status());
+        assertEquals(9_000L, poison.get(1).durationMs());
+        assertEquals(3_000L, poison.get(1).tickIntervalMs());
 
         var shield = resolver.resolve(catalog.technique("sand-shield")).effects();
         assertEquals(EffectType.SHIELD, shield.get(0).type());
@@ -58,7 +61,8 @@ class TechniqueEffectResolverTest {
 
         var control = resolver.resolve(catalog.technique("tsukuyomi")).effects();
         assertEquals("STUN", control.get(1).status());
-        assertEquals(2, control.get(1).durationTurns());
+        assertEquals(0, control.get(1).durationTurns());
+        assertEquals(6_000L, control.get(1).durationMs());
     }
 
     @Test
