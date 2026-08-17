@@ -1,178 +1,160 @@
-# Real-Time Combat Migration Report — M47/M48
+# Real-Time Combat Migration Report — M47–M50
 
 ## Executive summary
 
-M47 introduced the deterministic continuous-time combat foundation. M48 begins production cutover by moving campaign PvE to the real-time simulator while retaining a one-way legacy replay projection for existing Unity builds.
+M47 introduced deterministic continuous-time combat. M48 moved Campaign PvE to it. M49 moved Unity campaign playback to timestamped replay. M50 moves Arena and Shadow Arena to the same authoritative runtime and promotes their replay in Unity.
 
-The new runtime is simulation-time driven. It never sleeps, never reads the system clock and never allocates one thread/coroutine per combatant. A single priority queue advances all actors, casts and status lifecycle events deterministically.
+The simulator is driven only by simulation time: no sleeps, no system clock and no per-combatant thread/coroutine. One priority queue advances actors, casts and status lifecycle events deterministically.
 
-## Implemented in M47
+## M47 — Runtime foundation
 
-### Millisecond ability/effect timing
+Implemented canonical millisecond combat timing:
 
-`BattleAbility` owns the canonical real-time timing contract:
+- `BattleAbility.cooldownMs`
+- `BattleAbility.castTimeMs`
+- `BattleAbility.recoveryMs`
+- `SkillEffectDefinition.durationMs`
+- `SkillEffectDefinition.tickIntervalMs`
+- `RealtimeBattleRuleset.simulationTickMs`
 
-- `cooldownMs`
-- `castTimeMs`
-- `recoveryMs`
-
-`SkillEffectDefinition` now supports:
-
-- `durationMs`
-- `tickIntervalMs`
-
-Legacy constructors and `durationTurns` remain temporarily so existing content compiles during migration. Compatibility conversion is not parity-verified timing data.
-
-### Fixed real-time ruleset
-
-`RealtimeBattleRuleset` defines the fixed simulation tick, speed-to-action interval mapping, deterministic timestamp quantization, battle timeout, damage constants and temporary legacy duration bridge.
-
-The current experimental profile uses a 50 ms simulation quantum and a 180 second maximum battle duration.
-
-### Deterministic scheduler
-
-`RealtimeDeterministicBattleEngine` uses one priority queue ordered by:
+`RealtimeDeterministicBattleEngine` uses deterministic ordering:
 
 1. timestamp;
 2. scheduled-event priority;
 3. stable actor order (`TeamSide`, slot, actor id);
 4. insertion sequence.
 
-Scheduled event priority is status tick, status expiry, cast completion, then actor ready. Equal-time behavior is therefore explicit and replay-stable.
+The current scheduled priorities are status tick, status expiry, cast completion, then actor ready. Actors advance on independent speed-derived timelines. STUN/SILENCE, DOT lifecycle, stat modifiers, shield, cleanse/dispel and revive are time-based in the new engine.
 
-### Independent actor timelines and casts
+`RealtimeBattleEvent`/`RealtimeBattleResult` provide timestamped replay and final HP.
 
-Each alive combatant schedules its own `ACTION_READY` event from speed. Ability execution is split into `CAST_START` and `CAST_COMPLETE`, with cooldown and recovery measured in simulation milliseconds. `STUN` can interrupt a cast at completion and `SILENCE` forces basic attack selection while active.
+## M48 — Campaign cutover
 
-### Real-time statuses
+`PlayableBattleService` no longer executes `DeterministicBattleEngine`.
 
-The new engine stores status expiry as `expiresAtMs`. Periodic effects are scheduled independently and generation tokens invalidate stale refresh events without mutating the priority queue.
+Every campaign wave executes exactly one `RealtimeBattleRequest` through `RealtimeBattleExecutor`. Progression, reward and victory use `RealtimeBattleResult`. Campaign stars use elapsed duration rather than round count.
 
-Implemented lifecycle includes BURN / POISON / BLEED, STUN, SILENCE, stat modifiers, cleanse/dispel, shields, revive and status expiry events.
+`RealtimeBattleCompatibilityAdapter` creates a legacy `BattleResult` projection from the same authoritative replay so older Unity builds can still function without a second simulation.
 
-### Timestamped replay
+Temporary star gates are experimental only:
 
-`RealtimeBattleEvent` carries `timestampMs` plus millisecond duration metadata. The replay protocol includes `ACTION_READY`, `CAST_START`, `CAST_COMPLETE` and `STATUS_EXPIRED` in addition to damage/heal/status/VFX metadata.
-
-### Foundation tests
-
-`RealtimeDeterministicBattleEngineTest` covers replay determinism, fixed-tick timestamps, independent speed timelines, stable equal-time ordering and millisecond periodic-status lifecycle.
-
-## Implemented in M48
-
-### Canonical application request boundary
-
-`RealtimeBattleRequest` is the application-facing request model for the new simulator. `RealtimeBattleExecutor` isolates the temporary M47 bridge through legacy `BattleRequest`, so campaign application code no longer needs to know about `BattleRuleset.maxRounds`.
-
-The bridge exists only because the M47 engine overload was deliberately additive. It can be removed behind this boundary after all production callers are migrated.
-
-### Campaign PvE is authoritative real-time combat
-
-`PlayableBattleService` no longer instantiates or executes `DeterministicBattleEngine`.
-
-For every campaign wave it now:
-
-1. builds the same player/enemy `BattleUnitSeed` roster;
-2. creates `RealtimeBattleRequest` with a deterministic wave seed;
-3. executes exactly one real-time simulation;
-4. uses `RealtimeBattleResult.outcome` for wave/campaign victory;
-5. uses the real-time ruleset version in `campaign_runs`;
-6. grants campaign progress/rewards only from the real-time authoritative outcome.
-
-No second legacy simulation is run, avoiding divergent outcomes or duplicate RNG paths.
-
-### Duration-based campaign stars
-
-Campaign stars no longer depend on `BattleResult.rounds`.
-
-The temporary M48 migration gates are:
-
-- 3 stars: at most 20,000 ms per wave;
-- 2 stars: at most 40,000 ms per wave;
+- 3 stars: <= 20,000 ms per wave;
+- 2 stars: <= 40,000 ms per wave;
 - 1 star: slower successful clear.
 
-These are experimental migration values, not verified reference balance data.
+## M49 — Unity timestamp replay
 
-### Dual replay envelope for Unity compatibility
+Unity now models `timestampMs` / `durationMs`, promotes `realtimeBattle` into its existing presentation DTO and plays events according to simulation timestamp deltas.
 
-`RealtimeBattleCompatibilityAdapter` projects the authoritative timestamped replay into the existing `BattleResult` shape. It converts timestamps/durations into approximate legacy round/turn buckets strictly for presentation compatibility.
+`CAST_START` begins the animation. Equal-timestamp events execute without fabricated waits. `PlaybackSpeed` scales presentation only and does not change simulation results.
 
-`PlayableBattleService` now returns both:
+Legacy replay remains a fallback during staged migration.
 
-- `battle` — legacy projection for existing Unity clients;
-- `realtimeBattle` — authoritative timestamped result for the next Unity playback migration.
+## M50 — Competitive cutover
 
-Each wave also contains both forms. This preserves old JSON properties while allowing M49 to migrate client playback without another server endpoint change.
+### Arena
 
-### M48 tests
+`ArenaApplicationService` now executes one authoritative real-time battle.
 
-Added coverage for:
+- rating is resolved from `RealtimeBattleResult.outcome`;
+- Arena Coin reward is resolved from the same outcome;
+- audit persistence stores the real-time ruleset version and outcome;
+- response includes both legacy `battle` projection and authoritative `realtimeBattle`.
 
-- projection of timestamped events into the legacy response shape;
-- projection of millisecond durations into legacy duration buckets;
-- preservation of authoritative outcome/final HP in the projection;
-- duration-based 1/2/3-star thresholds and multi-wave scaling.
+### Shadow Arena
 
-## Compatibility strategy
+Every 5v5 squad in the best-of-three series now executes one real-time simulation.
 
-The following legacy contracts still exist globally and remain migration debt:
+- squad victory uses authoritative real-time outcome;
+- DRAW tiebreak first compares authoritative `finalHp`;
+- fallback tiebreak remains squad power then stable player seed order;
+- persisted squad audit data stores `durationMs` and `rulesetVersion` instead of legacy round count;
+- each squad response includes both compatibility `battle` and authoritative `realtimeBattle`.
 
-- `DeterministicBattleEngine` for modes not cut over yet;
+`SERIES_RULES_VERSION` is now `bo3-hp-power-tiebreak-realtime-v2`.
+
+### Unity competitive replay
+
+`RealtimeBattleDtoCompatibility` now promotes Campaign, Arena and Shadow Arena. `PlayableGameStore` applies promotion immediately after each battle API response, so all three modes reuse the existing `BattleVisualStage` / `BattleTimelinePlayer` path.
+
+## Current production-mode state
+
+| Mode | Authoritative server combat | Unity presentation |
+|---|---|---|
+| Campaign / Adventure | Real-time | Timestamped replay |
+| Arena | Real-time | Timestamped replay |
+| Shadow Arena | Real-time per squad | Timestamped replay per squad |
+
+No listed production battle mode needs the legacy engine for authoritative outcome/reward/rating after M50.
+
+## Integrity gates
+
+M47/M48 include Java unit coverage for deterministic replay, speed timelines, stable equal-time ordering, millisecond status lifecycle, compatibility projection and duration star thresholds.
+
+M49/M50 add static migration gates:
+
+- `scripts/validate-realtime-unity-replay.py`
+- `scripts/validate-realtime-competitive-cutover.py`
+- `.github/workflows/realtime-unity-replay-integrity.yml`
+- `.github/workflows/realtime-competitive-cutover.yml`
+
+The competitive gate explicitly rejects reintroduction of `DeterministicBattleEngine`, legacy `new BattleRequest(...)` or `BattleRuleset.experimentalV1()` in Arena/Shadow Arena application services.
+
+## Remaining legacy debt
+
+The migration is not complete while these contracts remain:
+
+- `DeterministicBattleEngine` source and tests;
 - `BattleRuleset.maxRounds`;
 - `BattleEvent.round`;
 - `BattleEvent.durationTurns`;
 - `BattleResult.rounds`;
 - `SkillEffectDefinition.durationTurns`;
-- `PassiveTrigger.TURN_START`;
-- the temporary request bridge inside `RealtimeBattleExecutor`;
-- the legacy Unity projection returned by campaign PvE.
+- `PassiveTrigger.TURN_START` naming/semantics bridge;
+- temporary legacy request bridge inside `RealtimeBattleExecutor`;
+- `RealtimeBattleCompatibilityAdapter` and projected round/turn fields;
+- UI copy that may still display projected rounds;
+- production skill content that relies on default/converted timings.
 
-Campaign progression/rewards no longer depend on those legacy contracts.
+## Known non-final timing values
 
-## Known non-final defaults
-
-The following values are engineering defaults until reference evidence provides measured parity values:
+The following remain engineering defaults until measured reference evidence exists:
 
 - 50 ms simulation tick;
 - speed/action-interval curve;
 - default skill cooldowns;
 - default cast/recovery times;
-- legacy-turn-to-millisecond conversion;
-- default periodic status tick interval;
-- 180 second timeout;
+- temporary 3,000 ms legacy-turn conversion;
+- default periodic status interval;
+- 180 second battle timeout;
 - campaign duration star thresholds.
 
-They must not be promoted to `VERIFIED` reference data without evidence.
+These values must not be marked `VERIFIED` without evidence.
 
 ## Next milestones
 
-### M49 — Unity real-time replay playback
-
-- introduce timestamped battle DTOs in Unity;
-- schedule presentation from `timestampMs` rather than round/sequence delay constants;
-- interpolate movement/animation between timestamps;
-- bind `CAST_START` / `CAST_COMPLETE` to technique animation and VFX;
-- keep legacy `battle` fallback during the first client rollout;
-- add pause/speed-up/replay without changing simulation results.
-
-### M50 — Arena / Shadow Arena cutover
-
-- migrate standard Arena through the same real-time executor;
-- migrate Shadow Arena after 5v5 deterministic/replay tests;
-- remove mode-level dependencies on `rounds` and round-based ranking logic;
-- preserve seeds and auditable battle records.
-
 ### M51 — Content timing cutover
 
-- author `durationMs` and `tickIntervalMs` for all production status effects;
-- author cooldown/cast/recovery timing per skill/hero version;
-- remove production dependence on legacy duration conversion;
-- extend validation to reject turn-authored production content.
+- author milliseconds for every production skill/status;
+- remove production reliance on `durationTurns` conversion and default ability timing;
+- add integrity checks requiring explicit real-time timing for production content;
+- replace temporary turn-based passive terminology where appropriate.
 
-### M52 — Legacy engine/projection removal
+### M52 — Legacy contract removal
 
-Delete turn/round contracts only when every production mode and Unity replay uses the real-time protocol and CI covers the complete cutover.
+- remove the request bridge from `RealtimeBattleExecutor`;
+- make the real-time engine accept only `RealtimeBattleRequest`;
+- remove old round engine once code search proves no production caller remains;
+- remove projected `round`, `rounds`, `durationTurns` from server/client presentation paths;
+- update UI status text to duration/time semantics.
+
+### M53 — Runtime/device validation
+
+- Unity Editor/play-mode replay tests;
+- Android device replay/performance evidence;
+- deterministic replay capture across server and Unity presentation;
+- tune animation timing and speed controls without changing authoritative simulation.
 
 ## Release impact
 
-M47/M48 improve combat architecture and move campaign PvE onto the new runtime, but they do not remove the existing production-art, reference-evidence or Android device-validation release blockers. Real-time timing defaults also remain experimental until backed by measured reference evidence.
+M47–M50 substantially complete the architecture cutover for authoritative combat and replay, but they do not remove release blockers around production art, measured reference/parity evidence and Android device validation. Timing defaults remain experimental until those evidence gates are satisfied.
