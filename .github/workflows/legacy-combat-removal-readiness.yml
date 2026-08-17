@@ -1,0 +1,32 @@
+name: Legacy Combat Removal Readiness
+
+on:
+  pull_request:
+    paths:
+      - 'server/src/main/java/com/ninjaassemble/battle/sim/**'
+      - 'server/src/main/java/com/ninjaassemble/play/**'
+      - 'server/src/main/java/com/ninjaassemble/pvp/**'
+      - 'server/src/test/java/com/ninjaassemble/battle/sim/**'
+      - 'scripts/validate-ability-protocol.py'
+      - 'scripts/validate-passive-lifecycle.py'
+      - 'scripts/validate-structured-effects.py'
+      - 'scripts/validate-legacy-combat-removal-readiness.py'
+      - '.github/workflows/legacy-combat-removal-readiness.yml'
+  workflow_dispatch:
+
+jobs:
+  removal-readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate ability protocol on realtime runtime
+        run: python scripts/validate-ability-protocol.py
+      - name: Validate passive lifecycle on realtime runtime
+        run: python scripts/validate-passive-lifecycle.py
+      - name: Validate structured effects on realtime runtime
+        run: python scripts/validate-structured-effects.py
+      - name: Verify legacy engine has no production or validator consumers
+        run: python scripts/validate-legacy-combat-removal-readiness.py
