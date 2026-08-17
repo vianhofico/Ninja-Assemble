@@ -18,7 +18,7 @@ class PassiveLifecycleBattleTest {
         BattleUnitSeed owner = unit("owner", TeamSide.A, 0, 10_000, 20, 1_000, List.of(passive));
         BattleUnitSeed enemy = unit("enemy", TeamSide.B, 0, 10_000, 20, 1_000, List.of());
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(101L, rules(4_000), List.of(owner, enemy)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(101L, rules(4_000), List.of(owner, enemy)));
         BattleEvent trigger = result.events().stream().filter(it -> it.type() == BattleEventType.PASSIVE_TRIGGER).findFirst().orElseThrow();
         BattleEvent rage = result.events().stream().filter(it -> it.type() == BattleEventType.RAGE_GAIN && "start-rage".equals(it.abilityId())).findFirst().orElseThrow();
         assertEquals(0L, trigger.timestampMs());
@@ -34,7 +34,7 @@ class PassiveLifecycleBattleTest {
         BattleUnitSeed ally = unit("ally", TeamSide.A, 1, 500, 1, 700, List.of());
         BattleUnitSeed enemy = unit("enemy", TeamSide.B, 0, 20_000, 50, 2_000, List.of());
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(102L, rules(7_000), List.of(owner, ally, enemy)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(102L, rules(7_000), List.of(owner, ally, enemy)));
         List<Long> triggers = result.events().stream().filter(it -> it.type() == BattleEventType.PASSIVE_TRIGGER && "periodic-heal".equals(it.abilityId()))
                 .map(BattleEvent::timestampMs).toList();
         assertTrue(triggers.contains(3_000L));
@@ -48,7 +48,7 @@ class PassiveLifecycleBattleTest {
         BattleUnitSeed defender = unit("defender", TeamSide.A, 0, 10_000, 10, 900, List.of(passive));
         BattleUnitSeed attacker = unit("attacker", TeamSide.B, 0, 10_000, 60, 1_200, List.of());
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(103L, rules(5_000), List.of(defender, attacker)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(103L, rules(5_000), List.of(defender, attacker)));
         BattleEvent trigger = result.events().stream().filter(it -> it.type() == BattleEventType.PASSIVE_TRIGGER && "react-rage".equals(it.abilityId())).findFirst().orElseThrow();
         BattleEvent rage = result.events().stream().filter(it -> it.type() == BattleEventType.RAGE_GAIN && "react-rage".equals(it.abilityId())).findFirst().orElseThrow();
         assertEquals("AFTER_DAMAGE_TAKEN", trigger.triggerId());
@@ -62,7 +62,7 @@ class PassiveLifecycleBattleTest {
         BattleUnitSeed owner = unit("owner", TeamSide.A, 0, 100, 20, 700, List.of(passive));
         BattleUnitSeed enemy = unit("enemy", TeamSide.B, 0, 10_000, 70, 1_500, List.of());
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(104L, rules(8_000), List.of(owner, enemy)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(104L, rules(8_000), List.of(owner, enemy)));
         long triggers = result.events().stream().filter(it -> it.type() == BattleEventType.PASSIVE_TRIGGER && "low-heal".equals(it.abilityId())).count();
         assertEquals(1L, triggers);
         assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.HEAL && "low-heal".equals(it.abilityId())));
@@ -76,7 +76,7 @@ class PassiveLifecycleBattleTest {
         BattleUnitSeed survivor = unit("survivor", TeamSide.A, 1, 10_000, 20, 700, List.of(passive));
         BattleUnitSeed enemy = unit("enemy", TeamSide.B, 0, 10_000, 100, 2_000, List.of());
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(105L, rules(6_000), List.of(victim, survivor, enemy)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(105L, rules(6_000), List.of(victim, survivor, enemy)));
         BattleEvent trigger = result.events().stream().filter(it -> it.type() == BattleEventType.PASSIVE_TRIGGER && "ally-ko-buff".equals(it.abilityId())).findFirst().orElseThrow();
         assertEquals("survivor", trigger.actorId());
         assertEquals("ALLY_KO", trigger.triggerId());

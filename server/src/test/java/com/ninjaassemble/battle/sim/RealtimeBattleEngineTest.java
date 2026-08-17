@@ -8,13 +8,13 @@ import com.ninjaassemble.battle.domain.DamageChannel;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class DeterministicBattleEngineTest {
+class RealtimeBattleEngineTest {
     @Test
     void sameSeedProducesIdenticalTimestampedTimeline() {
-        BattleRequest request = new BattleRequest(77L, BattleRuleset.experimentalV1(), List.of(
+        RealtimeBattleRequest request = new RealtimeBattleRequest(77L, BattleRuleset.experimentalV1(), List.of(
                 unit("a", TeamSide.A, 0, 20_000, 300, 1_200),
                 unit("b", TeamSide.B, 0, 20_000, 300, 1_000)));
-        DeterministicBattleEngine engine = new DeterministicBattleEngine();
+        RealtimeBattleEngine engine = new RealtimeBattleEngine();
         BattleResult first = engine.simulate(request);
         BattleResult second = engine.simulate(request);
         assertEquals(first.outcome(), second.outcome());
@@ -28,7 +28,7 @@ class DeterministicBattleEngineTest {
     void speedChangesIndependentActionFrequency() {
         BattleRuleset shortFight = new BattleRuleset("speed-test", 0, 1_000, 0, 8_000,
                 1_000, 1_500, 400, 3_000, 15, 100, 50);
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(88L, shortFight, List.of(
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(88L, shortFight, List.of(
                 unit("fast", TeamSide.A, 0, 1_000_000, 1, 1_500),
                 unit("slow", TeamSide.A, 1, 1_000_000, 1, 750),
                 unit("dummy", TeamSide.B, 0, 1_000_000, 1, 1_000))));
@@ -42,7 +42,7 @@ class DeterministicBattleEngineTest {
     void rageCapsAtOneHundredAndUnlocksSignatureRageSkill() {
         BattleRuleset rules = new BattleRuleset("rage-test", 0, 1_000, 0, 20_000,
                 1_000, 800, 300, 2_000, 20, 100, 50);
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(99L, rules, List.of(
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(99L, rules, List.of(
                 unit("hero", TeamSide.A, 0, 1_000_000, 1, 1_000),
                 unit("dummy", TeamSide.B, 0, 1_000_000, 1, 1_000))));
         assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.RAGE_FULL && "hero".equals(it.actorId())));
@@ -54,7 +54,7 @@ class DeterministicBattleEngineTest {
     void equalTimestampActionsUseStableActorOrdering() {
         BattleRuleset rules = new BattleRuleset("tie-test", 0, 1_000, 0, 2_000,
                 1_000, 1_000, 400, 2_000, 15, 100, 50);
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(100L, rules, List.of(
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(100L, rules, List.of(
                 unit("alpha", TeamSide.A, 0, 100_000, 1, 1_000),
                 unit("beta", TeamSide.B, 0, 100_000, 1, 1_000))));
         List<BattleEvent> ready = result.events().stream().filter(it -> it.type() == BattleEventType.ACTION_READY && it.timestampMs() == 1_000).toList();

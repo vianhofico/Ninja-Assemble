@@ -20,7 +20,7 @@ class StructuredBattleEffectsTest {
         BattleUnitSeed enemyFront = unit("enemy-front", TeamSide.B, 0, 10_000, 100, 900, null);
         BattleUnitSeed enemyRear = unit("enemy-rear", TeamSide.B, 1, 10_000, 100, 800, null);
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(11L, shortRules(5_000), List.of(actor, enemyFront, enemyRear)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(11L, shortRules(5_000), List.of(actor, enemyFront, enemyRear)));
         long firstHitAt = result.events().stream().filter(it -> it.type() == BattleEventType.DAMAGE && "actor".equals(it.actorId())).mapToLong(BattleEvent::timestampMs).min().orElseThrow();
         List<BattleEvent> area = result.events().stream().filter(it -> it.timestampMs() == firstHitAt && it.type() == BattleEventType.DAMAGE && "actor".equals(it.actorId())).toList();
         assertEquals(List.of("enemy-front", "enemy-rear"), area.stream().map(BattleEvent::targetId).toList());
@@ -35,7 +35,7 @@ class StructuredBattleEffectsTest {
         BattleUnitSeed controller = unitWithPassives("controller", TeamSide.A, 0, 20_000, 10, 1_000, List.of(stunAtStart));
         BattleUnitSeed target = unit("target", TeamSide.B, 0, 20_000, 10, 1_000, null);
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(12L, shortRules(7_000), List.of(controller, target)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(12L, shortRules(7_000), List.of(controller, target)));
         BattleEvent applied = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_APPLIED && "STUN".equals(it.statusId())).findFirst().orElseThrow();
         BattleEvent blocked = result.events().stream().filter(it -> it.type() == BattleEventType.ACTION_BLOCKED && "target".equals(it.actorId())).findFirst().orElseThrow();
         BattleEvent expired = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_EXPIRED && "STUN".equals(it.statusId())).findFirst().orElseThrow();
@@ -54,7 +54,7 @@ class StructuredBattleEffectsTest {
         BattleUnitSeed caster = unitWithPassives("caster", TeamSide.A, 0, 50_000, 10, 1_000, List.of(burnAtStart));
         BattleUnitSeed target = unit("target", TeamSide.B, 0, 50_000, 10, 500, null);
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(13L, shortRules(5_000), List.of(caster, target)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(13L, shortRules(5_000), List.of(caster, target)));
         BattleEvent applied = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_APPLIED && "BURN".equals(it.statusId())).findFirst().orElseThrow();
         List<Long> ticks = result.events().stream().filter(it -> it.type() == BattleEventType.STATUS_TICK && "BURN".equals(it.statusId()))
                 .map(BattleEvent::timestampMs).filter(it -> it <= applied.timestampMs() + 3_000).toList();
@@ -75,7 +75,7 @@ class StructuredBattleEffectsTest {
         BattleUnitSeed healer = unit("healer", TeamSide.A, 1, 5_000, 10, 1_000, set(healAndRevive));
         BattleUnitSeed enemy = unit("enemy", TeamSide.B, 0, 5_000, 100, 2_000, set(lethal));
 
-        BattleResult result = new DeterministicBattleEngine().simulate(new BattleRequest(14L, shortRules(8_000), List.of(fallen, healer, enemy)));
+        BattleResult result = new RealtimeBattleEngine().simulate(new RealtimeBattleRequest(14L, shortRules(8_000), List.of(fallen, healer, enemy)));
         assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.KO && "fallen".equals(it.targetId())));
         assertTrue(result.events().stream().anyMatch(it -> it.type() == BattleEventType.REVIVE && "fallen".equals(it.targetId())));
     }

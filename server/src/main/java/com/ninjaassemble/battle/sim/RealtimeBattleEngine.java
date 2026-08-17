@@ -6,7 +6,6 @@ import com.ninjaassemble.hero.domain.SkillEffectDefinition;
 import com.ninjaassemble.hero.domain.TargetSelector;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -23,13 +22,12 @@ import java.util.Set;
  * simulator advances directly to the next scheduled logical event. "Simultaneous" combat is represented by one
  * stable priority queue, not by Java threads.</p>
  */
-public final class DeterministicBattleEngine {
+public final class RealtimeBattleEngine {
     private static final int MAX_RAGE = 100;
     private static final Set<String> DOT_STATUSES = Set.of("BURN", "POISON", "BLEED");
     private static final Set<String> NEGATIVE_STATUSES = Set.of("STUN", "SILENCE", "BURN", "POISON", "BLEED", "ATK_DOWN", "DEF_DOWN", "SPEED_DOWN");
-    private static final Set<String> POSITIVE_STATUSES = Set.of("ATK_UP", "DEF_UP", "SPEED_UP");
 
-    public BattleResult simulate(BattleRequest request) {
+    public BattleResult simulate(RealtimeBattleRequest request) {
         if (request == null || request.ruleset() == null || request.units() == null || request.units().isEmpty()) {
             throw new IllegalArgumentException("battle request/ruleset/units required");
         }

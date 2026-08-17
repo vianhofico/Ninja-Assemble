@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate structured effects after M49 real-time migration."""
+"""Validate structured effects on the canonical realtime combat engine."""
 from __future__ import annotations
 
 import csv
@@ -21,13 +21,14 @@ def main() -> int:
             "DAMAGE", "HEAL", "RAGE", "STATUS", "CLEANSE", "DISPEL", "REVIVE", "SHIELD")
     require("server/src/main/java/com/ninjaassemble/hero/domain/SkillEffectDefinition.java",
             "long durationMs", "long tickIntervalMs", "durationMs < 0", "tickIntervalMs < 0")
-    require("server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java",
             "PriorityQueue<ScheduledEvent>", "STATUS_TICK", "STATUS_EXPIRE", "hasStatus(\"STUN\"", "hasStatus(\"SILENCE\"")
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java",
+            "record RealtimeBattleRequest")
     require("client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs", "STATUS_TICK")
 
     with DATA.open(encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
-        fields = handle.seek(0)  # no-op: keeps linter quiet in minimal script
     if not rows:
         raise SystemExit("STRUCTURED_EFFECTS_INVALID no technique effects")
     required = {"duration_ms", "tick_interval_ms", "effect_type", "status_id"}
@@ -47,7 +48,7 @@ def main() -> int:
             raise SystemExit(f"STRUCTURED_EFFECTS_INVALID DOT without tick interval {row['technique_id']}:{status}")
         if interval > 0 and duration <= 0:
             raise SystemExit(f"STRUCTURED_EFFECTS_INVALID periodic effect without duration {row['technique_id']}")
-    print(f"STRUCTURED_EFFECTS_OK rows={len(rows)} timing=milliseconds")
+    print(f"STRUCTURED_EFFECTS_OK rows={len(rows)} timing=milliseconds engine=RealtimeBattleEngine")
     return 0
 
 

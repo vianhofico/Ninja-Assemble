@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static contract checks for M49 continuous-time ability/Rage playback."""
+"""Static contract checks for continuous-time ability/Rage playback."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,11 +19,13 @@ def main() -> int:
             "rageDelta", "cooldownMs", "castTimeMs", "recoveryMs")
     require("server/src/main/java/com/ninjaassemble/battle/sim/BattleUnitSeed.java",
             "BattleAbilitySet abilities", "BattleAbilitySet.basicOnly")
-    require("server/src/main/java/com/ninjaassemble/battle/sim/DeterministicBattleEngine.java",
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java",
+            "record RealtimeBattleRequest", "BattleRuleset ruleset", "List<BattleUnitSeed> units")
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java",
             "PriorityQueue<ScheduledEvent>", "chooseAbility", "RAGE_FULL", "RAGE_SKILL_READY", "attackIntervalMs")
     require("server/src/main/java/com/ninjaassemble/play/domain/ExperimentalAbilityProfile.java",
             "ReferenceProfiles.ABILITY_CYCLE", "BattleAbilityKind.RAGE_SKILL", "22_000", "-100")
-    require("server/src/test/java/com/ninjaassemble/battle/sim/DeterministicBattleEngineTest.java",
+    require("server/src/test/java/com/ninjaassemble/battle/sim/RealtimeBattleEngineTest.java",
             "rageCapsAtOneHundredAndUnlocksSignatureRageSkill", "speedChangesIndependentActionFrequency")
     require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
             "timestampMs", "abilityId", "abilityKind", "effectKey", "rageAfter", "durationMs")
@@ -31,7 +33,7 @@ def main() -> int:
             "SetPlaybackSpeed", "Time.unscaledDeltaTime", "SetRage(item.RageAfter)")
     require("game-data/combat/rage-rules.csv", "max_rage", "rage_skill_cost", "100")
     require("game-data/reference/balance-profiles.csv", "experimental-ability-cycle-v1,ABILITY_CYCLE,EXPERIMENTAL")
-    print("ABILITY_PROTOCOL_OK runtime=continuous_time rage=0..100 signature=RAGE_SKILL")
+    print("ABILITY_PROTOCOL_OK runtime=continuous_time engine=RealtimeBattleEngine request=RealtimeBattleRequest rage=0..100")
     return 0
 
 

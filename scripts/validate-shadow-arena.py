@@ -17,9 +17,12 @@ def main() -> int:
             "SHADOW_SQUAD_SIZE = 5", "SHADOW_SQUAD_COUNT = 3", "SHADOW_ROSTER_SIZE", "SHADOW_WINS_REQUIRED = 2")
     require("server/src/main/resources/db/migration/V5__pvp_arena.sql",
             "shadow_arena_profiles", "shadow_arena_battles", "roster_snapshot jsonb", "squad_results jsonb")
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java",
+            "Authoritative deterministic continuous-time auto-combat simulation", "PriorityQueue<ScheduledEvent>")
+    require("server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleRequest.java", "record RealtimeBattleRequest")
     require("server/src/main/java/com/ninjaassemble/pvp/application/ShadowArenaApplicationService.java",
             "BattleRules.SHADOW_ROSTER_SIZE", "new ShadowArenaRosterSnapshot", "ShadowArenaMatchResolver",
-            "bo3-hp-power-realtime-v2", "BattleRuleset.experimentalV1()", "durationMs()",
+            "bo3-hp-power-realtime-v2", "RealtimeBattleEngine", "RealtimeBattleRequest", "BattleRuleset.experimentalV1()", "durationMs()",
             "TOTAL_HP", "SQUAD_POWER", "Currency.SHADOW_COIN",
             "training ? 0", "shadow_arena_profiles", "shadow_arena_battles", "cast(? as jsonb)")
     require("server/src/main/java/com/ninjaassemble/play/api/PlayableGameController.java",
@@ -35,7 +38,7 @@ def main() -> int:
     require("client-unity/Assets/Scripts/Game/UI/MobileVerticalSliceController.cs",
             "ScreenId.ShadowArena", "BuildShadowArena", "PresentShadowArenaBattle", "NEED {shadow.missingCount} NINJA",
             "rating/reward unchanged")
-    print("PLAYABLE_SHADOW_ARENA_OK eligibility=15 squads=3x5 wins=2 training_fallback=yes tiebreak=hp>power combat=realtime")
+    print("PLAYABLE_SHADOW_ARENA_OK eligibility=15 squads=3x5 wins=2 tiebreak=hp>power combat=RealtimeBattleEngine")
     return 0
 
 
