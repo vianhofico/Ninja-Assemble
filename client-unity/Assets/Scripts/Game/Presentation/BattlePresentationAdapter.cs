@@ -12,7 +12,7 @@ namespace NinjaAssemble.Presentation
             var result = new List<BattlePresentationEvent>();
             if (battle.events == null) return result;
 
-            Array.Sort(battle.events, (a, b) => a.sequence.CompareTo(b.sequence));
+            Array.Sort(battle.events, CompareEvents);
             foreach (BattleEventDto item in battle.events)
             {
                 if (item == null) continue;
@@ -21,6 +21,7 @@ namespace NinjaAssemble.Presentation
                     Sequence = item.sequence,
                     Type = item.type ?? string.Empty,
                     Round = item.round,
+                    TimestampMs = item.timestampMs,
                     ActorId = item.actorId ?? string.Empty,
                     TargetId = item.targetId ?? string.Empty,
                     Amount = item.amount,
@@ -32,10 +33,25 @@ namespace NinjaAssemble.Presentation
                     EffectType = item.effectType ?? string.Empty,
                     StatusId = item.statusId ?? string.Empty,
                     DurationTurns = item.durationTurns,
-                    TriggerId = item.triggerId ?? string.Empty
+                    DurationMs = item.durationMs,
+                    TriggerId = item.triggerId ?? string.Empty,
+                    IsRealtime = battle.realtime || item.realtime
                 });
             }
             return result;
+        }
+
+        private static int CompareEvents(BattleEventDto left, BattleEventDto right)
+        {
+            if (ReferenceEquals(left, right)) return 0;
+            if (left == null) return 1;
+            if (right == null) return -1;
+            if (left.realtime || right.realtime)
+            {
+                int timestamp = left.timestampMs.CompareTo(right.timestampMs);
+                if (timestamp != 0) return timestamp;
+            }
+            return left.sequence.CompareTo(right.sequence);
         }
     }
 }
