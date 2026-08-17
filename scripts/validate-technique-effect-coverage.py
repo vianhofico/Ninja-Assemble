@@ -11,6 +11,7 @@ LIBRARIES = [ROOT / f"game-data/skills/technique-library-0{i}.csv" for i in rang
 OVERRIDES = ROOT / "game-data/skills/technique-effects.csv"
 RESOLVER = ROOT / "server/src/main/java/com/ninjaassemble/play/domain/TechniqueEffectResolver.java"
 TEST = ROOT / "server/src/test/java/com/ninjaassemble/play/domain/TechniqueEffectResolverTest.java"
+BASELINE_TECHNIQUE_COUNT = 120
 
 
 def main() -> int:
@@ -22,8 +23,12 @@ def main() -> int:
                 if technique_id in techniques:
                     raise SystemExit(f"duplicate technique id: {technique_id}")
                 techniques[technique_id] = row
-    if len(techniques) != 120:
-        raise SystemExit(f"expected 120 technique definitions, got {len(techniques)}")
+    # The catalog is allowed to grow after M47/M50.  The coverage contract is
+    # set-based, not tied forever to the original 120-technique seed.
+    if len(techniques) < BASELINE_TECHNIQUE_COUNT:
+        raise SystemExit(
+            f"technique catalog regressed below baseline {BASELINE_TECHNIQUE_COUNT}: got {len(techniques)}"
+        )
 
     grouped: dict[str, list[int]] = defaultdict(list)
     with OVERRIDES.open(encoding="utf-8", newline="") as handle:
@@ -68,7 +73,10 @@ def main() -> int:
 
     executable = sum(1 for row in techniques.values() if row["kind"] != "PASSIVE")
     passive = len(techniques) - executable
-    print(f"TECHNIQUE_EFFECT_COVERAGE_OK techniques={len(techniques)} executable={executable} passive_deferred={passive} curated={len(grouped)} timing=milliseconds")
+    print(
+        f"TECHNIQUE_EFFECT_COVERAGE_OK techniques={len(techniques)} baseline={BASELINE_TECHNIQUE_COUNT} "
+        f"executable={executable} passive_deferred={passive} curated={len(grouped)} timing=milliseconds"
+    )
     return 0
 
 
