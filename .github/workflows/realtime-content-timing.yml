@@ -1,0 +1,22 @@
+name: Realtime Content Timing
+
+on:
+  pull_request:
+    paths:
+      - 'game-data/skills/**'
+      - 'server/src/main/java/com/ninjaassemble/hero/domain/SkillEffectDefinition.java'
+      - 'server/src/main/java/com/ninjaassemble/play/domain/**'
+      - 'server/src/main/java/com/ninjaassemble/battle/sim/BattleAbility.java'
+      - 'scripts/validate-realtime-content-timing.py'
+      - '.github/workflows/realtime-content-timing.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-realtime-content-timing.py
