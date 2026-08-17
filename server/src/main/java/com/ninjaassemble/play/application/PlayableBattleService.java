@@ -1,11 +1,11 @@
 package com.ninjaassemble.play.application;
 
 import com.ninjaassemble.battle.sim.BattleOutcome;
-import com.ninjaassemble.battle.sim.BattleRequest;
 import com.ninjaassemble.battle.sim.BattleResult;
 import com.ninjaassemble.battle.sim.BattleRuleset;
 import com.ninjaassemble.battle.sim.BattleUnitSeed;
-import com.ninjaassemble.battle.sim.DeterministicBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleEngine;
+import com.ninjaassemble.battle.sim.RealtimeBattleRequest;
 import com.ninjaassemble.battle.sim.TeamSide;
 import com.ninjaassemble.campaign.application.CampaignEnemyTeamService;
 import com.ninjaassemble.campaign.application.CampaignProgressService;
@@ -51,7 +51,7 @@ public class PlayableBattleService {
     private final JdbcTemplate jdbc;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
-    private final DeterministicBattleEngine engine = new DeterministicBattleEngine();
+    private final RealtimeBattleEngine engine = new RealtimeBattleEngine();
 
     public PlayableBattleService(PlayerService players, FormationService formations, EnergyService energy,
                                  ExperimentalCombatStatsResolver stats, CampaignStageFlowService stageFlow,
@@ -101,7 +101,7 @@ public class PlayableBattleService {
                         unit.id(), enemy.characterId(), enemy.displayName(), enemy.variant(), enemy.level(),
                         unit.side(), unit.slot(), unit.maxHp()));
             }
-            BattleResult waveBattle = engine.simulate(new BattleRequest(waveSeed, ruleset, units));
+            BattleResult waveBattle = engine.simulate(new RealtimeBattleRequest(waveSeed, ruleset, units));
             totalDurationMs = Math.addExact(totalDurationMs, waveBattle.durationMs());
             waveResults.add(new CampaignWaveResult(wave.index(), waveSeed, List.copyOf(participants), waveBattle));
             if (waveBattle.outcome() != BattleOutcome.TEAM_A) break;
