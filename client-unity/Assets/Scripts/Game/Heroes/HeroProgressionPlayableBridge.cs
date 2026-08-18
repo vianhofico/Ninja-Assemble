@@ -65,18 +65,18 @@ namespace NinjaAssemble.Heroes
         private async void AdvanceFrame()
         {
             OwnedHeroDto hero = SelectedHero;
-            if (hero == null || store == null) return;
+            if (hero == null || store == null || service == null) return;
             try
             {
                 SetStatus("Advancing " + hero.displayName + " frame...");
                 if (MobileGameBootstrap.IsOffline)
                 {
-                    long goldCost = Math.Max(1000, hero.level * 500L);
-                    if (store.Gold < goldCost) throw new InvalidOperationException("Not enough Gold");
                     string next = NextFrame(hero.frameTier);
                     hero.frameTier = next;
-                    SetBackingField(store, "Gold", Math.Max(0, store.Gold - goldCost));
-                    SetStatus($"{hero.displayName} • {next} • -{goldCost:N0} Gold • OFFLINE TEST");
+                    string[] formationIds = (store.Formation?.heroes ?? Array.Empty<OwnedHeroDto>()).Select(value => value.id).ToArray();
+                    if (formationIds.Length == 5) await service.SaveFormationAsync(store.PlayerId, formationIds);
+                    await RefreshHeroes();
+                    SetStatus($"{hero.displayName} • {next} • OFFLINE TEST (no economy charge)");
                     return;
                 }
 
@@ -143,6 +143,7 @@ namespace NinjaAssemble.Heroes
                 case "BLUE": return "PURPLE";
                 case "PURPLE": return "ORANGE";
                 case "ORANGE": return "RED";
+                case "RED": return "RED";
                 default: return "BLUE";
             }
         }
