@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.ninja-assemble/schema/m75-e2e-run-v1.json",
+  "title": "M75E2ERunEvidence",
+  "type": "object",
+  "required": ["schemaVersion","commitSha","environment","startedAt","finishedAt","result","journeySteps","reliabilityCases","artifacts"],
+  "properties": {
+    "schemaVersion": {"const": "m75-e2e-run-v1"},
+    "commitSha": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "environment": {"type":"string","minLength":1},
+    "startedAt": {"type":"string","format":"date-time"},
+    "finishedAt": {"type":"string","format":"date-time"},
+    "result": {"enum":["PASS","FAIL"]},
+    "journeySteps": {
+      "type":"array","minItems":20,
+      "items":{"type":"object","required":["id","result"],"properties":{"id":{"type":"string"},"result":{"enum":["PASS","FAIL"]},"notes":{"type":"string"}},"additionalProperties":false}
+    },
+    "reliabilityCases": {
+      "type":"array","minItems":10,
+      "items":{"type":"object","required":["id","result"],"properties":{"id":{"type":"string"},"result":{"enum":["PASS","FAIL"]},"notes":{"type":"string"}},"additionalProperties":false}
+    },
+    "artifacts": {
+      "type":"object",
+      "required":["serverLogs","testReport","databaseMigrationLog"],
+      "properties":{"serverLogs":{"type":"string","minLength":1},"testReport":{"type":"string","minLength":1},"databaseMigrationLog":{"type":"string","minLength":1},"unityReport":{"type":"string"}},
+      "additionalProperties":false
+    }
+  },
+  "additionalProperties":false
+}
