@@ -1,13 +1,13 @@
 # Mobile Release Status
 
-Current runtime checkpoint: **M53 — canonical deterministic realtime/Rage combat contracts on `main`.**  
+Current runtime checkpoint: **M54 — playable-quality battle presentation integrated on top of canonical M53 realtime/Rage combat.**  
 Current completion-governance checkpoint: **M56 — authoritative completion roadmap and merge policy.**
 
 Immediate integration queue:
 
-1. **M54 / PR #72** — playable-quality battle HUD, impact feedback and Rage Skill presentation.
-2. **M55 / PR #73** — Android Development APK + signed Release AAB pipeline. M55 currently depends on M54 and must be refreshed against `main` after M54 merges.
-3. After M54/M55 integration, continue M57+ from the newest `main` following `docs/100-PERCENT-COMPLETION-PLAN.md`.
+1. **M55** — rebuild the Android Development APK + signed Release AAB pipeline from the newest `main`, validate CI, then merge.
+2. **M57** — modernize realtime/Rage reference-evidence schemas and harden release gates.
+3. Continue M58+ from the newest `main` following `docs/100-PERCENT-COMPLETION-PLAN.md`.
 
 The old M17–M22 checkpoint text is no longer the source of truth.
 
@@ -28,6 +28,7 @@ The old M17–M22 checkpoint text is no longer the source of truth.
 | Full production Campaign | vertical-slice content | 100% frozen stage census | BLOCKED |
 | Resource PvE modes | foundations/partial | 100% frozen PvE census | BLOCKED |
 | Arena/Shadow combat | realtime foundations | complete seasonal/meta/UI loop | PARTIAL |
+| Battle presentation | M54 HUD/feedback/Rage cinematic foundation | production hero-specific presentation | FOUNDATION PASS |
 | Production mobile UI screens | functional shell/partial | 100% release navigation graph | BLOCKED |
 | Full new-account -> late-game E2E | not complete | PASS | BLOCKED |
 | Passing Android device evidence | 0 | >=2 devices and >=2 classes | BLOCKED |
@@ -59,8 +60,8 @@ The old M17–M22 checkpoint text is no longer the source of truth.
 - Realtime replay consumption.
 - Hero Version/Awakening presentation identity.
 - Art/Addressables package contracts and development fallbacks.
-- M54 battle presentation work prepared in PR #72.
-- M55 Android build automation work prepared in PR #73.
+- M54 Pause/Resume, 1x/2x/4x playback, smooth HP/Rage presentation, impact feedback and Rage Skill cinematic foundation.
+- M55 Android build automation remains the next integration milestone and must be rebuilt from the newest `main`.
 
 ### Validation foundation
 
@@ -112,7 +113,7 @@ Planned: M75.
 
 ### 7. Real Android release proof
 
-CI code is being prepared, but release requires real artifacts and physical-device evidence. GitHub Actions billing/runner availability, Unity licensing credentials and release signing secrets are external dependencies that cannot be replaced by fabricated evidence.
+Release requires real artifacts and physical-device evidence. GitHub Actions billing/runner availability, Unity licensing credentials and release signing secrets are external dependencies that cannot be replaced by fabricated evidence.
 
 Planned: M55, M76 and M77.
 
@@ -150,11 +151,12 @@ latest main
  -> one milestone branch
  -> implementation + validation
  -> PR to main
+ -> required CI green on the exact head SHA
  -> merge
  -> next milestone from the new main
 ```
 
-Do not repeat a long-lived stacked milestone chain. Current M54 -> M55 is the last accepted temporary dependency and must be normalized after M54 merges.
+Do not repeat a long-lived stacked milestone chain. M55 must be normalized onto `main` after M54 lands.
 
 ---
 
@@ -167,7 +169,6 @@ High-level sequence:
 ```text
 M54 battle presentation
  -> M55 Android build lane
- -> M56 completion baseline
  -> M57 evidence schema/gates
  -> M58-M60 full skill completion
  -> M61-M65 full gameplay/content loops
