@@ -18,6 +18,8 @@ jobs:
         run: |
           bash scripts/validate-core.sh
           mvn -B -f server/pom.xml test
+      - name: Require evidence-backed reference profiles
+        run: python scripts/validate-reference-evidence.py
       - name: Require full release readiness
         run: python scripts/validate-release-readiness.py --release
       - name: Require all hero art packages READY
@@ -26,3 +28,5 @@ jobs:
         run: python scripts/validate-production-assets.py
       - name: Require real Android device evidence
         run: python scripts/validate-mobile-release-evidence.py --release
+      - name: Enforce aggregate release audit
+        run: python scripts/release-audit.py --enforce

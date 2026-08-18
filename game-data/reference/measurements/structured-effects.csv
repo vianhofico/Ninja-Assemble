@@ -1,1 +1,1 @@
-measurement_id,profile_id,context_key,ability_id,effect_index,effect_type,target_selector,status_id,duration_turns,expected_amount,observed_amount,evidence_ref,observed_at,notes
+measurement_id,profile_id,context_key,ability_id,effect_index,effect_type,target_selector,status_id,duration_ms,tick_interval_ms,expected_amount,observed_amount,evidence_ref,observed_at,notes

@@ -1,0 +1,1 @@
+measurement_id,profile_id,context_key,character_id,variant,ability_id,event_type,attack_interval_ms,cast_time_ms,recovery_ms,cooldown_ms,battle_elapsed_ms,evidence_ref,observed_at,notes

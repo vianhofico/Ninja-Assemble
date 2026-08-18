@@ -1,1 +1,1 @@
-measurement_id,profile_id,context_key,character_id,variant,ability_id,ability_kind,energy_before,energy_after,coefficient_bps,evidence_ref,observed_at,notes
+measurement_id,profile_id,context_key,character_id,variant,ability_id,ability_kind,rage_before,rage_after,coefficient_bps,cooldown_ms,cast_time_ms,recovery_ms,evidence_ref,observed_at,notes
