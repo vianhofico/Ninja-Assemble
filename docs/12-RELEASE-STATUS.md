@@ -1,12 +1,13 @@
 # Mobile Release Status
 
-Current merged checkpoint: **M53 — canonical deterministic realtime/Rage combat contracts on `main`.**
+Current runtime checkpoint: **M53 — canonical deterministic realtime/Rage combat contracts on `main`.**  
+Current completion-governance checkpoint: **M56 — authoritative completion roadmap and merge policy.**
 
 Immediate integration queue:
 
 1. **M54 / PR #72** — playable-quality battle HUD, impact feedback and Rage Skill presentation.
 2. **M55 / PR #73** — Android Development APK + signed Release AAB pipeline. M55 currently depends on M54 and must be refreshed against `main` after M54 merges.
-3. **M56+** — execute `docs/100-PERCENT-COMPLETION-PLAN.md` milestone by milestone, merging each completed milestone into `main` before starting the next independent milestone.
+3. After M54/M55 integration, continue M57+ from the newest `main` following `docs/100-PERCENT-COMPLETION-PLAN.md`.
 
 The old M17–M22 checkpoint text is no longer the source of truth.
 
