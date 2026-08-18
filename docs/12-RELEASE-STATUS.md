@@ -1,20 +1,15 @@
 # Mobile Release Status
 
-Current implementation checkpoint: **M57 — realtime/Rage reference schema and evidence-gate hardening.**  
-Current completion-governance checkpoint: **M56 — authoritative completion roadmap and merge policy.**
+Current implementation checkpoint: **M58 — full-roster skill identity/editorial audit gate.**
 
-Merged foundations:
+Merged implementation foundations:
 
-- **M54** — playable-quality battle presentation.
-- **M55** — reproducible Android build pipeline implementation; real APK/AAB execution remains unverified while Actions/Unity credentials are unavailable.
-- **M57** — canonical realtime/Rage measurement schemas and production evidence gates.
+- **M54** playable-quality battle presentation.
+- **M55** Android build pipeline implementation (artifact execution still externally unverified).
+- **M57** canonical realtime/Rage reference schemas and evidence gates.
+- **M58** full-roster skill identity/canon/editorial audit + production enforcement gate.
 
-Immediate queue:
-
-1. **M58** — full Hero Version skill identity/canon/editorial review.
-2. **M59** — executable mechanics and realtime timing review.
-3. **M60** — balance/presentation review.
-4. Continue M61+ from the newest `main` per `docs/100-PERCENT-COMPLETION-PLAN.md`.
+Immediate queue: **M59 mechanics/realtime timing → M60 balance/presentation → M61+ gameplay/content** from the newest `main`.
 
 ---
 
@@ -22,103 +17,58 @@ Immediate queue:
 
 | Area / gate | Current | Release target | State |
 |---|---:|---:|---|
-| Base/reference characters | 189 | >=180 | PASS foundation |
-| Collectible Hero Versions | 194 | frozen release roster | PASS structure |
-| Base skill slots | 970 (=194×5) | 100% final reviewed | STRUCTURE PASS / REVIEW BLOCKED |
-| Awakening Skills | 60 | 100% final reviewed | STRUCTURE PASS / REVIEW BLOCKED |
-| Playable/reference variant census | 427 | frozen release presentation census | PASS census |
-| Production art packages fully READY | 0 / 427 | 427 / 427 | BLOCKED |
+| Hero Versions | 194 | 194 | STRUCTURE PASS |
+| Base skill slots | 970 | 970 reviewed | STRUCTURE PASS / IDENTITY REVIEW BLOCKED |
+| Awakening Skills | 60 | 60 reviewed | STRUCTURE PASS / IDENTITY REVIEW BLOCKED |
 | Reference/balance profiles VERIFIED | 0 / 10 | 10 / 10 | SCHEMA PASS / EVIDENCE BLOCKED |
-| Realtime timing corpus | schema defined, 0 measured rows | threshold-backed VERIFIED | EVIDENCE BLOCKED |
-| Rage rules corpus | schema defined, 0 measured rows | threshold-backed VERIFIED | EVIDENCE BLOCKED |
-| Battle presentation | M54 foundation merged | production hero-specific presentation | FOUNDATION PASS |
-| Android build pipeline | M55 merged | reproducible artifact proof | IMPLEMENTED / EXECUTION UNVERIFIED |
-| Passing Android device evidence | 0 | >=2 devices and >=2 classes | BLOCKED |
-| Full production Campaign | vertical-slice content | frozen production census | BLOCKED |
-| Resource PvE modes | foundations/partial | frozen production census | BLOCKED |
-| Arena/Shadow combat | realtime foundations | complete seasonal/meta/UI loop | PARTIAL |
+| Production art packages fully READY | 0 / 427 | 427 / 427 | BLOCKED |
+| Battle presentation | M54 merged | production hero-specific presentation | FOUNDATION PASS |
+| Android build pipeline | M55 merged | real reproducible artifact proof | IMPLEMENTED / EXECUTION UNVERIFIED |
+| Passing physical Android device evidence | 0 | >=2 devices / >=2 classes | BLOCKED |
+| Production gameplay/content | foundations/partial | full release vertical slices | BLOCKED |
 | Production mobile UI | functional shell/partial | full release navigation graph | BLOCKED |
 | Full fresh-account -> late-game E2E | not complete | PASS | BLOCKED |
-| `release-audit.py --enforce` | intentionally fails until evidence/art/device gates pass | PASS | BLOCKED |
 
-`READY`, `VERIFIED`, `PARITY_PASS`, artifact PASS and device PASS are evidence states. They must never be inferred from implementation progress.
+`READY_DESIGN`, `READY`, `VERIFIED`, `PARITY_PASS`, artifact PASS and device PASS are evidence/review states, never aliases for “code exists”.
 
 ---
 
-## M57 evidence truth
+## M58 identity truth
 
-M57 removes stale turn/energy terminology from release measurement schemas:
+The repository structurally covers 194 Hero Versions × 5 normal skills plus 60 sixth Awakening Skills, but many entries are deliberate M47/M50 design seeds rather than final canon review.
 
-- `energy_before/energy_after` -> `rage_before/rage_after`;
-- `duration_turns` -> `duration_ms/tick_interval_ms`;
-- dedicated `REALTIME_TIMING` corpus;
-- dedicated `RAGE_RULES` corpus.
+`validate-m58-skill-identity.py` now audits the entire generated catalog and production `--enforce` requires:
 
-All 10 balance profiles remain `EXPERIMENTAL`, and the new corpora start header-only. Current VERIFIED count remains **0 / 10**.
+- 970 / 970 reviewed base identities;
+- 194 / 194 fully reviewed Hero Versions;
+- 60 / 60 reviewed Awakening identities;
+- zero exact duplicate full kits among reviewed versions;
+- complete EN/VI/canon/editorial fields without research-debt markers.
 
-The evidence validator now maps every release category to a concrete corpus/schema, rejects legacy fields and placeholder confidence debt in promoted evidence, and enforces sample/context/evidence-ref thresholds for VERIFIED profiles.
-
-The production release workflow now runs both `validate-reference-evidence.py` and `release-audit.py --enforce`; false status promotion cannot satisfy the production gate by itself.
+Existing `RESEARCH_REQUIRED`, `UNREVIEWED`, `UNRESOLVED_EXPLICIT_DESIGN`, and equivalent debt remains visible and blocks release. M58 integration does not mass-promote structural candidates.
 
 ---
 
 ## Remaining release blockers
 
-### Skill completion — M58–M60
-Final identity/editorial, mechanics/timing, balance and presentation review for the full release roster.
-
-### Gameplay/content — M61–M65
-Complete Campaign, resource PvE, competitive, progression and economy/live-loop vertical slices.
-
-### Production UI — M66–M68
-Final mobile UX, state handling, safe-area/aspect and complete interactions.
-
-### Production art — M69–M73
-Real repository-backed portrait/icon/chibi/animation/VFX/SFX/regression packages; current fully READY count is 0 / 427.
-
-### Evidence/parity — M74
-Real measurements must satisfy all final profile thresholds; M57 only makes the gate enforceable.
-
-### E2E/reliability — M75
-Fresh-account -> late-game E2E plus persistence/migration/concurrency/idempotency regression proof.
-
-### Device/release certification — M76–M77
-Real artifacts, physical-device evidence, signing proof, performance and final release audit remain non-bypassable hard gates.
+1. **M58 content debt:** complete actual canon/editorial review for every unresolved base and Awakening identity.
+2. **M59–M60:** explicit deterministic mechanics, realtime timing, balance and presentation review.
+3. **M61–M65:** full Campaign/PvE/PvP/progression/economy/live vertical slices.
+4. **M66–M68:** production mobile UX.
+5. **M69–M73:** real production art/animation/VFX/SFX packages; current fully READY = 0/427.
+6. **M74:** real parity/balance evidence; current VERIFIED = 0/10.
+7. **M75:** full E2E/reliability evidence.
+8. **M76–M77:** real Android artifact/device/performance/signing/release proof.
 
 ---
 
 ## Merge workflow
 
 ```text
-latest main
- -> one milestone branch
- -> implementation + available validation
- -> final diff review
- -> check CI
+latest main -> milestone branch -> implementation/audit -> final diff -> check CI
  -> fix real failures
- -> if a non-release job cannot allocate a runner, document the outage and use policy §6 only when equivalent validation is genuine
- -> squash merge
- -> next milestone from new main
+ -> non-release runner outage: document + policy §6 exception when equivalent validation is genuine
+ -> squash merge -> next milestone from new main
 ```
 
-Release-certification evidence cannot use the outage exception.
-
----
-
-## Roadmap
-
-```text
-M54 [MERGED]
- -> M55 [MERGED]
- -> M57 [INTEGRATION]
- -> M58-M60 skills
- -> M61-M65 gameplay/content
- -> M66-M68 mobile UI
- -> M69-M73 production art
- -> M74 parity/balance
- -> M75 E2E/reliability
- -> M76 device certification
- -> M77 release candidate
-```
-
-Desktop remains gated behind M77 mobile release certification.
+Production release evidence gates cannot use the outage exception.
