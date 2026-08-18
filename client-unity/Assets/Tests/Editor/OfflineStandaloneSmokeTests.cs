@@ -11,6 +11,7 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace NinjaAssemble.Tests.Editor
@@ -114,18 +115,27 @@ namespace NinjaAssemble.Tests.Editor
 
             foreach (EditorBuildSettingsScene buildScene in scenes)
             {
-                EditorSceneManager.OpenScene(buildScene.path, OpenSceneMode.Single);
+                Scene openedScene = EditorSceneManager.OpenScene(buildScene.path, OpenSceneMode.Single);
+                Assert.IsTrue(openedScene.IsValid() && openedScene.isLoaded, "Generated scene did not load: " + buildScene.path);
+
+                GameObject[] roots = openedScene.GetRootGameObjects();
                 if (buildScene.path.EndsWith("/Bootstrap.unity", StringComparison.OrdinalIgnoreCase))
                 {
-                    MobileGameBootstrap bootstrap = UnityEngine.Object.FindObjectOfType<MobileGameBootstrap>();
-                    Assert.IsNotNull(bootstrap, "Bootstrap scene must contain MobileGameBootstrap.");
+                    MobileGameBootstrap[] bootstraps = roots
+                        .SelectMany(root => root.GetComponentsInChildren<MobileGameBootstrap>(true))
+                        .ToArray();
+                    Assert.AreEqual(1, bootstraps.Length, "Bootstrap scene must contain exactly one MobileGameBootstrap.");
                     FieldInfo mode = typeof(MobileGameBootstrap).GetField("runtimeMode", BindingFlags.Instance | BindingFlags.NonPublic);
-                    Assert.AreEqual(MobileRuntimeMode.OfflinePlaytest, mode.GetValue(bootstrap));
+                    Assert.IsNotNull(mode, "MobileGameBootstrap runtimeMode field is missing.");
+                    Assert.AreEqual(MobileRuntimeMode.OfflinePlaytest, mode.GetValue(bootstraps[0]));
                     continue;
                 }
 
-                MobileVerticalSliceController controller = UnityEngine.Object.FindObjectOfType<MobileVerticalSliceController>();
-                Assert.IsNotNull(controller, "Missing MobileVerticalSliceController in " + buildScene.path);
+                MobileVerticalSliceController[] controllers = roots
+                    .SelectMany(root => root.GetComponentsInChildren<MobileVerticalSliceController>(true))
+                    .ToArray();
+                Assert.AreEqual(1, controllers.Length, "Expected exactly one MobileVerticalSliceController in " + buildScene.path);
+                MobileVerticalSliceController controller = controllers[0];
                 AssertField<TMP_Text>(controller, "resourceText", buildScene.path);
                 AssertField<TMP_Text>(controller, "bodyText", buildScene.path);
                 AssertField<TMP_Text>(controller, "statusText", buildScene.path);
