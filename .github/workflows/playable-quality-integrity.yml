@@ -1,0 +1,68 @@
+name: Playable Quality Integrity
+
+on:
+  pull_request:
+    paths:
+      - 'client-unity/Assets/Scripts/Game/Presentation/**'
+      - 'client-unity/Assets/Tests/Editor/**'
+      - 'scripts/validate-playable-quality.py'
+      - 'scripts/validate-battle-visual-stage.py'
+      - '.github/workflows/playable-quality-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  static-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate M54 playable quality contract
+        run: python scripts/validate-playable-quality.py
+      - name: Validate runtime visual-stage compatibility
+        run: python scripts/validate-battle-visual-stage.py
+
+  unity-editmode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require Unity CI credentials
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          test -n "$UNITY_LICENSE" || { echo "::error::UNITY_LICENSE secret is required"; exit 1; }
+          test -n "$UNITY_EMAIL" || { echo "::error::UNITY_EMAIL secret is required"; exit 1; }
+          test -n "$UNITY_PASSWORD" || { echo "::error::UNITY_PASSWORD secret is required"; exit 1; }
+
+      - name: Compile and run Unity EditMode tests
+        id: unity-tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          testMode: EditMode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: M54 Unity EditMode
+          artifactsPath: artifacts/m54-editmode
+
+      - name: Upload Unity test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m54-unity-editmode-${{ github.run_number }}
+          path: artifacts/m54-editmode
+          if-no-files-found: ignore
+          retention-days: 14
