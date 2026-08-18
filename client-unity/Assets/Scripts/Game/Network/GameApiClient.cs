@@ -23,7 +23,13 @@ namespace NinjaAssemble.Network
             if (!string.IsNullOrWhiteSpace(variant)) path += "?variant=" + Escape(variant);
             return GetAsync<HeroKitDto>(path);
         }
-        public Task<PlayerDto> LoginGuestAsync(string guestKey, string displayName) => PostJsonAsync<PlayerDto>("/api/v1/players/guest", JsonUtility.ToJson(new GuestLoginRequest { guestKey = guestKey, displayName = displayName }));
+        public async Task<PlayerDto> LoginGuestAsync(string guestKey, string displayName)
+        {
+            PlayerDto player = await PostJsonAsync<PlayerDto>("/api/v1/players/guest", JsonUtility.ToJson(new GuestLoginRequest { guestKey = guestKey, displayName = displayName }));
+            ApiAuthSession.Set(player?.sessionToken);
+            if (player == null || !ApiAuthSession.HasToken) throw new InvalidOperationException("Guest login did not return a signed player session token");
+            return player;
+        }
         public Task<BootstrapDto> BootstrapAsync(string playerId) => PostJsonAsync<BootstrapDto>($"/api/v1/play/{Escape(playerId)}/bootstrap", "{}");
         public Task<OwnedHeroDto[]> GetOwnedHeroesAsync(string playerId) => GetArrayAsync<OwnedHeroDto>($"/api/v1/play/{Escape(playerId)}/heroes");
         public Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds) => PutJsonAsync<FormationDto>($"/api/v1/play/{Escape(playerId)}/formation", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
@@ -67,7 +73,12 @@ namespace NinjaAssemble.Network
         private Task<T> PostJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPOST, json);
         private Task<T> PutJsonAsync<T>(string path, string json) => SendJsonAsync<T>(path, UnityWebRequest.kHttpVerbPUT, json);
         private async Task<T> SendJsonAsync<T>(string path, string method, string json) { using UnityWebRequest request = new UnityWebRequest(baseUrl + path, method); request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json)); request.downloadHandler = new DownloadHandlerBuffer(); request.SetRequestHeader("Content-Type", "application/json"); await Send(request); return JsonUtility.FromJson<T>(request.downloadHandler.text); }
-        private static async Task Send(UnityWebRequest request) { UnityWebRequestAsyncOperation operation = request.SendWebRequest(); while (!operation.isDone) await Task.Yield(); if (request.result != UnityWebRequest.Result.Success) throw new InvalidOperationException($"HTTP {(long)request.responseCode}: {request.error} :: {request.downloadHandler?.text}"); }
+        private static async Task Send(UnityWebRequest request)
+        {
+            if (ApiAuthSession.HasToken) request.SetRequestHeader("Authorization", "Bearer " + ApiAuthSession.BearerToken);
+            UnityWebRequestAsyncOperation operation = request.SendWebRequest(); while (!operation.isDone) await Task.Yield();
+            if (request.result != UnityWebRequest.Result.Success) throw new InvalidOperationException($"HTTP {(long)request.responseCode}: {request.error} :: {request.downloadHandler?.text}");
+        }
         private static string Escape(string value) => UnityWebRequest.EscapeURL(value ?? string.Empty);
     }
 }

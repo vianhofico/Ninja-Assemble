@@ -1,3 +1,4 @@
+using NinjaAssemble.Settings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,13 +37,13 @@ namespace NinjaAssemble.UI.Production
             TMP_Text eyebrow=ProductionUiFactory.Text(stack.transform,"Eyebrow",spec.Eyebrow,17f,TextAlignmentOptions.Left,ProductionUiTokens.Accent);SetHeight(eyebrow.gameObject,34f);
             TMP_Text title=ProductionUiFactory.Text(stack.transform,"ProductionTitle",spec.Title,38f,TextAlignmentOptions.Left,ProductionUiTokens.Text);title.fontStyle=FontStyles.Bold;SetHeight(title.gameObject,56f);
             TMP_Text subtitle=ProductionUiFactory.Text(stack.transform,"Subtitle",spec.Subtitle,20f,TextAlignmentOptions.Left,ProductionUiTokens.Muted);SetHeight(subtitle.gameObject,60f);
-            Image card=ProductionUiFactory.Panel(stack.transform,"LiveStateCard",ProductionUiTokens.SurfaceRaised);LayoutElement cardLayout=card.gameObject.AddComponent<LayoutElement>();cardLayout.flexibleHeight=1f;cardLayout.minHeight=270f;
+            Image card=ProductionUiFactory.Panel(stack.transform,"LiveStateCard",ProductionUiTokens.SurfaceRaised);LayoutElement cardLayout=card.gameObject.AddComponent<LayoutElement>();cardLayout.flexibleHeight=1f;cardLayout.minHeight=220f;
             TMP_Text body=ProductionUiFactory.Text(card.transform,"LiveBody","Loading live state...",23f,TextAlignmentOptions.TopLeft,ProductionUiTokens.Text);RectTransform bodyRect=body.rectTransform;ProductionUiFactory.Anchor(bodyRect,new Vector2(.035f,.20f),new Vector2(.965f,.94f));
             TMP_Text status=ProductionUiFactory.Text(card.transform,"LiveStatus",string.Empty,18f,TextAlignmentOptions.BottomLeft,ProductionUiTokens.Muted);RectTransform statusRect=status.rectTransform;ProductionUiFactory.Anchor(statusRect,new Vector2(.035f,.035f),new Vector2(.72f,.20f));
             Button action=ProductionUiFactory.Button(stack.transform,"ProductionPrimaryAction",spec.ActionLabel,null,220f);TMP_Text actionLabel=action.transform.Find("Label")?.GetComponent<TMP_Text>();SetHeight(action.gameObject,ProductionUiTokens.TouchMin+8f);
 
             MobileScreenRoot root=safe.GetComponent<MobileScreenRoot>();ScreenId id=root!=null?root.ScreenId:ScreenId.Home;
-            if(id==ScreenId.ResourcePve||id==ScreenId.Progression)
+            if(id==ScreenId.ResourcePve||id==ScreenId.Progression||id==ScreenId.Settings)
             {
                 var binding=panel.gameObject.AddComponent<ProductionLiveFeatureBinding>();binding.Configure(id,body,status,action,actionLabel);
             }
@@ -50,6 +51,7 @@ namespace NinjaAssemble.UI.Production
             {
                 var binding=panel.gameObject.AddComponent<ProductionLegacyScreenBinding>();binding.Configure(sourceBody,sourceStatus,sourceButton,sourceAction,body,status,action,actionLabel);
             }
+            AccessibilityPreferences.ApplyTextScale();
             legacy.gameObject.SetActive(false);
         }
 

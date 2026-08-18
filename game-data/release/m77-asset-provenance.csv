@@ -1,0 +1,7 @@
+scope,asset_or_ip,origin,license_or_rights_ref,release_status,notes
+source_code,Ninja Assemble repository,INTERNAL_ORIGINAL,repository-history,READY,Repository-authored code remains subject to dependency licenses
+unity_packages,Unity Package dependencies,THIRD_PARTY,client-unity/Packages/manifest.json,PENDING_REVIEW,Dependency notices/licenses must be collected for store release
+spring_dependencies,Spring Boot and JVM dependencies,THIRD_PARTY,server/pom.xml,PENDING_REVIEW,Dependency notices/licenses must be collected for distribution
+character_ip,Naruto-derived character names identities and techniques,THIRD_PARTY_IP,,RIGHTS_NOT_DOCUMENTED,Public/commercial release requires documented rights or replacement with original IP
+hero_art,Production hero portraits icons chibi VFX audio,PROJECT_ASSETS,art/manifests/hero-art-manifest.csv,PENDING_EVIDENCE,Each READY package needs repository-backed provenance/review evidence
+music_voice,Music voice and long-form audio,PROJECT_ASSETS,,PENDING_EVIDENCE,No release asset may ship without source/license provenance

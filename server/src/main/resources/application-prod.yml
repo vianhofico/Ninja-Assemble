@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN:2}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:10000}
+      validation-timeout: ${DB_VALIDATION_TIMEOUT_MS:5000}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      timeout: ${REDIS_TIMEOUT:2s}
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+
+server:
+  shutdown: graceful
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+game:
+  auth:
+    session-secret: ${GAME_SESSION_SECRET}
+    session-ttl-seconds: ${GAME_SESSION_TTL_SECONDS:2592000}
+  release:
+    rate-limit:
+      guest-per-minute: ${RATE_LIMIT_GUEST_PER_MINUTE:20}
+      read-per-minute: ${RATE_LIMIT_READ_PER_MINUTE:300}
+      write-per-minute: ${RATE_LIMIT_WRITE_PER_MINUTE:120}
