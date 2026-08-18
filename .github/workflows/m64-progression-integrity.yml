@@ -1,0 +1,22 @@
+name: m64-progression-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/progression/**'
+      - 'server/src/main/java/com/ninjaassemble/progression/**'
+      - 'server/src/main/resources/db/migration/V17__advanced_progression.sql'
+      - 'client-unity/Assets/Scripts/Game/Progression/**'
+      - 'scripts/validate-m64-progression.py'
+      - '.github/workflows/m64-progression-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-progression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m64-progression.py
