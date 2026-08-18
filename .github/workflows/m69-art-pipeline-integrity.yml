@@ -1,0 +1,26 @@
+name: m69-art-pipeline-integrity
+
+on:
+  pull_request:
+    paths:
+      - 'art/**'
+      - 'scripts/generate-art-batch-plan.py'
+      - 'scripts/validate-m69-art-pipeline.py'
+      - 'scripts/validate-art-packages.py'
+      - '.github/workflows/m69-art-pipeline-integrity.yml'
+      - 'docs/art/**'
+      - 'docs/release/M69_STATUS.md'
+  workflow_dispatch:
+
+jobs:
+  validate-art-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate M69 production art contract
+        run: python scripts/validate-m69-art-pipeline.py
+      - name: Validate hero art package state
+        run: python scripts/validate-art-packages.py

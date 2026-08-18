@@ -1,0 +1,32 @@
+{
+  "contractVersion": "m69-art-package-v2",
+  "censusTarget": 427,
+  "batchCount": 43,
+  "batchSize": 10,
+  "lastBatchSize": 7,
+  "statusFlow": ["TODO", "CONCEPT", "IN_PROGRESS", "REVIEW", "READY"],
+  "requiredComponents": [
+    "portrait",
+    "icon",
+    "chibiPrefab",
+    "animationSet",
+    "vfxSet",
+    "sfxSet",
+    "regressionCapture",
+    "reviewEvidence"
+  ],
+  "addressablePrefixes": {
+    "portrait": "heroes/{characterId}/{variantSlug}/portrait",
+    "icon": "heroes/{characterId}/{variantSlug}/icon",
+    "chibiPrefab": "heroes/{characterId}/{variantSlug}/prefab",
+    "animationSet": "animations/{characterId}/{variantSlug}",
+    "vfxSet": "vfx/{characterId}/{variantSlug}",
+    "sfxSet": "sfx/{characterId}/{variantSlug}",
+    "regressionCapture": "regression/heroes/{characterId}/{variantSlug}"
+  },
+  "requiredAnimatorStates": ["Idle", "Move", "Attack", "Hit", "KO", "Skill", "RageSkill"],
+  "requiredVfxChannels": ["basicHit", "skill", "rageSkill", "status", "ko"],
+  "requiredSfxChannels": ["attack", "hit", "skill", "rageSkill", "ko"],
+  "requiredReviewEvidence": ["portraitCapture", "battleCapture", "addressablesAudit", "performanceAudit"],
+  "readyRule": "READY is valid only when every required component is READY and every referenced repository file/evidence artifact exists. Never infer READY from a manifest label alone."
+}

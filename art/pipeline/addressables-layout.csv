@@ -1,0 +1,8 @@
+component,address_pattern,label,required_extension,notes
+portrait,heroes/{characterId}/{variantSlug}/portrait,hero-portrait,.png,Transparent bust/full portrait export
+icon,heroes/{characterId}/{variantSlug}/icon,hero-icon,.png,Square roster/summon icon
+chibiPrefab,heroes/{characterId}/{variantSlug}/prefab,hero-prefab,.prefab,Runtime chibi prefab root
+animationSet,animations/{characterId}/{variantSlug},hero-animation,.controller,Animator controller plus clips
+vfxSet,vfx/{characterId}/{variantSlug},hero-vfx,.prefab,VFX prefab collection
+sfxSet,sfx/{characterId}/{variantSlug},hero-sfx,.asset,Audio mapping asset
+regressionCapture,regression/heroes/{characterId}/{variantSlug},hero-regression,.png,Reference capture used by review gate

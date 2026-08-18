@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.ninja-assemble/schema/art-review-evidence-v1.json",
+  "title": "HeroArtReviewEvidence",
+  "type": "object",
+  "required": ["characterId", "variant", "reviewer", "reviewedAt", "captures", "addressablesAudit", "performanceAudit", "result"],
+  "properties": {
+    "characterId": {"type": "string", "minLength": 1},
+    "variant": {"type": "string", "minLength": 1},
+    "reviewer": {"type": "string", "minLength": 1},
+    "reviewedAt": {"type": "string", "format": "date-time"},
+    "captures": {
+      "type": "object",
+      "required": ["portrait", "battle"],
+      "properties": {
+        "portrait": {"type": "string", "minLength": 1},
+        "battle": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "addressablesAudit": {"type": "string", "minLength": 1},
+    "performanceAudit": {"type": "string", "minLength": 1},
+    "result": {"enum": ["PASS", "FAIL"]},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

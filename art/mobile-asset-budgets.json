@@ -1,0 +1,28 @@
+{
+  "budgetVersion": "m69-v1",
+  "sourceOfTruth": "art/pipeline/performance-budgets.csv",
+  "texture": {
+    "portraitMaxDimension": 2048,
+    "iconMaxDimension": 512,
+    "chibiTextureMaxDimension": 2048,
+    "compression": "platform-mobile"
+  },
+  "runtime": {
+    "maxMaterialsPerHero": 4,
+    "maxSkinnedMeshRenderersPerHero": 4,
+    "maxBonesPerHero": 128,
+    "maxPrefabRuntimeObjects": 160
+  },
+  "vfx": {
+    "maxParticleSystemsPerRageSkill": 12,
+    "maxPeakParticlesPerRageSkill": 500
+  },
+  "audio": {
+    "maxSkillClipSeconds": 12
+  },
+  "release": {
+    "requiresRegressionCapture": true,
+    "requiresHumanReviewEvidence": true,
+    "readyMayNotUseFallbackAssets": true
+  }
+}
