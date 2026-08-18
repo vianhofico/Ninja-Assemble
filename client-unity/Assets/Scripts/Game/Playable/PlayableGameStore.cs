@@ -7,7 +7,7 @@ namespace NinjaAssemble.Playable
 {
     public sealed class PlayableGameStore
     {
-        private readonly GameApiClient api;
+        private readonly IPlayableGameService api;
         public string PlayerId { get; private set; }
         public OwnedHeroDto[] Heroes { get; private set; } = Array.Empty<OwnedHeroDto>();
         public FormationDto Formation { get; private set; }
@@ -33,7 +33,7 @@ namespace NinjaAssemble.Playable
         public QuestDto ClaimableQuest => Quests?.quests?.FirstOrDefault(quest => quest.claimable);
         public MailDto ClaimableMail => Mail?.mails?.FirstOrDefault(mail => !mail.claimed && (mail.attachments?.Length ?? 0) > 0);
 
-        public PlayableGameStore(GameApiClient api) => this.api = api ?? throw new ArgumentNullException(nameof(api));
+        public PlayableGameStore(IPlayableGameService api) => this.api = api ?? throw new ArgumentNullException(nameof(api));
 
         public async Task LoginAndBootstrapAsync(string guestKey, string displayName)
         {
