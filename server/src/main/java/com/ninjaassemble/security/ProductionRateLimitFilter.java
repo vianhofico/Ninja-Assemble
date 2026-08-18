@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @Profile("prod")
-@Order(Ordered.HIGHEST_PRECEDENCE + 30)
+@Order(Ordered.HIGHEST_PRECEDENCE + 15)
 public final class ProductionRateLimitFilter extends OncePerRequestFilter {
     private final StringRedisTemplate redis;
     private final int readLimit;
