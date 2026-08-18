@@ -29,7 +29,7 @@ def main() -> int:
     require(timeline,
             "BattlePlaybackHud", "BattleImpactFeedback", "EnsurePlayableQualityLayer",
             "speed != 1 && speed != 2 && speed != 4", "SetPresentationRate", "CurrentTimestampMs",
-            "paused = false")
+            "paused = false", "CurrentTimestampMs = 0")
     require(actor,
             "SetPresentationRate", "RageSkill", "rageSkillClip", "Mathf.MoveTowards",
             "targetHealth01", "targetRage", "presentationPaused", "if (presentationPaused) return;")
@@ -44,7 +44,7 @@ def main() -> int:
             "TimestampMs = item.timestampMs", "RageAfter = item.rageAfter", "DurationMs = item.durationMs")
     require(unity_tests,
             "PlaybackSpeed_AcceptsOnlyOneTwoAndFour", "PauseState_IsExplicitAndReversible",
-            "NewPlayback_ResetsPauseAndTimestamp", "Assert.Throws<ArgumentOutOfRangeException>")
+            "Assert.Throws<ArgumentOutOfRangeException>")
     require(workflow,
             "game-ci/unity-test-runner@v4", "testMode: EditMode", "projectPath: client-unity",
             "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD", "actions/upload-artifact@v4")
