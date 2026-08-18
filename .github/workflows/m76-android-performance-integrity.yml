@@ -1,0 +1,25 @@
+name: m76-android-performance-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/release/m76-device-profiles.json'
+      - 'game-data/release/mobile-device-evidence.csv'
+      - 'game-data/release/evidence/m76/**'
+      - 'client-unity/Assets/Scripts/Game/Performance/**'
+      - 'scripts/validate-mobile-release-evidence.py'
+      - 'scripts/validate-m76-android-performance.py'
+      - 'scripts/validate-android-build.py'
+      - '.github/workflows/m76-android-performance-integrity.yml'
+      - '.github/workflows/production-release-gate.yml'
+      - 'docs/verification/M76_ANDROID_PERFORMANCE_DEVICE.md'
+      - 'docs/release/M76_STATUS.md'
+jobs:
+  validate-android-performance-framework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate M76 performance/device framework
+        run: python scripts/validate-m76-android-performance.py
