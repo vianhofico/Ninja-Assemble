@@ -17,6 +17,7 @@ namespace NinjaAssemble.Playable
             for (int i = 0; i < heroes.Length; i++)
             {
                 string slug = Names[i].ToLowerInvariant().Replace(' ', '-');
+                bool awakeningFixture = i < 3;
                 heroes[i] = new OwnedHeroDto
                 {
                     id = "offline-hero-" + (i + 1),
@@ -27,6 +28,8 @@ namespace NinjaAssemble.Playable
                     exp = 0,
                     frameTier = i < 5 ? "PURPLE" : "BLUE",
                     awakened = false,
+                    awakeningId = awakeningFixture ? "offline-awakening-" + slug : string.Empty,
+                    awakeningName = awakeningFixture ? "Offline Awakening Test" : string.Empty,
                     currentVariant = "BASE",
                     awakeningLevel = 0
                 };
