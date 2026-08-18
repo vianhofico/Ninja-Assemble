@@ -1,0 +1,10 @@
+feature_id,implementation_milestone,validator,evidence_status,notes
+campaign,M61,scripts/validate-m61-campaign.py,PENDING_EVIDENCE,Production implementation exists; parity requires measured/reference evidence
+resource_pve,M62,scripts/validate-m62-resource-pve.py,PENDING_EVIDENCE,Nine release modes implemented; parity not inferred from implementation
+arena_shadow_arena,M63,scripts/validate-m63-competitive.py,PENDING_EVIDENCE,Competitive meta-loop implemented; rating/reward parity still evidence-bound
+progression,M64,scripts/validate-m64-progression.py,PENDING_EVIDENCE,Product configuration implemented; source parity not claimed
+economy_live,M65,scripts/validate-m65-economy-live.py,PENDING_EVIDENCE,Economy/live contracts implemented; price/rate parity not claimed
+mobile_ui_core,M67,scripts/validate-m67-core-screens.py,PENDING_EVIDENCE,Core production screens implemented; visual parity requires review evidence
+mobile_ui_live,M68,scripts/validate-m68-live-screens.py,PENDING_EVIDENCE,Live/social screens implemented; visual parity requires review evidence
+art_pipeline,M69,scripts/validate-m69-art-pipeline.py,PENDING_EVIDENCE,Pipeline frozen; package readiness belongs to M70-M73
+art_batches,M73,scripts/validate-m73-art-batches.py,PENDING_EVIDENCE,All 427 packages assigned; readiness remains evidence-driven
