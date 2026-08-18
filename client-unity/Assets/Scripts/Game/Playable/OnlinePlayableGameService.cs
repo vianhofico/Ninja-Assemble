@@ -11,6 +11,8 @@ namespace NinjaAssemble.Playable
         public Task<BootstrapDto> BootstrapAsync(string playerId) => client.BootstrapAsync(playerId);
         public Task<OwnedHeroDto[]> GetOwnedHeroesAsync(string playerId) => client.GetOwnedHeroesAsync(playerId);
         public Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds) => client.SaveFormationAsync(playerId, heroIds);
+        public Task<AwakeningViewDto> GetAwakeningAsync(string playerId, string playerHeroId) => client.GetAwakeningAsync(playerId, playerHeroId);
+        public Task<AwakeningViewDto> AwakenAsync(string playerId, string playerHeroId) => client.AwakenAsync(playerId, playerHeroId);
         public Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId) => client.GetCampaignStagesAsync(playerId);
         public Task<PlayBattleDto> PlayCampaignStageAsync(string playerId, string stageId) => client.PlayCampaignStageAsync(playerId, stageId);
         public Task<CampaignSweepDto> SweepCampaignStageAsync(string playerId, string stageId, string requestId) => client.SweepCampaignStageAsync(playerId, stageId, requestId);
