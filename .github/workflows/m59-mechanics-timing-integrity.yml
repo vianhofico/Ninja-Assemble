@@ -1,0 +1,23 @@
+name: m59-mechanics-timing-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/skills/**'
+      - 'server/src/main/java/com/ninjaassemble/play/**'
+      - 'server/src/test/java/com/ninjaassemble/play/**'
+      - 'scripts/validate-m59-mechanics.py'
+      - 'scripts/validate-technique-effect-coverage.py'
+      - '.github/workflows/m59-mechanics-timing-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-mechanics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit full-roster realtime mechanics state
+        run: python scripts/validate-m59-mechanics.py
