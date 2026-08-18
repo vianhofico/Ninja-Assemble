@@ -12,34 +12,59 @@ namespace NinjaAssemble.Presentation
         private Coroutine playback;
         private int playbackSpeed = 1;
         private bool paused;
+        private BattlePlaybackHud playbackHud;
+        private BattleImpactFeedback impactFeedback;
 
         public event Action<BattlePresentationEvent> EventPresented;
         public event Action PlaybackCompleted;
         public bool IsPlaying => playback != null;
         public int PlaybackSpeed => playbackSpeed;
         public bool IsPaused => paused;
+        public long CurrentTimestampMs { get; private set; }
 
         public void Register(BattleActorView actor)
         {
             if (actor == null || string.IsNullOrWhiteSpace(actor.BattleUnitId)) return;
             actors[actor.BattleUnitId] = actor;
+            actor.SetPresentationRate(playbackSpeed, paused);
         }
         public bool TryGetActor(string battleUnitId, out BattleActorView actor) => actors.TryGetValue(battleUnitId ?? string.Empty, out actor);
         public void ClearActors() => actors.Clear();
 
         public void SetPlaybackSpeed(int speed)
         {
-            if (speed != 1 && speed != 2 && speed != 3) throw new ArgumentOutOfRangeException(nameof(speed), "Battle playback supports 1x, 2x or 3x");
+            if (speed != 1 && speed != 2 && speed != 4) throw new ArgumentOutOfRangeException(nameof(speed), "Battle playback supports 1x, 2x or 4x");
             playbackSpeed = speed;
+            RefreshActorPresentationRates();
         }
-        public void SetPaused(bool value) => paused = value;
+
+        public void SetPaused(bool value)
+        {
+            paused = value;
+            RefreshActorPresentationRates();
+        }
 
         public Coroutine Play(IReadOnlyList<BattlePresentationEvent> events)
         {
             if (events == null) throw new ArgumentNullException(nameof(events));
             if (playback != null) StopCoroutine(playback);
+            paused = false;
+            CurrentTimestampMs = 0;
+            EnsurePlayableQualityLayer();
+            RefreshActorPresentationRates();
             playback = StartCoroutine(PlayRoutine(events));
             return playback;
+        }
+
+        private void EnsurePlayableQualityLayer()
+        {
+            playbackHud = GetComponent<BattlePlaybackHud>();
+            if (playbackHud == null) playbackHud = gameObject.AddComponent<BattlePlaybackHud>();
+            playbackHud.Bind(this);
+
+            impactFeedback = GetComponent<BattleImpactFeedback>();
+            if (impactFeedback == null) impactFeedback = gameObject.AddComponent<BattleImpactFeedback>();
+            impactFeedback.Bind(this);
         }
 
         private IEnumerator PlayRoutine(IReadOnlyList<BattlePresentationEvent> events)
@@ -50,6 +75,7 @@ namespace NinjaAssemble.Presentation
                 long delta = Math.Max(0, item.TimestampMs - previousTimestampMs);
                 if (delta > 0) yield return WaitForSimulationDelay(delta);
                 previousTimestampMs = Math.Max(previousTimestampMs, item.TimestampMs);
+                CurrentTimestampMs = previousTimestampMs;
                 Present(item);
                 EventPresented?.Invoke(item);
             }
@@ -75,6 +101,11 @@ namespace NinjaAssemble.Presentation
         private void AdvanceStatusClocks(double simulationDeltaMs)
         {
             foreach (BattleActorView actor in actors.Values) actor.AdvanceStatusClock(simulationDeltaMs);
+        }
+
+        private void RefreshActorPresentationRates()
+        {
+            foreach (BattleActorView actor in actors.Values) actor.SetPresentationRate(playbackSpeed, paused);
         }
 
         private void Present(BattlePresentationEvent item)
