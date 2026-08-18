@@ -85,6 +85,9 @@ namespace NinjaAssemble.Playable
             data.clearedStageIds = data.clearedStageIds ?? Array.Empty<string>();
             data.claimedQuestIds = data.claimedQuestIds ?? Array.Empty<string>();
             data.claimedMailIds = data.claimedMailIds ?? Array.Empty<string>();
+            data.readMailIds = data.readMailIds ?? Array.Empty<string>();
+            if (data.arenaRating <= 0) data.arenaRating = 1000;
+            if (data.shadowRating <= 0) data.shadowRating = 1000;
         }
     }
 }
