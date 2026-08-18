@@ -23,7 +23,6 @@ namespace NinjaAssemble.Presentation
         };
 
         private readonly Dictionary<string, BattleParticipantDto> participants = new Dictionary<string, BattleParticipantDto>();
-        private readonly Dictionary<string, RectTransform> actorSlots = new Dictionary<string, RectTransform>();
         private readonly HeroAddressableLoader loader = new HeroAddressableLoader();
         private HeroArtRuntimeCatalog artCatalog;
         private RectTransform stageRoot;
@@ -46,7 +45,6 @@ namespace NinjaAssemble.Presentation
                 if (participant == null || string.IsNullOrWhiteSpace(participant.battleUnitId)) continue;
                 participants[participant.battleUnitId] = participant;
                 RectTransform slot = CreateSlot(participant);
-                actorSlots[participant.battleUnitId] = slot;
                 BattleActorView actor = await CreateActorAsync(participant, slot);
                 timeline.Register(actor);
             }
@@ -58,7 +56,6 @@ namespace NinjaAssemble.Presentation
         private void ClearStage()
         {
             participants.Clear();
-            actorSlots.Clear();
             currentBattle = null;
             if (stageRoot != null)
             {
@@ -178,7 +175,7 @@ namespace NinjaAssemble.Presentation
 
             BattleActorView actor = actorObject.AddComponent<BattleActorView>();
             actor.ConfigureUi(name, level, hp);
-            actor.ConfigureEnergyUi(rage);
+            actor.ConfigureRageUi(rage);
             actor.ConfigureStatusUi(status);
             ConfigureActor(actor, participant);
             return actor;
@@ -186,7 +183,7 @@ namespace NinjaAssemble.Presentation
 
         private void OnPlaybackCompleted()
         {
-            if (currentBattle == null || currentBattle.battle == null) return;
+            if (currentBattle == null || currentBattle.battle == null || timeline == null) return;
             bool teamAWon = string.Equals(currentBattle.battle.outcome, "TEAM_A", StringComparison.OrdinalIgnoreCase);
             bool teamBWon = string.Equals(currentBattle.battle.outcome, "TEAM_B", StringComparison.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, BattleParticipantDto> pair in participants)
