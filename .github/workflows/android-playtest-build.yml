@@ -1,0 +1,159 @@
+name: Android Playtest Build
+
+on:
+  pull_request:
+    paths:
+      - 'client-unity/**'
+      - 'scripts/build-mobile.sh'
+      - 'scripts/validate-android-build.py'
+      - '.github/workflows/android-playtest-build.yml'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Android artifact to build
+        required: true
+        default: development
+        type: choice
+        options:
+          - development
+          - release
+          - both
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-playtest-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    name: Validate Android build contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-android-build.py
+
+  development-apk:
+    name: Build development APK
+    needs: contract
+    if: github.event_name == 'pull_request' || inputs.build_type == 'development' || inputs.build_type == 'both'
+    runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify Unity license secrets
+        shell: bash
+        run: |
+          test -n "$UNITY_LICENSE" || { echo '::error::UNITY_LICENSE secret is required'; exit 1; }
+          test -n "$UNITY_EMAIL" || { echo '::error::UNITY_EMAIL secret is required'; exit 1; }
+          test -n "$UNITY_PASSWORD" || { echo '::error::UNITY_PASSWORD secret is required'; exit 1; }
+
+      - name: Build Android development APK
+        uses: game-ci/unity-builder@v5
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          targetPlatform: Android
+          buildMethod: NinjaAssemble.EditorTools.MobileBuildAutomation.BuildAndroidDevelopment
+          buildName: NinjaAssemble
+          buildsPath: builds/android
+          androidExportType: androidPackage
+          versioning: Custom
+          version: 0.1.${{ github.run_number }}
+          androidVersionCode: ${{ github.run_number }}
+          customParameters: -ninjaBuildCommit ${{ github.sha }}
+          allowDirtyBuild: true
+
+      - name: Verify APK output
+        shell: bash
+        run: |
+          test -s builds/android/NinjaAssemble.apk
+          test -s builds/android/build-metadata.json
+
+      - name: Upload playtest APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NinjaAssemble-playtest-apk-${{ github.run_number }}
+          path: |
+            builds/android/NinjaAssemble.apk
+            builds/android/build-metadata.json
+          if-no-files-found: error
+          retention-days: 14
+
+  release-aab:
+    name: Build signed release AAB
+    needs: contract
+    if: github.event_name == 'workflow_dispatch' && (inputs.build_type == 'release' || inputs.build_type == 'both')
+    runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+      ANDROID_KEYALIAS_NAME: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+      ANDROID_KEYALIAS_PASS: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify release secrets and materialize keystore
+        shell: bash
+        run: |
+          test -n "$UNITY_LICENSE" || { echo '::error::UNITY_LICENSE secret is required'; exit 1; }
+          test -n "$UNITY_EMAIL" || { echo '::error::UNITY_EMAIL secret is required'; exit 1; }
+          test -n "$UNITY_PASSWORD" || { echo '::error::UNITY_PASSWORD secret is required'; exit 1; }
+          test -n "$ANDROID_KEYSTORE_BASE64" || { echo '::error::ANDROID_KEYSTORE_BASE64 secret is required'; exit 1; }
+          test -n "$ANDROID_KEYSTORE_PASS" || { echo '::error::ANDROID_KEYSTORE_PASS secret is required'; exit 1; }
+          test -n "$ANDROID_KEYALIAS_NAME" || { echo '::error::ANDROID_KEYALIAS_NAME secret is required'; exit 1; }
+          test -n "$ANDROID_KEYALIAS_PASS" || { echo '::error::ANDROID_KEYALIAS_PASS secret is required'; exit 1; }
+          mkdir -p client-unity/.ci
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > client-unity/.ci/ninja-release.keystore
+          test -s client-unity/.ci/ninja-release.keystore
+
+      - name: Build signed Android release AAB
+        uses: game-ci/unity-builder@v5
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          targetPlatform: Android
+          buildMethod: NinjaAssemble.EditorTools.MobileBuildAutomation.BuildAndroidRelease
+          buildName: NinjaAssemble
+          buildsPath: builds/android
+          androidExportType: androidAppBundle
+          androidKeystoreName: .ci/ninja-release.keystore
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+          versioning: Custom
+          version: 0.1.${{ github.run_number }}
+          androidVersionCode: ${{ github.run_number }}
+          customParameters: -ninjaBuildCommit ${{ github.sha }}
+          allowDirtyBuild: true
+
+      - name: Verify AAB output
+        shell: bash
+        run: |
+          test -s builds/android/NinjaAssemble.aab
+          test -s builds/android/build-metadata.json
+
+      - name: Upload signed AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: NinjaAssemble-release-aab-${{ github.run_number }}
+          path: |
+            builds/android/NinjaAssemble.aab
+            builds/android/build-metadata.json
+          if-no-files-found: error
+          retention-days: 14
