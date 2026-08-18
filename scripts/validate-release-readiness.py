@@ -44,7 +44,8 @@ def main() -> int:
         raise SystemExit("RELEASE_READINESS_INVALID cannot parse ScreenId")
     screens = [item.strip().strip(",") for item in match.group(1).splitlines() if item.strip()]
     expected = ["Home", "NinjaRoster", "HeroDetail", "Formation", "Adventure", "Battle", "Summon", "Arena",
-                "ShadowArena", "Guild", "Shop", "Inventory", "Quest", "Events", "Mail", "Settings"]
+                "ShadowArena", "Guild", "Shop", "Inventory", "Quest", "Events", "Mail", "Settings",
+                "ResourcePve", "Progression"]
     if screens != expected:
         errors.append(f"ScreenId coverage changed: actual={screens}")
 
