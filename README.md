@@ -4,18 +4,34 @@ Ninja Assemble là dự án game mobile được xây dựng lại theo phương
 
 > Repository không chứa asset trích xuất từ APK, source code độc quyền, logic server dịch ngược hoặc tài nguyên gốc được phân phối lại. Gameplay được triển khai lại độc lập; production art được quản lý bằng các package contract có file/evidence rõ ràng.
 
-## Bản Android chơi thử
+## Tải bản Offline Test
 
-Dự án hiện đã build thành công **development APK** bằng Unity trên GitHub Actions. Đây là bản dành cho cài đặt và chơi thử local trên thiết bị Android, **không phải bản phát hành Google Play**.
+Bản **Offline Playtest** dành cho Android được thiết kế theo đúng mục tiêu: **tải APK → cài → mở → chơi thử ngay**.
 
-- Workflow đã xác minh: `Android Playtest Build #19`
-- Artifact: `NinjaAssemble-playtest-apk-19`
-- SHA-256 artifact: `99a6c2db4b7fecc0b4dcba2bcdc2a6425c8fcce90b066ad4a85793e941babd8f`
-- Source đã được merge vào `main` qua PR #102.
+Bản này:
 
-Khi có GitHub Release playtest, hãy tải file APK trong phần **Releases** của repository. Nếu chỉ cần artifact CI, có thể mở workflow Android Playtest Build tương ứng trong GitHub Actions.
+- không cần PostgreSQL;
+- không cần Redis;
+- không cần Java/Spring Boot server;
+- không cần PC chạy backend;
+- gameplay offline không phụ thuộc Internet;
+- lưu tiến trình bằng local save trên thiết bị.
 
-## Trạng thái hiện tại
+Vào mục **Releases** của repository và tải file:
+
+`NinjaAssemble-offline-playtest.apk`
+
+Sau khi tải về Android, mở APK và cho phép cài ứng dụng từ nguồn ngoài nếu hệ điều hành yêu cầu. Đây là **playtest prerelease**, không phải bản Google Play/production release.
+
+Mỗi release kèm `SHA256SUMS.txt` và `build-metadata.json` để đối chiếu artifact với source commit đã build.
+
+## Nội dung Offline Playtest
+
+Offline mode hiện có bootstrap/local profile, roster, formation, campaign battle, deterministic replay contract, Resource PvE, summon/pity/duplicate, hero level-up, awakening test fixture, frame progression test, Arena training, Shadow Arena training, shop, inventory, quest và mail. Local state được lưu lại giữa các lần mở app.
+
+Pipeline trước khi xuất APK chạy validator offline, Unity EditMode standalone smoke, tạo toàn bộ mobile scene shell và build Android APK thật bằng Unity. Điều này giảm nguy cơ lặp lại tình trạng “compile thành công nhưng mở app lỗi ngay”.
+
+## Trạng thái dự án
 
 Các nền tảng chính đã có:
 
@@ -23,14 +39,17 @@ Các nền tảng chính đã có:
 - **120 kỹ năng song ngữ EN/VI**, 44 kit profile tái sử dụng và mapping kit cho toàn bộ nhân vật gốc;
 - Server Java 21 / Spring Boot với player state, wallet/energy, hero ownership, formation, deterministic battle/replay, progression/evolution, campaign, resource PvE, Arena/Shadow Arena, summon/pity, shop, inventory/equipment, guild, daily/events và mail;
 - Unity mobile client với Bootstrap, các màn hình gameplay chính và vertical slice cho battle/summon/level-up;
+- standalone Offline Playtest mode không cần backend;
 - hệ thống presentation dựa trên Addressables;
 - art production gate cho portrait/icon/chibi/animation/VFX/SFX/regression capture/review;
 - parity gate có evidence cho combat stats, damage formula, summon profile và level cost;
-- pipeline build Android APK/AAB và contract kiểm thử thiết bị.
+- pipeline build Android APK/AAB, Unity standalone smoke và contract kiểm thử thiết bị.
 
 ### Những phần chưa được tuyên bố production-ready
 
-APK chơi thử đã build thành công không đồng nghĩa game đã đạt production release gate. Release audit vẫn yêu cầu evidence thật cho production art, reference/balance parity và kiểm thử hiệu năng/smoke test trên thiết bị Android vật lý. Xem `docs/12-RELEASE-STATUS.md` để biết trạng thái chi tiết.
+Offline APK chơi thử không đồng nghĩa game đã đạt production release gate. Production release audit vẫn yêu cầu evidence thật cho production art, reference/balance parity và kiểm thử hiệu năng/smoke test trên thiết bị Android vật lý. Không được dùng Offline Playtest fixture làm bằng chứng production art hoặc device certification.
+
+Xem `docs/12-RELEASE-STATUS.md` để biết trạng thái chi tiết.
 
 ## Cấu trúc repository
 
@@ -42,14 +61,17 @@ APK chơi thử đã build thành công không đồng nghĩa game đã đạt p
 ├── art/                   # manifests, package schema, regression/review contracts
 ├── docs/                  # luật chơi, kiến trúc, milestone và release documentation
 ├── scripts/               # validation, generation, release/build helpers
-├── .github/workflows/     # CI và Android build
-└── docker-compose.yml     # PostgreSQL + Redis
+├── .github/workflows/     # CI, offline playtest release và Android build
+└── docker-compose.yml     # PostgreSQL + Redis cho online/server development
 ```
 
-## Chạy hạ tầng local
+## Chạy bản online/server local
+
+Phần này **không cần thiết cho Offline Playtest APK**. Chỉ dùng khi phát triển backend online:
 
 ```bash
 docker compose up -d postgres redis
+mvn -f server/pom.xml spring-boot:run
 ```
 
 ## Kiểm tra server
@@ -59,7 +81,17 @@ bash scripts/validate-core.sh
 mvn -f server/pom.xml test
 ```
 
-## Kiểm tra content / release
+## Kiểm tra offline playtest
+
+```bash
+python scripts/validate-offline-core.py
+python scripts/validate-offline-gameplay.py
+python scripts/validate-offline-screens.py
+python scripts/validate-offline-runtime-smoke.py
+python scripts/validate-offline-playtest-release.py
+```
+
+## Kiểm tra content / production release
 
 ```bash
 python scripts/validate-content.py
@@ -72,7 +104,7 @@ python scripts/validate-mobile-release-evidence.py
 python scripts/release-audit.py --markdown
 ```
 
-Một số strict release check được thiết kế để fail khi evidence production thực tế chưa đầy đủ; không được biến các gate này thành pass giả.
+Một số strict production release check được thiết kế để fail khi evidence production thực tế chưa đầy đủ; không được biến các gate này thành pass giả.
 
 ## Mở project Unity
 
@@ -82,7 +114,7 @@ Mở thư mục `client-unity` bằng Unity 6000.0. Để tạo lại mobile sce
 
 ## Build Android local
 
-Cần cài Unity Android Build Support. Development build tạo APK để cài trực tiếp lên Android:
+Cần cài Unity Android Build Support. Development build tạo APK offline/playtest để cài trực tiếp lên Android:
 
 ```bash
 UNITY_PATH=/path/to/Unity ./scripts/build-mobile.sh development
