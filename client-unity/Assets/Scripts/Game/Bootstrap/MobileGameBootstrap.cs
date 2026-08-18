@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using NinjaAssemble.Network;
 using NinjaAssemble.Playable;
+using NinjaAssemble.Progression;
 using NinjaAssemble.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,6 +16,7 @@ namespace NinjaAssemble.Bootstrap
         [SerializeField] private bool autoEnterHome = true;
 
         public static PlayableGameStore Store { get; private set; }
+        public static AdvancedProgressionStore AdvancedProgression { get; private set; }
         public static bool IsReady => Store != null && !string.IsNullOrWhiteSpace(Store.PlayerId);
 
         public void Configure(GameApiConfig config, string displayName = "Ninja", bool enterHome = true)
@@ -29,6 +31,11 @@ namespace NinjaAssemble.Bootstrap
             DontDestroyOnLoad(gameObject);
             if (Store != null)
             {
+                if (AdvancedProgression == null && apiConfig != null)
+                {
+                    AdvancedProgression = new AdvancedProgressionStore(new AdvancedProgressionClient(apiConfig));
+                    await AdvancedProgression.InitializeAsync(Store.PlayerId);
+                }
                 if (autoEnterHome) SceneManager.LoadScene(MobileSceneNames.For(ScreenId.Home));
                 return;
             }
@@ -40,6 +47,8 @@ namespace NinjaAssemble.Bootstrap
                 Store = new PlayableGameStore(client);
                 string guestKey = LoadOrCreateGuestKey();
                 await Store.LoginAndBootstrapAsync(guestKey, guestDisplayName);
+                AdvancedProgression = new AdvancedProgressionStore(new AdvancedProgressionClient(apiConfig));
+                await AdvancedProgression.InitializeAsync(Store.PlayerId);
                 if (autoEnterHome) SceneManager.LoadScene(MobileSceneNames.For(ScreenId.Home));
             }
             catch (Exception exception)
