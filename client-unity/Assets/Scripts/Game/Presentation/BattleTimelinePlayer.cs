@@ -69,9 +69,16 @@ namespace NinjaAssemble.Presentation
 
         private IEnumerator PlayRoutine(IReadOnlyList<BattlePresentationEvent> events)
         {
+            // Guarantee at least one suspension point before completion so Play() can safely store
+            // the Coroutine handle even for empty or all-zero-timestamp replays.
+            yield return null;
+
             long previousTimestampMs = 0;
             foreach (BattlePresentationEvent item in events)
             {
+                if (item == null) continue;
+                while (paused) yield return null;
+
                 long delta = Math.Max(0, item.TimestampMs - previousTimestampMs);
                 if (delta > 0) yield return WaitForSimulationDelay(delta);
                 previousTimestampMs = Math.Max(previousTimestampMs, item.TimestampMs);
