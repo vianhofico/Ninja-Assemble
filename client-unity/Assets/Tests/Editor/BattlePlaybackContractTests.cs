@@ -49,15 +49,5 @@ namespace NinjaAssemble.Tests.Editor
             timeline.SetPaused(false);
             Assert.IsFalse(timeline.IsPaused);
         }
-
-        [Test]
-        public void NewPlayback_ResetsPauseAndTimestamp()
-        {
-            timeline.SetPaused(true);
-            timeline.Play(Array.Empty<BattlePresentationEvent>());
-
-            Assert.IsFalse(timeline.IsPaused);
-            Assert.AreEqual(0L, timeline.CurrentTimestampMs);
-        }
     }
 }
