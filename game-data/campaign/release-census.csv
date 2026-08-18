@@ -1,0 +1,13 @@
+stage_id,difficulty,release_status,evidence_ref,notes
+c1-s1,NORMAL,PRODUCTION_READY,game-data/campaign/stages.csv,Training opener; single-wave five-enemy stage
+c1-s2,NORMAL,PRODUCTION_READY,game-data/campaign/stages.csv,Normal progression stage
+c1-s3,NORMAL,PRODUCTION_READY,game-data/campaign/stages.csv,Normal team trial stage
+c1-s4,NORMAL,PRODUCTION_READY,game-data/campaign/stage-enemies.csv,Normal chapter boss; two-wave stage
+c2-s1,ELITE,PRODUCTION_READY,game-data/campaign/stages.csv,Elite chapter opener
+c2-s2,ELITE,PRODUCTION_READY,game-data/campaign/stages.csv,Elite Uchiha stage
+c2-s3,ELITE,PRODUCTION_READY,game-data/campaign/stages.csv,Elite Sannin stage
+c2-s4,ELITE,PRODUCTION_READY,game-data/campaign/stage-enemies.csv,Elite chapter boss; two-wave stage
+c3-s1,HEROIC,PRODUCTION_READY,game-data/campaign/stages.csv,Heroic chapter opener
+c3-s2,HEROIC,PRODUCTION_READY,game-data/campaign/stages.csv,Heroic Eight Gates stage
+c3-s3,HEROIC,PRODUCTION_READY,game-data/campaign/stages.csv,Heroic Team Seven stage
+c3-s4,HEROIC,PRODUCTION_READY,game-data/campaign/stage-enemies.csv,Heroic final boss; two-wave stage
