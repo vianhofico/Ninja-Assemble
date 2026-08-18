@@ -11,6 +11,6 @@ namespace NinjaAssemble.Network
     }
     [Serializable] public sealed class HeroKitDto { public string profileId; public TechniqueDto[] techniques; }
     [Serializable] public sealed class GuestLoginRequest { public string guestKey; public string displayName; }
-    [Serializable] public sealed class PlayerDto { public string id; public string displayName; public int level; public long exp; }
+    [Serializable] public sealed class PlayerDto { public string id; public string displayName; public int level; public long exp; public string sessionToken; }
     [Serializable] internal sealed class ArrayEnvelope<T> { public T[] items; }
 }
