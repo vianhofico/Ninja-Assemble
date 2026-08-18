@@ -12,6 +12,7 @@ M54 starts the production game-feel pass without coupling presentation to server
 - asset-independent hit flashes, damage numbers and impact shake
 - heal, shield, status, KO and Rage-ready feedback
 - Rage Skill cinematic overlay / letterbox treatment
+- interruption-safe feedback: replacement shakes restore the stable stage origin and replacement Rage cinematics destroy the previous overlay
 - compatibility fallback from the new `RageSkill` Animator trigger to existing `Ultimate` triggers so current prefabs do not break
 - canonical `ConfigureRageUi` presentation API while preserving only the serialized `energySlider` migration attribute for old prefabs
 - replay lifecycle hardening so empty/all-zero-timestamp event streams cannot leave a stale `IsPlaying` coroutine handle
@@ -29,6 +30,8 @@ Neither module changes combat state, RNG, rewards or timestamps. They only consu
 
 M54 removes the old `BattleVisualStage` damage-feedback subscription. Damage numbers, hit flashes and critical shake now have one owner: `BattleImpactFeedback`. Every feedback coroutine uses `TryPresentationDelta`: while paused it yields without changing alpha, position, scale or shake offset. This prevents the previous case where shake time stopped but the screen still randomized position every frame.
 
+Feedback interruption is also explicit. `ResetShake` restores the stable stage origin, and a new shake first restores any interrupted shake before capturing its own origin. `ResetCinematic` stops the active cinematic and destroys its overlay before a replacement is started, preventing stacked letterbox overlays from surviving interrupted Rage casts.
+
 `BattleVisualStage` remains responsible for actor/stage construction and victory presentation. Its fallback actor now exposes both HP and Rage meters through a shared meter builder, so Rage smoothing/readiness is testable even while the release art gate still routes most heroes through fallback presentation.
 
 ## Production asset path
@@ -37,7 +40,7 @@ The primitive runtime feedback is deliberately replaceable. Final hero-specific 
 
 ## Validation
 
-`scripts/validate-playable-quality.py` rejects loss of the 1x/2x/4x controls, full pause behavior, replay lifecycle hardening, Rage cinematic hooks, unified damage feedback, fallback Rage visibility, canonical Rage UI naming, smooth HUD targets, Unity EditMode CI coverage or accidental reintroduction of the runtime `ULTIMATE` ability-kind branch.
+`scripts/validate-playable-quality.py` rejects loss of the 1x/2x/4x controls, full pause behavior, replay lifecycle hardening, interrupt-safe shake/cinematic cleanup, Rage cinematic hooks, unified damage feedback, fallback Rage visibility, canonical Rage UI naming, smooth HUD targets, Unity EditMode CI coverage or accidental reintroduction of the runtime `ULTIMATE` ability-kind branch.
 
 `scripts/validate-battle-visual-stage.py` is migrated from the M22 `FloatingDamage`/`CriticalShake` contract to the M54 single-feedback architecture. It rejects duplicate stage feedback and the pre-Rage `ConfigureEnergyUi` method while requiring the fallback Rage meter.
 
