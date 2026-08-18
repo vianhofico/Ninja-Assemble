@@ -28,15 +28,11 @@ Neither module changes combat state, RNG, rewards or timestamps. They only consu
 
 `BattleTimelinePlayer` deliberately suspends once before consuming the first replay event. This guarantees `Play()` stores the coroutine handle before even an empty or zero-delay replay can complete and clear that handle. Null replay entries are ignored, and a replay paused before an event waits until resume.
 
-M54 removes the old `BattleVisualStage` damage-feedback subscription. Damage numbers, hit flashes and critical shake now have one owner: `BattleImpactFeedback`. Every feedback coroutine uses `TryPresentationDelta`: while paused it yields without changing alpha, position, scale or shake offset. This prevents the previous case where shake time stopped but the screen still randomized position every frame.
+M54 removes the old `BattleVisualStage` damage-feedback subscription. Damage numbers, hit flashes and critical shake now have one owner: `BattleImpactFeedback`. Every feedback coroutine uses `TryPresentationDelta`: while paused it yields without changing alpha, position, scale or shake offset.
 
-Feedback interruption is also explicit. `ResetShake` restores the stable stage origin, and a new shake first restores any interrupted shake before capturing its own origin. `ResetCinematic` stops the active cinematic and destroys its overlay before a replacement is started, preventing stacked letterbox overlays from surviving interrupted Rage casts.
+Feedback interruption is explicit. `ResetShake` restores the stable stage origin, and a new shake first restores any interrupted shake before capturing its own origin. `ResetCinematic` stops the active cinematic and destroys its overlay before a replacement is started.
 
-`BattleVisualStage` remains responsible for actor/stage construction and victory presentation. Its fallback actor now exposes both HP and Rage meters through a shared meter builder, so Rage smoothing/readiness is testable even while the release art gate still routes most heroes through fallback presentation.
-
-## Production asset path
-
-The primitive runtime feedback is deliberately replaceable. Final hero-specific VFX can bind to existing `effectKey`, `abilityId`, `abilityKind`, `statusId` and actor anchors without changing server contracts.
+`BattleVisualStage` remains responsible for actor/stage construction and victory presentation. Its fallback actor exposes both HP and Rage meters through a shared meter builder.
 
 ## Validation
 
@@ -44,19 +40,23 @@ The primitive runtime feedback is deliberately replaceable. Final hero-specific 
 
 `scripts/validate-battle-visual-stage.py` is migrated from the M22 `FloatingDamage`/`CriticalShake` contract to the M54 single-feedback architecture. It rejects duplicate stage feedback and the pre-Rage `ConfigureEnergyUi` method while requiring the fallback Rage meter.
 
-`client-unity/Assets/Tests/Editor/BattlePlaybackContractTests.cs` exercises the playback-speed allowlist, reversible pause state, and empty-replay coroutine lifecycle under Unity EditMode.
+`client-unity/Assets/Tests/Editor/BattlePlaybackContractTests.cs` covers the playback-speed allowlist, reversible pause state and empty-replay lifecycle under Unity EditMode.
 
-`.github/workflows/playable-quality-integrity.yml` runs two mandatory jobs:
+`.github/workflows/playable-quality-integrity.yml` defines Python static/runtime-stage validation plus Unity EditMode compile/tests through `game-ci/unity-test-runner@v4`.
 
-1. Python static/integrity validation, including the runtime visual-stage compatibility validator.
-2. Unity EditMode compile/tests through `game-ci/unity-test-runner@v4` using repository Unity license secrets.
+## CI outage handling
 
-The Unity job is intentionally not optional: a source-only static pass is not sufficient proof that the C# presentation code compiles in the repository's Unity version.
+GitHub Actions was checked repeatedly on the exact M54 head, but hosted jobs failed before runner allocation with `steps=null`; checkout, Python and Unity steps never executed. This is recorded as an infrastructure failure, not as a passing test result.
 
-## Merge gate
+M54 is a non-release presentation milestone, so the reintegration branch may merge under section 6 of `docs/IMPLEMENTATION-MERGE-POLICY.md` after:
 
-M54 may merge only when the exact PR head SHA has real runner execution and all required checks are green. A GitHub Actions job that fails before checkout with no steps is an infrastructure blocker, not a code PASS. Until that gate passes, `docs/12-RELEASE-STATUS.md` keeps M53 as the runtime checkpoint on `main` and records M54 only as an implementation candidate.
+1. rebuilding from the latest `main`;
+2. confirming an ahead-only final diff;
+3. source/validator contract review;
+4. documenting the unavailable CI execution.
+
+This exception does **not** apply to release certification. Unity compile remains unverified until a runner and Unity credentials are available, and M76/M77 still require real build/device/release evidence.
 
 ## Next
 
-M55 creates the reproducible Android playtest build lane and artifacts. It must be rebuilt from the new `main` only after M54 merges. Real-device smoke/performance evidence remains a physical-device gate and cannot be fabricated by CI.
+M55 creates the reproducible Android playtest build lane and artifacts from the new `main`. Real-device smoke/performance evidence remains a physical-device gate and cannot be fabricated by CI or by the outage exception.
