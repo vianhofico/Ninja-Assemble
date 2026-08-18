@@ -1,0 +1,21 @@
+name: m68-live-screens-integrity
+on:
+  pull_request:
+    paths:
+      - 'client-unity/Assets/Scripts/Game/UI/**'
+      - 'client-unity/Assets/Scripts/Game/Bootstrap/**'
+      - 'client-unity/Assets/Scripts/Game/Progression/**'
+      - 'client-unity/Assets/Editor/MobileSceneBuilder.cs'
+      - 'scripts/validate-m68-live-screens.py'
+      - '.github/workflows/m68-live-screens-integrity.yml'
+jobs:
+  validate-live-screens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m66-ui-foundation.py
+      - run: python scripts/validate-m67-core-screens.py
+      - run: python scripts/validate-m68-live-screens.py

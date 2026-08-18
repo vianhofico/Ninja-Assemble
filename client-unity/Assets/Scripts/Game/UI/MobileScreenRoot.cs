@@ -52,6 +52,8 @@ namespace NinjaAssemble.UI
             ScreenId.Events => "Events",
             ScreenId.Mail => "Mail",
             ScreenId.Settings => "Settings",
+            ScreenId.ResourcePve => "ResourcePve",
+            ScreenId.Progression => "Progression",
             _ => throw new ArgumentOutOfRangeException(nameof(id), id, null)
         };
     }

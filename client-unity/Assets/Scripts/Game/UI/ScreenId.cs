@@ -17,6 +17,8 @@ namespace NinjaAssemble.UI
         Quest,
         Events,
         Mail,
-        Settings
+        Settings,
+        ResourcePve,
+        Progression
     }
 }
