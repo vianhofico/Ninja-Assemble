@@ -1,13 +1,15 @@
 # Mobile Release Status
 
-Current runtime checkpoint: **M54 — playable-quality battle presentation integrated on top of canonical M53 realtime/Rage combat.**  
-Current completion-governance checkpoint: **M56 — authoritative completion roadmap and merge policy.**
+Current runtime checkpoint on `main`: **M53 — canonical deterministic realtime/Rage combat contracts.**  
+Current completion-governance checkpoint on `main`: **M56 — authoritative completion roadmap and merge policy.**  
+Current implementation candidate: **M54 / PR #75 — playable-quality battle presentation; implementation complete, CI/merge blocked until GitHub Actions actually allocates runners and required checks pass.**
 
 Immediate integration queue:
 
-1. **M55** — rebuild the Android Development APK + signed Release AAB pipeline from the newest `main`, validate CI, then merge.
-2. **M57** — modernize realtime/Rage reference-evidence schemas and harden release gates.
-3. Continue M58+ from the newest `main` following `docs/100-PERCENT-COMPLETION-PLAN.md`.
+1. **M54 / PR #75** — execute required CI on the exact head SHA, fix any real failures, then squash-merge into `main`.
+2. **M55** — only after M54 merges, rebuild the Android Development APK + signed Release AAB pipeline from the newest `main`, validate CI, then merge.
+3. **M57** — only after M55 merges, modernize realtime/Rage reference-evidence schemas and harden release gates.
+4. Continue M58+ from the newest `main` following `docs/100-PERCENT-COMPLETION-PLAN.md`.
 
 The old M17–M22 checkpoint text is no longer the source of truth.
 
@@ -28,7 +30,7 @@ The old M17–M22 checkpoint text is no longer the source of truth.
 | Full production Campaign | vertical-slice content | 100% frozen stage census | BLOCKED |
 | Resource PvE modes | foundations/partial | 100% frozen PvE census | BLOCKED |
 | Arena/Shadow combat | realtime foundations | complete seasonal/meta/UI loop | PARTIAL |
-| Battle presentation | M54 HUD/feedback/Rage cinematic foundation | production hero-specific presentation | FOUNDATION PASS |
+| Battle presentation | M54 implementation candidate in PR #75 | production hero-specific presentation | IMPLEMENTED / CI BLOCKED |
 | Production mobile UI screens | functional shell/partial | 100% release navigation graph | BLOCKED |
 | Full new-account -> late-game E2E | not complete | PASS | BLOCKED |
 | Passing Android device evidence | 0 | >=2 devices and >=2 classes | BLOCKED |
@@ -60,8 +62,8 @@ The old M17–M22 checkpoint text is no longer the source of truth.
 - Realtime replay consumption.
 - Hero Version/Awakening presentation identity.
 - Art/Addressables package contracts and development fallbacks.
-- M54 Pause/Resume, 1x/2x/4x playback, smooth HP/Rage presentation, impact feedback and Rage Skill cinematic foundation.
-- M55 Android build automation remains the next integration milestone and must be rebuilt from the newest `main`.
+- M54 candidate adds Pause/Resume, 1x/2x/4x playback, full pause-aware feedback, smooth HP/Rage presentation, visible fallback Rage meters, impact feedback, Rage Skill cinematic and replay lifecycle hardening.
+- M55 Android build automation remains the next milestone but must not be normalized/merged until M54 lands.
 
 ### Validation foundation
 
@@ -70,48 +72,53 @@ The old M17–M22 checkpoint text is no longer the source of truth.
 - Art component/package/real-file gates.
 - Android device evidence schema.
 - Release audit infrastructure.
+- M54 candidate adds playable-quality static validation plus Unity EditMode compile/regression coverage.
 
 ---
 
 ## Major release blockers
 
-### 1. Full skill review
+### 1. Current M54 CI/merge gate
+
+PR #75 is ahead-only from `main`, but GitHub Actions jobs are currently failing before checkout with no allocated workflow steps. This is tracked in issue #76. M54 is not counted as merged or complete on `main` until required checks actually execute and pass on the exact head SHA.
+
+### 2. Full skill review
 
 The repository has complete structural coverage for Hero Versions/Awakenings, but structural coverage is not final design approval. The release requires complete identity/canon/editorial, mechanics/timing and balance review for all release skills, including presentation keys and deterministic regression coverage.
 
 Planned: M58–M60.
 
-### 2. Full production gameplay content
+### 3. Full production gameplay content
 
 The existing code demonstrates the reusable systems, but the release still needs complete production Campaign, Resource PvE, competitive loops, progression tracks and coherent economy/live-loop content.
 
 Planned: M61–M65.
 
-### 3. Production mobile UI/UX
+### 4. Production mobile UI/UX
 
 The current mobile shell/vertical slice is not the final game interface. Every release screen must receive production design, real interactions, mobile safe-area/aspect handling and loading/error/empty states.
 
 Planned: M66–M68.
 
-### 4. Production art/animation/VFX/audio
+### 5. Production art/animation/VFX/audio
 
 The release art gate requires concrete repository-backed files. Current tracked/READY counts are far below the 427-package release target.
 
 Planned: M69–M73.
 
-### 5. Reference/balance verification
+### 6. Reference/balance verification
 
 Current balance profile file contains ten profiles and all ten are still `EXPERIMENTAL`. Realtime/Rage measurement schemas and corpora must be completed and every release-required profile must satisfy its evidence thresholds before `VERIFIED`.
 
 Planned: M57 and M74.
 
-### 6. Full automated acceptance/reliability
+### 7. Full automated acceptance/reliability
 
 The project still needs one complete fresh-account -> late-game E2E journey plus persistence, migration, concurrency/idempotency, screenshot and Unity/device regression coverage.
 
 Planned: M75.
 
-### 7. Real Android release proof
+### 8. Real Android release proof
 
 Release requires real artifacts and physical-device evidence. GitHub Actions billing/runner availability, Unity licensing credentials and release signing secrets are external dependencies that cannot be replaced by fabricated evidence.
 
