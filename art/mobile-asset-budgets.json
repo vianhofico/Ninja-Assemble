@@ -1,34 +1,28 @@
 {
   "budgetVersion": "m69-v1",
+  "sourceOfTruth": "art/pipeline/performance-budgets.csv",
   "texture": {
-    "portraitMaxDimension": 1024,
+    "portraitMaxDimension": 2048,
     "iconMaxDimension": 512,
     "chibiTextureMaxDimension": 2048,
-    "uiTextureMaxDimension": 2048,
-    "compression": "ASTC",
-    "mipmaps": false
+    "compression": "platform-mobile"
   },
-  "animation": {
-    "maxControllerLayers": 4,
-    "maxBattleClipSeconds": 12,
-    "requiredStates": ["Idle", "Move", "Attack", "Hit", "KO", "Skill", "RageSkill"]
+  "runtime": {
+    "maxMaterialsPerHero": 4,
+    "maxSkinnedMeshRenderersPerHero": 4,
+    "maxBonesPerHero": 128,
+    "maxPrefabRuntimeObjects": 160
   },
   "vfx": {
-    "maxConcurrentHeroSystems": 12,
-    "maxParticlesPerHeroEffect": 300,
-    "maxHeroEffectSeconds": 8,
-    "mobileOverdrawReviewRequired": true
+    "maxParticleSystemsPerRageSkill": 12,
+    "maxPeakParticlesPerRageSkill": 500
   },
   "audio": {
-    "format": "Vorbis",
-    "sampleRateHz": 44100,
-    "maxSfxSeconds": 8,
-    "streamMusicOnly": true,
-    "normalizePeakDb": -1.0
+    "maxSkillClipSeconds": 12
   },
-  "package": {
-    "maxInstalledBytesPerHeroVariant": 12582912,
-    "releaseRequiresRegressionCapture": true,
-    "releaseRequiresHumanReviewEvidence": true
+  "release": {
+    "requiresRegressionCapture": true,
+    "requiresHumanReviewEvidence": true,
+    "readyMayNotUseFallbackAssets": true
   }
 }
