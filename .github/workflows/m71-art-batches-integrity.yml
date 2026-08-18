@@ -1,0 +1,19 @@
+name: m71-art-batches-integrity
+on:
+  pull_request:
+    paths:
+      - 'art/**'
+      - 'scripts/validate-art-batch-range.py'
+      - 'scripts/validate-m71-art-batches.py'
+      - '.github/workflows/m71-art-batches-integrity.yml'
+      - 'docs/art/M71_ART_BATCHES_B11_B20.md'
+      - 'docs/release/M71_STATUS.md'
+jobs:
+  validate-m71-batches:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m71-art-batches.py
