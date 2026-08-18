@@ -1,0 +1,17 @@
+name: offline-core-integrity
+on:
+  pull_request:
+    paths:
+      - 'client-unity/Assets/Scripts/Game/Bootstrap/**'
+      - 'client-unity/Assets/Scripts/Game/Playable/**'
+      - 'scripts/validate-offline-core.py'
+      - '.github/workflows/offline-core-integrity.yml'
+jobs:
+  validate-offline-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-offline-core.py
