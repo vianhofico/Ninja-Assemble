@@ -16,7 +16,8 @@ def main():
     try:
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-playable-arena.py")],cwd=ROOT,check=True)
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-shadow-arena.py")],cwd=ROOT,check=True)
-        require("server/src/main/resources/db/migration/V15__competitive_production_runs.sql","competitive_daily_attempts","UTC_DAILY")
+        require("server/src/main/resources/db/migration/V15__competitive_production_runs.sql",
+                "competitive_daily_attempts","game_date","attempts_used","idx_competitive_daily_attempts_date")
         require("server/src/main/resources/db/migration/V16__competitive_defense_seasons.sql",
                 "competitive_battle_requests","competitive_season_results","shadow_defense_formations","result_json","claimed boolean")
         season=require("server/src/main/java/com/ninjaassemble/pvp/application/CompetitiveSeasonService.java",
@@ -38,7 +39,7 @@ def main():
         require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
                 "SeasonRewardDto","CompetitiveHistoryItemDto","defenseConfigured","replayed")
         api=require("client-unity/Assets/Scripts/Game/Network/GameApiClient.cs",
-                '"/competitive/arena"','"/competitive/shadow-arena"',"SaveArenaDefenseAsync","SaveShadowDefenseAsync","GetArenaHistoryAsync","GetShadowArenaHistoryAsync","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")
+                "/competitive/arena","/competitive/shadow-arena","SaveArenaDefenseAsync","SaveShadowDefenseAsync","GetArenaHistoryAsync","GetShadowArenaHistoryAsync","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")
         if '$"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle"' in api: raise ValueError("Unity production Arena path still uses legacy non-idempotent endpoint")
         require("client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs",
                 "ArenaHistory","ShadowArenaHistory","SaveArenaDefenseAsync","SaveShadowDefenseAsync","Guid.NewGuid().ToString()","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")

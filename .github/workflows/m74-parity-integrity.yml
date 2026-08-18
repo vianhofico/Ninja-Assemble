@@ -1,0 +1,24 @@
+name: m74-parity-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/reference/**'
+      - 'game-data/release/m74-parity-census.csv'
+      - 'scripts/validate-m74-parity.py'
+      - 'scripts/validate-m58-skill-identity.py'
+      - 'scripts/validate-m59-mechanics.py'
+      - 'scripts/validate-m60-balance-presentation.py'
+      - '.github/workflows/m74-parity-integrity.yml'
+      - '.github/workflows/production-release-gate.yml'
+      - 'docs/release/M74_STATUS.md'
+      - 'docs/verification/M74_PARITY_VERIFICATION.md'
+jobs:
+  validate-parity-framework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate truthful M74 dashboard
+        run: python scripts/validate-m74-parity.py

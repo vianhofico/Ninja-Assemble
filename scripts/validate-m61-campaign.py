@@ -68,7 +68,7 @@ def main() -> int:
         require("server/src/main/java/com/ninjaassemble/campaign/api/CampaignSweepController.java",
                 '"/{stageId}/sweep"', "requestId is required", "sweeps.sweep")
         require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs", "CampaignSweepDto", "CampaignSweepItemDto")
-        require("client-unity/Assets/Scripts/Game/Network/GameApiClient.cs", "SweepCampaignStageAsync", '"/sweep"')
+        require("client-unity/Assets/Scripts/Game/Network/GameApiClient.cs", "SweepCampaignStageAsync", '/campaign/stages/{Escape(stageId)}/sweep')
         require("client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs", "SweepableStage", "SweepCampaignAsync", "RefreshCampaignAsync", "RefreshInventoryAsync")
 
         ready = sum(1 for r in census if r["release_status"].strip() == "PRODUCTION_READY")

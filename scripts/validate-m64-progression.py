@@ -16,7 +16,8 @@ def main():
     try:
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-hero-progression.py")],cwd=ROOT,check=True)
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-playable-equipment.py")],cwd=ROOT,check=True)
-        require("server/src/main/java/com/ninjaassemble/progression/application/FrameAdvanceApplicationService.java","advance","FrameTier")
+        require("server/src/main/java/com/ninjaassemble/progression/application/FrameAdvanceApplicationService.java",
+                "advance(UUID playerId, UUID playerHeroId, UUID requestId)","FrameState","FrameAdvancePolicy.advance","frame_tier","frame_advance_step","for update","ActionRequestService","FRAME_ADVANCE")
         tracks=rows("game-data/progression/advanced-tracks.csv")
         if len(tracks)!=11:raise ValueError(f"expected 11 advanced tracks, found {len(tracks)}")
         ids={r["track_id"].strip() for r in tracks};beasts={r["track_id"].strip() for r in tracks if r["track_type"].strip()=="JINCHURIKI"}
@@ -35,9 +36,9 @@ def main():
         require("server/src/main/java/com/ninjaassemble/progression/application/AdvancedProgressionApplicationService.java","pg_advisory_xact_lock","progression:","Currency.GOLD","inventory.mutate","for update","withReplayed(true)","result_json")
         require("server/src/main/java/com/ninjaassemble/progression/api/AdvancedProgressionController.java",'"/{trackId}/upgrade"',"requestId is required")
         require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionDtos.cs","AdvancedProgressionBoardDto","AdvancedProgressionUpgradeDto","cumulativeBonus")
-        require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionClient.cs","GetBoardAsync","UpgradeAsync",'"/progression/advanced"')
+        require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionClient.cs","GetBoardAsync","UpgradeAsync","/progression/advanced","/upgrade")
         require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionStore.cs","RecommendedTrack","Guid.NewGuid().ToString()","RefreshAsync")
-        print("M64_PROGRESSION_OK frame=1 hero_level=1 equipment=1 learning=2 tailed_beasts=9 upgrades=idempotent client_module=1")
+        print("M64_PROGRESSION_OK frame=string-tier-policy hero_level=1 equipment=1 learning=2 tailed_beasts=9 upgrades=idempotent client_module=1")
         return 0
     except (ValueError,subprocess.CalledProcessError,KeyError) as e:
         print(f"M64_PROGRESSION_INVALID {e}",file=sys.stderr);return 1
