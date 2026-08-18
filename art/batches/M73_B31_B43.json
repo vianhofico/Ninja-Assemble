@@ -1,0 +1,10 @@
+{
+  "milestone": "M73",
+  "firstBatch": "B31",
+  "lastBatch": "B43",
+  "expectedPackages": 127,
+  "productionState": "ACTIVE",
+  "completionRule": "Every selected package must satisfy the M69 READY rule with repository-backed files and evidence.",
+  "readyCountSource": "scripts/validate-art-batch-range.py",
+  "notes": "B31-B42 contain ten packages each; B43 contains seven. This descriptor never certifies missing art."
+}
