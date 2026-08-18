@@ -14,6 +14,9 @@ namespace NinjaAssemble.Playable
         public int energy = 999;
         public int energyCap = 999;
         public int summonCount;
+        public int battleCount;
+        public long heroCoins;
+        public long ramen = 50;
         public OwnedHeroDto[] heroes = Array.Empty<OwnedHeroDto>();
         public string[] formationIds = Array.Empty<string>();
         public string[] clearedStageIds = Array.Empty<string>();
