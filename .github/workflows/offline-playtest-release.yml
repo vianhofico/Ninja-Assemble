@@ -1,0 +1,139 @@
+name: Offline Playtest Release
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/offline-playtest-release.yml'
+      - 'scripts/validate-offline-playtest-release.py'
+      - 'README.md'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/offline-playtest-release.yml'
+      - 'scripts/validate-offline-playtest-release.py'
+      - 'README.md'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Optional release version, for example 0.1.0
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: offline-playtest-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract:
+    name: Validate offline release contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-offline-core.py
+      - run: python scripts/validate-offline-gameplay.py
+      - run: python scripts/validate-offline-screens.py
+      - run: python scripts/validate-offline-runtime-smoke.py
+      - run: python scripts/validate-offline-playtest-release.py
+
+  build-apk:
+    name: Build standalone offline APK
+    needs: contract
+    runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify Unity license secrets
+        shell: bash
+        run: |
+          test -n "$UNITY_LICENSE" || { echo '::error::UNITY_LICENSE secret is required'; exit 1; }
+          test -n "$UNITY_EMAIL" || { echo '::error::UNITY_EMAIL secret is required'; exit 1; }
+          test -n "$UNITY_PASSWORD" || { echo '::error::UNITY_PASSWORD secret is required'; exit 1; }
+
+      - name: Run Unity EditMode standalone smoke
+        uses: game-ci/unity-test-runner@v4
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          testMode: EditMode
+          artifactsPath: unity-smoke-artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Android offline APK
+        uses: game-ci/unity-builder@v5
+        with:
+          projectPath: client-unity
+          unityVersion: auto
+          targetPlatform: Android
+          buildMethod: NinjaAssemble.EditorTools.MobileBuildAutomation.BuildAndroidDevelopment
+          buildName: NinjaAssemble
+          buildsPath: builds/android
+          androidExportType: androidPackage
+          versioning: Custom
+          version: ${{ inputs.release_version != '' && inputs.release_version || format('0.1.{0}', github.run_number) }}
+          androidVersionCode: ${{ github.run_number }}
+          customParameters: -ninjaBuildCommit ${{ github.sha }}
+          allowDirtyBuild: true
+
+      - name: Prepare release files
+        shell: bash
+        run: |
+          test -s builds/android/NinjaAssemble.apk
+          test -s builds/android/build-metadata.json
+          cp builds/android/NinjaAssemble.apk builds/android/NinjaAssemble-offline-playtest.apk
+          cd builds/android
+          sha256sum NinjaAssemble-offline-playtest.apk > SHA256SUMS.txt
+
+      - name: Upload verified offline APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NinjaAssemble-offline-playtest-${{ github.run_number }}
+          path: |
+            builds/android/NinjaAssemble-offline-playtest.apk
+            builds/android/build-metadata.json
+            builds/android/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish GitHub playtest release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_VERSION: ${{ inputs.release_version }}
+        shell: bash
+        run: |
+          VERSION="${REQUESTED_VERSION:-0.1.${GITHUB_RUN_NUMBER}}"
+          TAG="offline-playtest-v${VERSION}"
+          cat > /tmp/release-notes.md <<EOF
+          ## Ninja Assemble Offline Playtest ${VERSION}
+
+          Bản APK này dành cho **chơi thử offline trên Android**.
+
+          - Không cần Java/Spring Boot server.
+          - Không cần PostgreSQL hoặc Redis.
+          - Không cần kết nối Internet cho gameplay offline.
+          - Local save nằm trên thiết bị và có thể thay đổi/reset giữa các bản playtest.
+          - Đây không phải production/store release và không phải bằng chứng production-art/device certification.
+
+          Source commit: ${GITHUB_SHA}
+          EOF
+          gh release create "$TAG" \
+            builds/android/NinjaAssemble-offline-playtest.apk \
+            builds/android/build-metadata.json \
+            builds/android/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "Ninja Assemble Offline Playtest v${VERSION}" \
+            --notes-file /tmp/release-notes.md \
+            --prerelease
