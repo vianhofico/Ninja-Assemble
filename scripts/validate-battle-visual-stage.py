@@ -14,6 +14,7 @@ REQUIRED_FILES = [
     ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattlePresentationAdapter.cs",
     ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs",
     ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleActorView.cs",
+    ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleImpactFeedback.cs",
     ROOT / "client-unity/Assets/Scripts/Game/Presentation/HeroArtRuntimeCatalog.cs",
     ROOT / "client-unity/Assets/Scripts/Game/Presentation/HeroAddressableLoader.cs",
 ]
@@ -35,12 +36,18 @@ def main() -> int:
         if token not in server: errors.append(f"PlayableBattleService missing presentation participant token: {token}")
 
     timeline = (ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleTimelinePlayer.cs").read_text(encoding="utf-8")
-    for token in ('case "BASIC_ATTACK_START"', 'case "DAMAGE"', 'case "KO"', "Time.unscaledDeltaTime", "SetPlaybackSpeed", "PlaybackCompleted"):
+    for token in ('case "BASIC_ATTACK_START"', 'case "DAMAGE"', 'case "KO"', "Time.unscaledDeltaTime", "SetPlaybackSpeed", "PlaybackCompleted", "BattleImpactFeedback"):
         if token not in timeline: errors.append(f"BattleTimelinePlayer missing realtime playback token: {token}")
 
     stage = (ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleVisualStage.cs").read_text(encoding="utf-8")
-    for token in ("TeamAAnchors", "TeamBAnchors", "art.IsReady", "TryLoadPrefabAsync", "CreateFallbackActor", "FloatingDamage", "CriticalShake", "PlayVictory"):
+    for token in ("TeamAAnchors", "TeamBAnchors", "art.IsReady", "TryLoadPrefabAsync", "CreateFallbackActor", "PlayVictory"):
         if token not in stage: errors.append(f"BattleVisualStage missing runtime stage token: {token}")
+    for legacy in ("timeline.EventPresented += OnEventPresented", "FloatingDamage", "CriticalShake"):
+        if legacy in stage: errors.append(f"BattleVisualStage still owns duplicate legacy feedback path: {legacy}")
+
+    feedback = (ROOT / "client-unity/Assets/Scripts/Game/Presentation/BattleImpactFeedback.cs").read_text(encoding="utf-8")
+    for token in ('case "DAMAGE"', "damageText", "PopLabel", "ActorFlash", "StartShake", "PresentationDelta"):
+        if token not in feedback: errors.append(f"BattleImpactFeedback missing unified damage-feedback token: {token}")
 
     with MANIFEST.open(encoding="utf-8-sig", newline="") as handle: manifest_rows = list(csv.DictReader(handle))
     try: runtime = json.loads(RUNTIME_CATALOG.read_text(encoding="utf-8"))
@@ -59,7 +66,7 @@ def main() -> int:
         print("BATTLE_VISUAL_STAGE_INVALID", file=sys.stderr)
         for error in errors: print(" -", error, file=sys.stderr)
         return 1
-    print(f"BATTLE_VISUAL_STAGE_OK runtime_art_entries={len(actual)} participant_contract=10_units realtime_playback=true fallback=enabled")
+    print(f"BATTLE_VISUAL_STAGE_OK runtime_art_entries={len(actual)} participant_contract=10_units realtime_playback=true fallback=enabled feedback=single_path")
     return 0
 
 if __name__ == "__main__": raise SystemExit(main())
