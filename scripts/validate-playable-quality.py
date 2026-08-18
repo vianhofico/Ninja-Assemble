@@ -34,8 +34,9 @@ def main() -> int:
             "if (item == null) continue;", "while (paused) yield return null;")
     require(actor,
             "SetPresentationRate", "RageSkill", "rageSkillClip", "Mathf.MoveTowards",
-            "targetHealth01", "targetRage", "presentationPaused", "if (presentationPaused) return;")
-    forbid(actor, 'case "ULTIMATE"')
+            "targetHealth01", "targetRage", "presentationPaused", "if (presentationPaused) return;",
+            "ConfigureRageUi")
+    forbid(actor, 'case "ULTIMATE"', "ConfigureEnergyUi")
     require(hud,
             "PAUSE", "RESUME", "CreateSpeedButton", "CreateSpeedButton(panel.transform, 4)",
             "timeline.SetPlaybackSpeed", "timeline.SetPaused")
@@ -44,10 +45,11 @@ def main() -> int:
             "ActorFlash", "RageReadyPulse", "PopLabel", "damageText", "StartShake",
             "TryPresentationDelta", "timeline.IsPaused", "if (!TryPresentationDelta(out delta))")
     forbid(stage,
-           "timeline.EventPresented += OnEventPresented", "private IEnumerator FloatingDamage", "private IEnumerator CriticalShake")
+           "timeline.EventPresented += OnEventPresented", "private IEnumerator FloatingDamage", "private IEnumerator CriticalShake",
+           "ConfigureEnergyUi")
     require(stage,
             "timeline.PlaybackCompleted += OnPlaybackCompleted", "CreateRageSlider",
-            "actor.ConfigureEnergyUi(rage)", "slider.targetGraphic = fillImage")
+            "actor.ConfigureRageUi(rage)", "slider.targetGraphic = fillImage")
     require("client-unity/Assets/Scripts/Game/Presentation/BattlePresentationAdapter.cs",
             "TimestampMs = item.timestampMs", "RageAfter = item.rageAfter", "DurationMs = item.durationMs")
     require(unity_tests,
@@ -58,7 +60,7 @@ def main() -> int:
             "game-ci/unity-test-runner@v4", "testMode: EditMode", "projectPath: client-unity",
             "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD", "actions/upload-artifact@v4")
 
-    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=single-path fallback_rage=1 smooth_hud=1 replay_lifecycle=1 unity_editmode_gate=1")
+    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=single-path fallback_rage=1 rage_naming=1 smooth_hud=1 replay_lifecycle=1 unity_editmode_gate=1")
     return 0
 
 
