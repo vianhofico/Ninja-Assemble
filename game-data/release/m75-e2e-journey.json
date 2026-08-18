@@ -1,0 +1,26 @@
+{
+  "journeyVersion": "m75-e2e-v1",
+  "name": "Fresh account to late-game persistence",
+  "orderedSteps": [
+    {"id":"guest-login","domain":"account","contractRef":"client-unity/Assets/Scripts/Game/Network/GameApiClient.cs","requiredTokens":["LoginGuestAsync","/api/v1/players/guest"]},
+    {"id":"bootstrap","domain":"account","contractRef":"client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs","requiredTokens":["LoginAndBootstrapAsync","BootstrapAsync"]},
+    {"id":"starter-roster","domain":"roster","contractRef":"server/src/main/java/com/ninjaassemble/play/application/StarterRosterService.java","requiredTokens":["bootstrap","starter"]},
+    {"id":"formation","domain":"formation","contractRef":"client-unity/Assets/Scripts/Game/Network/GameApiClient.cs","requiredTokens":["SaveFormationAsync","/formation"]},
+    {"id":"campaign-first-clear","domain":"campaign","contractRef":"client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs","requiredTokens":["BattleCampaignAsync","RefreshCampaignAsync"]},
+    {"id":"campaign-reward","domain":"campaign","contractRef":"server/src/main/java/com/ninjaassemble/campaign/application/CampaignRewardService.java","requiredTokens":["CAMPAIGN_STAGE_REWARD","inventory.mutate"]},
+    {"id":"hero-level-up","domain":"progression","contractRef":"client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs","requiredTokens":["LevelUpAsync","Guid.NewGuid().ToString()"]},
+    {"id":"summon-pity-duplicate","domain":"summon","contractRef":"server/src/main/java/com/ninjaassemble/play/application/SummonApplicationService.java","requiredTokens":["pity","requestId"]},
+    {"id":"inventory-equipment","domain":"equipment","contractRef":"server/src/main/java/com/ninjaassemble/equipment/application/EquipmentApplicationService.java","requiredTokens":["equip","enhance","requestId"]},
+    {"id":"campaign-sweep-unlock","domain":"campaign","contractRef":"server/src/main/java/com/ninjaassemble/campaign/application/CampaignSweepService.java","requiredTokens":["previously cleared stage","campaign-sweep","withReplayed(true)"]},
+    {"id":"resource-pve","domain":"pve","contractRef":"server/src/main/java/com/ninjaassemble/pve/application/ResourcePveApplicationService.java","requiredTokens":["resource-pve:","withReplayed(true)"]},
+    {"id":"arena-defense-battle-history","domain":"competitive","contractRef":"server/src/main/java/com/ninjaassemble/pvp/application/ProductionArenaService.java","requiredTokens":["saveDefense","fight","history","competitive_battle_requests"]},
+    {"id":"shadow-arena-15-unit-series","domain":"competitive","contractRef":"server/src/main/java/com/ninjaassemble/pvp/application/ProductionShadowArenaService.java","requiredTokens":["SHADOW_ROSTER_SIZE","SHADOW_SQUAD_COUNT","history"]},
+    {"id":"guild-lifecycle","domain":"guild","contractRef":"server/src/main/java/com/ninjaassemble/guild/application/GuildApplicationService.java","requiredTokens":["contribute","hitBoss","requestId"]},
+    {"id":"quest-event-mail","domain":"live","contractRef":"client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs","requiredTokens":["ClaimQuestAsync","ClaimMailAsync","RefreshQuestsAsync"]},
+    {"id":"awakening","domain":"hero","contractRef":"client-unity/Assets/Scripts/Game/Network/GameApiClient.cs","requiredTokens":["GetAwakeningAsync","AwakenAsync"]},
+    {"id":"frame-advance","domain":"progression","contractRef":"server/src/main/java/com/ninjaassemble/progression/application/FrameAdvanceApplicationService.java","requiredTokens":["FRAME_ADVANCE","ActionRequestService","for update"]},
+    {"id":"advanced-progression","domain":"progression","contractRef":"server/src/main/java/com/ninjaassemble/progression/application/AdvancedProgressionApplicationService.java","requiredTokens":["pg_advisory_xact_lock","progression:","withReplayed(true)"]},
+    {"id":"restart-persistence","domain":"persistence","contractRef":"server/src/main/resources/db/migration/V17__advanced_progression.sql","requiredTokens":["player_progression_tracks","progression_upgrade_requests"]},
+    {"id":"late-game-state","domain":"release","contractRef":"scripts/validate-m74-parity.py","requiredTokens":["M74_PARITY_DASHBOARD","--enforce"]}
+  ]
+}
