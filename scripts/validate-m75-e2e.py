@@ -43,7 +43,7 @@ def validate_structure():
 
     # Reliability-critical implementation contracts.
     require('server/src/main/java/com/ninjaassemble/economy/application/WalletService.java','idempotencyKey','findWithLockById','ledger.existsByPlayerIdAndIdempotencyKey')
-    require('server/src/main/java/com/ninjaassemble/economy/domain/WalletBalance.java','next < 0')
+    require('server/src/main/java/com/ninjaassemble/economy/domain/WalletBalance.java','Math.addExact','after < 0','insufficient balance')
     require('server/src/main/java/com/ninjaassemble/inventory/domain/InventoryStack.java','insufficient item quantity')
     require('server/src/main/java/com/ninjaassemble/campaign/application/CampaignSweepService.java','pg_advisory_xact_lock','withReplayed(true)')
     require('server/src/main/java/com/ninjaassemble/pvp/application/ProductionArenaService.java','pg_advisory_xact_lock','competitive_battle_requests')
