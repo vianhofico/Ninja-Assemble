@@ -1,33 +1,38 @@
-# Ninja Assemble — Private Clean-Room Expanded Replica
+# Ninja Assemble — Bản triển khai Clean-Room mở rộng
 
-Private educational/research implementation that recreates the **observable gameplay systems** of Ninja Assemble / Ninja Rebirth and expands the playable roster across Naruto + Naruto Shippuden.
+Ninja Assemble là dự án game mobile được xây dựng lại theo phương pháp **clean-room**, tập trung tái hiện các hệ thống gameplay có thể quan sát của Ninja Assemble / Ninja Rebirth và mở rộng đội hình nhân vật dựa trên Naruto + Naruto Shippuden.
 
-> This repository does not contain ripped APK assets, proprietary source code, decompiled server logic, or redistributed original game resources. Gameplay is reimplemented clean-room; production art is ingested through explicit file-backed package contracts.
+> Repository không chứa asset trích xuất từ APK, source code độc quyền, logic server dịch ngược hoặc tài nguyên gốc được phân phối lại. Gameplay được triển khai lại độc lập; production art được quản lý bằng các package contract có file/evidence rõ ràng.
 
-## Current status
+## Bản Android chơi thử
 
-The project has moved well beyond bootstrap. Current mobile foundations include:
+Dự án hiện đã build thành công **development APK** bằng Unity trên GitHub Actions. Đây là bản dành cho cài đặt và chơi thử local trên thiết bị Android, **không phải bản phát hành Google Play**.
 
-- **189 base characters / 427 playable variant census rows**;
-- **120 bilingual EN/VI techniques**, 44 reusable kit profiles and complete base-character kit mapping;
-- Java 21 / Spring Boot server with player state, wallet/energy, hero ownership, formation, deterministic battle/replay, progression/evolution, campaign, resource PvE, Arena/Shadow Arena, summon/pity, shops, inventory/equipment, guild, daily/events and mail;
-- Unity mobile client shell with Bootstrap + 16 core screens and live battle/summon/level-up vertical-slice actions;
-- data-driven Addressables presentation contracts;
-- component-level art production gates for portrait/icon/chibi/animation/VFX/SFX/regression capture/review;
-- evidence-backed parity gates for combat stats, damage formula, summon profile and level cost;
-- Android APK/AAB build automation and release-device evidence contracts.
+- Workflow đã xác minh: `Android Playtest Build #19`
+- Artifact: `NinjaAssemble-playtest-apk-19`
+- SHA-256 artifact: `99a6c2db4b7fecc0b4dcba2bcdc2a6425c8fcce90b066ad4a85793e941babd8f`
+- Source đã được merge vào `main` qua PR #102.
 
-### Release blockers
+Khi có GitHub Release playtest, hãy tải file APK trong phần **Releases** của repository. Nếu chỉ cần artifact CI, có thể mở workflow Android Playtest Build tương ứng trong GitHub Actions.
 
-The mobile game is **not declared finished yet**. The release audit intentionally remains blocked until:
+## Trạng thái hiện tại
 
-1. all 427 required art packages are real and complete;
-2. all 4 release-critical reference/balance profiles are verified from measurements;
-3. Android builds pass smoke + performance runs on at least two distinct device models/classes.
+Các nền tảng chính đã có:
 
-See `docs/12-RELEASE-STATUS.md`.
+- **189 nhân vật gốc / 427 biến thể playable** trong census;
+- **120 kỹ năng song ngữ EN/VI**, 44 kit profile tái sử dụng và mapping kit cho toàn bộ nhân vật gốc;
+- Server Java 21 / Spring Boot với player state, wallet/energy, hero ownership, formation, deterministic battle/replay, progression/evolution, campaign, resource PvE, Arena/Shadow Arena, summon/pity, shop, inventory/equipment, guild, daily/events và mail;
+- Unity mobile client với Bootstrap, các màn hình gameplay chính và vertical slice cho battle/summon/level-up;
+- hệ thống presentation dựa trên Addressables;
+- art production gate cho portrait/icon/chibi/animation/VFX/SFX/regression capture/review;
+- parity gate có evidence cho combat stats, damage formula, summon profile và level cost;
+- pipeline build Android APK/AAB và contract kiểm thử thiết bị.
 
-## Repository layout
+### Những phần chưa được tuyên bố production-ready
+
+APK chơi thử đã build thành công không đồng nghĩa game đã đạt production release gate. Release audit vẫn yêu cầu evidence thật cho production art, reference/balance parity và kiểm thử hiệu năng/smoke test trên thiết bị Android vật lý. Xem `docs/12-RELEASE-STATUS.md` để biết trạng thái chi tiết.
+
+## Cấu trúc repository
 
 ```text
 .
@@ -35,20 +40,26 @@ See `docs/12-RELEASE-STATUS.md`.
 ├── server/                # Java 21 / Spring Boot game server
 ├── game-data/             # roster, variants, skills, localization, balance evidence
 ├── art/                   # manifests, package schema, regression/review contracts
-├── docs/                  # rules, architecture, milestone and release documentation
+├── docs/                  # luật chơi, kiến trúc, milestone và release documentation
 ├── scripts/               # validation, generation, release/build helpers
-├── .github/workflows/     # server + content integrity CI
+├── .github/workflows/     # CI và Android build
 └── docker-compose.yml     # PostgreSQL + Redis
 ```
 
-## Server validation
+## Chạy hạ tầng local
+
+```bash
+docker compose up -d postgres redis
+```
+
+## Kiểm tra server
 
 ```bash
 bash scripts/validate-core.sh
 mvn -f server/pom.xml test
 ```
 
-## Content / release validation
+## Kiểm tra content / release
 
 ```bash
 python scripts/validate-content.py
@@ -61,43 +72,38 @@ python scripts/validate-mobile-release-evidence.py
 python scripts/release-audit.py --markdown
 ```
 
-Strict release checks intentionally fail while real art/reference/device evidence is incomplete.
+Một số strict release check được thiết kế để fail khi evidence production thực tế chưa đầy đủ; không được biến các gate này thành pass giả.
 
-## Local infrastructure
+## Mở project Unity
 
-```bash
-docker compose up -d postgres redis
-```
-
-## Generate the Unity mobile scene shell
-
-Open `client-unity` in Unity 6000.0 and run:
+Mở thư mục `client-unity` bằng Unity 6000.0. Để tạo lại mobile scene shell, chạy menu:
 
 `Ninja Assemble → Mobile → Generate Complete Scene Shell`
 
-This generates Bootstrap plus Home, Ninja Roster, Hero Detail, Formation, Adventure, Battle, Summon, Arena, Shadow Arena, Guild, Shop, Inventory, Quest, Events, Mail and Settings scenes.
+## Build Android local
 
-## Android build
-
-With Unity Android Build Support installed:
+Cần cài Unity Android Build Support. Development build tạo APK để cài trực tiếp lên Android:
 
 ```bash
 UNITY_PATH=/path/to/Unity ./scripts/build-mobile.sh development
+```
+
+Release build tạo AAB và chỉ cần thiết khi chuẩn bị phát hành store:
+
+```bash
 UNITY_PATH=/path/to/Unity ./scripts/build-mobile.sh release
 ```
 
-Development produces an APK; release produces an AAB. Build output is written under `builds/android/` and is ignored by Git.
+Output được ghi vào `builds/android/` và không commit vào Git.
 
-## Art production rule
+## Quy tắc production art
 
-A playable variant cannot become release-ready from a CSV status alone. Any component marked READY must be backed by a real descriptor under:
+Một biến thể playable không được coi là release-ready chỉ vì CSV đánh dấu trạng thái. Component `READY` phải có descriptor thật tại:
 
 `art/packages/<character_id>/<variant-slug>/package.json`
 
-and concrete repository files for that component. Final review READY also requires review evidence.
+và phải có các file/evidence tương ứng trong repository. Final review `READY` cũng cần review evidence thực tế.
 
-## Implementation rule
+## Tài liệu chính
 
-Observable Ninja Assemble parity and the expanded Naruto/Shippuden roster are audited separately. No feature or character is considered complete merely because it exists in a census.
-
-See `docs/00-MASTER-PLAN.md`, `docs/12-RELEASE-STATUS.md`, `docs/16-M20-REFERENCE-EVIDENCE.md`, `docs/17-M19-ART-PACKAGE-GATES.md`, and `docs/18-M21-MOBILE-BUILD-ASSET-INGEST.md`.
+Xem thêm `docs/00-MASTER-PLAN.md`, `docs/12-RELEASE-STATUS.md`, `docs/100-PERCENT-COMPLETION-PLAN.md` và `docs/IMPLEMENTATION-MERGE-POLICY.md`.
