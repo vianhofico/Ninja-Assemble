@@ -36,13 +36,13 @@ jobs:
         run: python scripts/validate-m74-parity.py --enforce
       - name: Require certified M75 end-to-end reliability run
         run: python scripts/validate-m75-e2e.py --enforce
+      - name: Require certified M76 Android performance and physical-device evidence
+        run: python scripts/validate-m76-android-performance.py --enforce
       - name: Require full release readiness
         run: python scripts/validate-release-readiness.py --release
       - name: Require all hero art packages READY
         run: python scripts/validate-art-packages.py --release
       - name: Verify files behind READY art components
         run: python scripts/validate-production-assets.py
-      - name: Require real Android device evidence
-        run: python scripts/validate-mobile-release-evidence.py --release
       - name: Enforce aggregate release audit
         run: python scripts/release-audit.py --enforce

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.ninja-assemble/schema/m76-device-run-v1.json",
+  "title": "M76PhysicalAndroidDeviceRun",
+  "type": "object",
+  "required": ["schemaVersion","gitSha","unityVersion","artifact","device","benchmark","smokePass","performancePass","captureRef"],
+  "properties": {
+    "schemaVersion": {"const":"m76-device-run-v1"},
+    "gitSha": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "unityVersion": {"type":"string","minLength":1},
+    "artifact": {"type":"object","required":["type","ref"],"properties":{"type":{"enum":["APK","AAB"]},"ref":{"type":"string","minLength":1}},"additionalProperties":false},
+    "device": {"type":"object","required":["model","androidVersion","class","physical","buildFingerprint"],"properties":{"model":{"type":"string","minLength":1},"androidVersion":{"type":"string","minLength":1},"class":{"enum":["LOW","MID","HIGH"]},"physical":{"const":true},"buildFingerprint":{"type":"string","minLength":1}},"additionalProperties":false},
+    "benchmark": {"type":"object","required":["profile","scenario","averageFps","p95FrameMs","maxMemoryMb","measurementSeconds"],"properties":{"profile":{"const":"m76-device-profiles-v1"},"scenario":{"const":"campaign-realtime-battle-rage-v1"},"averageFps":{"type":"number","exclusiveMinimum":0},"p95FrameMs":{"type":"number","exclusiveMinimum":0},"maxMemoryMb":{"type":"number","exclusiveMinimum":0},"measurementSeconds":{"type":"number","minimum":180}},"additionalProperties":false},
+    "smokePass": {"const":true},
+    "performancePass": {"const":true},
+    "captureRef": {"type":"string","minLength":1},
+    "notes": {"type":"string"}
+  },
+  "additionalProperties": false
+}
