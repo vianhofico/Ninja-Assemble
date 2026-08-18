@@ -52,7 +52,9 @@ namespace NinjaAssemble.EditorTools
             new ScreenSpec(ScreenId.Quest, "Quest", "screen.quest"),
             new ScreenSpec(ScreenId.Events, "Events", "screen.events"),
             new ScreenSpec(ScreenId.Mail, "Mail", "screen.mail"),
-            new ScreenSpec(ScreenId.Settings, "Settings", "screen.settings")
+            new ScreenSpec(ScreenId.Settings, "Settings", "screen.settings"),
+            new ScreenSpec(ScreenId.ResourcePve, "Resource PvE", "screen.resourcePve"),
+            new ScreenSpec(ScreenId.Progression, "Advanced Progression", "screen.progression")
         };
 
         [MenuItem("Ninja Assemble/Mobile/Generate Complete Scene Shell")]
