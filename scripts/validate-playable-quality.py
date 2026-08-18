@@ -23,13 +23,16 @@ def main() -> int:
     actor = "client-unity/Assets/Scripts/Game/Presentation/BattleActorView.cs"
     hud = "client-unity/Assets/Scripts/Game/Presentation/BattlePlaybackHud.cs"
     feedback = "client-unity/Assets/Scripts/Game/Presentation/BattleImpactFeedback.cs"
+    unity_tests = "client-unity/Assets/Tests/Editor/BattlePlaybackContractTests.cs"
+    workflow = ".github/workflows/playable-quality-integrity.yml"
 
     require(timeline,
             "BattlePlaybackHud", "BattleImpactFeedback", "EnsurePlayableQualityLayer",
-            "speed != 1 && speed != 2 && speed != 4", "SetPresentationRate", "CurrentTimestampMs")
+            "speed != 1 && speed != 2 && speed != 4", "SetPresentationRate", "CurrentTimestampMs",
+            "paused = false")
     require(actor,
             "SetPresentationRate", "RageSkill", "rageSkillClip", "Mathf.MoveTowards",
-            "targetHealth01", "targetRage")
+            "targetHealth01", "targetRage", "presentationPaused", "if (presentationPaused) return;")
     forbid(actor, 'case "ULTIMATE"')
     require(hud,
             "PAUSE", "RESUME", "CreateSpeedButton", "CreateSpeedButton(panel.transform, 4)",
@@ -39,8 +42,14 @@ def main() -> int:
             "ActorFlash", "RageReadyPulse", "PopLabel", "StartShake")
     require("client-unity/Assets/Scripts/Game/Presentation/BattlePresentationAdapter.cs",
             "TimestampMs = item.timestampMs", "RageAfter = item.rageAfter", "DurationMs = item.durationMs")
+    require(unity_tests,
+            "PlaybackSpeed_AcceptsOnlyOneTwoAndFour", "PauseState_IsExplicitAndReversible",
+            "NewPlayback_ResetsPauseAndTimestamp", "Assert.Throws<ArgumentOutOfRangeException>")
+    require(workflow,
+            "game-ci/unity-test-runner@v4", "testMode: EditMode", "coverageEnabled: false",
+            "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD")
 
-    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=1 rage_cinematic=1 impact_feedback=1 smooth_hud=1")
+    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=1 smooth_hud=1 unity_editmode_gate=1")
     return 0
 
 
