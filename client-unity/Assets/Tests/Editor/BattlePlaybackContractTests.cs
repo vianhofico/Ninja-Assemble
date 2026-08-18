@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using NinjaAssemble.Presentation;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace NinjaAssemble.Tests.Editor
 {
@@ -48,6 +50,28 @@ namespace NinjaAssemble.Tests.Editor
             Assert.IsTrue(timeline.IsPaused);
             timeline.SetPaused(false);
             Assert.IsFalse(timeline.IsPaused);
+        }
+
+        [UnityTest]
+        public IEnumerator EmptyReplay_CompletesWithoutLeavingStalePlayingHandle()
+        {
+            int completed = 0;
+            timeline.PlaybackCompleted += () => completed++;
+
+            Coroutine handle = timeline.Play(Array.Empty<BattlePresentationEvent>());
+
+            Assert.IsNotNull(handle);
+            Assert.IsTrue(timeline.IsPlaying);
+
+            // PlayRoutine deliberately yields once before it can complete, so Play() always
+            // stores the handle before the routine clears it. Give the editor runner enough
+            // frames to resume both the playback and this test coroutine deterministically.
+            yield return null;
+            yield return null;
+
+            Assert.IsFalse(timeline.IsPlaying);
+            Assert.AreEqual(1, completed);
+            Assert.AreEqual(0L, timeline.CurrentTimestampMs);
         }
     }
 }
