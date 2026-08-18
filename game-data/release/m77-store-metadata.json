@@ -1,0 +1,21 @@
+{
+  "metadataVersion": "m77-store-metadata-v1",
+  "applicationId": "com.vianhofico.ninjaassemble",
+  "productName": "Ninja Assemble",
+  "defaultLocale": "vi-VN",
+  "supportedLocales": ["vi-VN", "en-US"],
+  "category": "GAME_ROLE_PLAYING",
+  "orientation": "LANDSCAPE",
+  "shortDescription": {
+    "vi-VN": "Game chiến thuật ninja đội hình 5 người với chiến đấu tự động thời gian thực.",
+    "en-US": "A five-ninja squad strategy game with realtime auto-battles."
+  },
+  "privacyPolicyUrl": "PENDING_PUBLIC_URL",
+  "supportUrl": "PENDING_PUBLIC_URL",
+  "contentRatingQuestionnaire": "PENDING_STORE_REVIEW",
+  "dataSafetyForm": "PENDING_STORE_REVIEW",
+  "rightsClearance": "BLOCKED_UNTIL_M77_PROVENANCE_READY",
+  "releaseNotesRef": "docs/release/M77_RELEASE_NOTES.md",
+  "knownIssuesRef": "docs/release/M77_KNOWN_ISSUES.md",
+  "supportRunbookRef": "docs/release/M77_SUPPORT_RUNBOOK.md"
+}
