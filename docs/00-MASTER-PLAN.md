@@ -248,3 +248,15 @@ A feature passes only when:
 8. Expand into the remaining modes.
 
 This order establishes the reusable combat/progression loop before content multiplication.
+
+## 7. Current execution roadmap after M53
+
+The historical phases above define the product architecture and observable-parity target. The repository has since progressed through the M53 canonical realtime/Rage combat baseline.
+
+Use the following documents as the authoritative execution layer for the remaining work:
+
+- `docs/100-PERCENT-COMPLETION-PLAN.md` — detailed M54–M77 completion sequence, deliverables and Definition of Done for each milestone.
+- `docs/IMPLEMENTATION-MERGE-POLICY.md` — mandatory branch/PR/validation/merge workflow; each completed milestone merges into `main` before the next independent milestone begins.
+- `docs/12-RELEASE-STATUS.md` — current completion dashboard and release blockers.
+
+The original parity definition remains unchanged: implementation structure alone is insufficient. Release completion still requires evidence, server/client behavior, deterministic tests, visual/flow validation and `PARITY_PASS` for release-scope observable behavior.
