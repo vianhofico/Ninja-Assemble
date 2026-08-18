@@ -1,0 +1,25 @@
+name: reference-evidence-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/reference/balance-profiles.csv'
+      - 'game-data/reference/measurements/**'
+      - 'scripts/validate-reference-evidence.py'
+      - 'scripts/release-audit.py'
+      - '.github/workflows/reference-evidence-integrity.yml'
+      - '.github/workflows/production-release-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-reference-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate reference schemas and evidence thresholds
+        run: python scripts/validate-reference-evidence.py
+      - name: Render aggregate release audit without promoting release state
+        run: python scripts/release-audit.py --json
