@@ -9,6 +9,8 @@ namespace NinjaAssemble.Playable
         Task<BootstrapDto> BootstrapAsync(string playerId);
         Task<OwnedHeroDto[]> GetOwnedHeroesAsync(string playerId);
         Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds);
+        Task<AwakeningViewDto> GetAwakeningAsync(string playerId, string playerHeroId);
+        Task<AwakeningViewDto> AwakenAsync(string playerId, string playerHeroId);
         Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId);
         Task<PlayBattleDto> PlayCampaignStageAsync(string playerId, string stageId);
         Task<CampaignSweepDto> SweepCampaignStageAsync(string playerId, string stageId, string requestId);
