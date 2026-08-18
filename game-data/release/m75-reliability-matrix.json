@@ -1,0 +1,15 @@
+{
+  "matrixVersion": "m75-reliability-v1",
+  "requiredCases": [
+    {"id":"migration-chain","contractRef":"server/src/main/resources/db/migration","assertion":"All committed Flyway migrations remain ordered and server startup can apply them to a clean database."},
+    {"id":"transaction-boundaries","contractRef":"server/src/main/java","assertion":"Reward, purchase and progression mutations execute within transactional service boundaries."},
+    {"id":"idempotent-retry","contractRef":"server/src/main/java","assertion":"Action requestId replay returns the stored result and never double-charges or double-grants."},
+    {"id":"duplicate-reward-prevention","contractRef":"server/src/main/java/com/ninjaassemble/economy","assertion":"Wallet/inventory ledgers reject duplicate grant keys."},
+    {"id":"negative-balance-prevention","contractRef":"server/src/main/java/com/ninjaassemble/economy/domain/WalletBalance.java","assertion":"Currency balance cannot become negative."},
+    {"id":"concurrency-locking","contractRef":"server/src/main/java","assertion":"Concurrent high-value actions use row/advisory locks before mutation."},
+    {"id":"battle-determinism","contractRef":"server/src/main/java/com/ninjaassemble/battle/sim/RealtimeBattleEngine.java","assertion":"Same seed/ruleset/unit seeds produce deterministic authoritative battle output."},
+    {"id":"api-contract","contractRef":"client-unity/Assets/Scripts/Game/Network","assertion":"Unity DTO/client contracts remain aligned with server endpoints."},
+    {"id":"restart-persistence","contractRef":"server/src/main/resources/db/migration","assertion":"Player state survives application restart and is reconstructed from durable storage."},
+    {"id":"soak-stability","contractRef":"game-data/release/evidence/m75","assertion":"A real certification run records sustained repeated actions without leaks, duplicate grants or state drift."}
+  ]
+}
