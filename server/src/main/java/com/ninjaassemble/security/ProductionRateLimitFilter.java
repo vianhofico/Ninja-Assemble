@@ -5,7 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Duration;
+import java.util.HexFormat;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
@@ -60,9 +63,16 @@ public final class ProductionRateLimitFilter extends OncePerRequestFilter {
     }
 
     private static String clientKey(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        String value = forwarded == null || forwarded.isBlank() ? request.getRemoteAddr() : forwarded.split(",", 2)[0].trim();
-        return Integer.toUnsignedString(value == null ? 0 : value.hashCode(), 36);
+        String authorization = request.getHeader("Authorization");
+        String stable = authorization != null && authorization.startsWith("Bearer ")
+                ? authorization.substring("Bearer ".length()).trim()
+                : request.getRemoteAddr();
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256").digest((stable == null ? "unknown" : stable).getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest, 0, 8);
+        } catch (Exception impossible) {
+            return Integer.toUnsignedString((stable == null ? "unknown" : stable).hashCode(), 36);
+        }
     }
 
     private static String bucket(String path) {
