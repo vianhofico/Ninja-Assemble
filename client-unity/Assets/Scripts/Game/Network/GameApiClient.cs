@@ -33,10 +33,19 @@ namespace NinjaAssemble.Network
         public Task<ResourcePveBoardDto> GetResourcePveAsync(string playerId) => GetAsync<ResourcePveBoardDto>($"/api/v1/play/{Escape(playerId)}/resource-pve");
         public Task<ResourcePveBattleDto> PlayResourcePveAsync(string playerId, string modeId, string requestId) => PostJsonAsync<ResourcePveBattleDto>($"/api/v1/play/{Escape(playerId)}/resource-pve/{Escape(modeId)}/battle", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<InventoryViewDto> GetInventoryAsync(string playerId) => GetAsync<InventoryViewDto>($"/api/v1/play/{Escape(playerId)}/inventory");
-        public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/arena");
-        public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle", "{}");
-        public Task<ShadowArenaStateDto> GetShadowArenaAsync(string playerId) => GetAsync<ShadowArenaStateDto>($"/api/v1/play/{Escape(playerId)}/shadow-arena");
-        public Task<ShadowArenaBattleDto> FightShadowArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ShadowArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/shadow-arena/{Escape(opponentPlayerId)}/battle", "{}");
+
+        public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/competitive/arena");
+        public Task<ArenaDefenseDto> SaveArenaDefenseAsync(string playerId, string[] heroIds) => PutJsonAsync<ArenaDefenseDto>($"/api/v1/play/{Escape(playerId)}/competitive/arena/defense", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
+        public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId, string requestId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/competitive/arena/{Escape(opponentPlayerId)}/battle", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<CompetitiveHistoryItemDto[]> GetArenaHistoryAsync(string playerId, int limit = 20) => GetArrayAsync<CompetitiveHistoryItemDto>($"/api/v1/play/{Escape(playerId)}/competitive/arena/history?limit={Math.Max(1, limit)}");
+        public Task<SeasonRewardDto> ClaimArenaSeasonAsync(string playerId) => PostJsonAsync<SeasonRewardDto>($"/api/v1/play/{Escape(playerId)}/competitive/arena/season/claim", "{}");
+
+        public Task<ShadowArenaStateDto> GetShadowArenaAsync(string playerId) => GetAsync<ShadowArenaStateDto>($"/api/v1/play/{Escape(playerId)}/competitive/shadow-arena");
+        public Task<ShadowDefenseDto> SaveShadowDefenseAsync(string playerId, string[] heroIds) => PutJsonAsync<ShadowDefenseDto>($"/api/v1/play/{Escape(playerId)}/competitive/shadow-arena/defense", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
+        public Task<ShadowArenaBattleDto> FightShadowArenaAsync(string playerId, string opponentPlayerId, string requestId) => PostJsonAsync<ShadowArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/competitive/shadow-arena/{Escape(opponentPlayerId)}/battle", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<CompetitiveHistoryItemDto[]> GetShadowArenaHistoryAsync(string playerId, int limit = 20) => GetArrayAsync<CompetitiveHistoryItemDto>($"/api/v1/play/{Escape(playerId)}/competitive/shadow-arena/history?limit={Math.Max(1, limit)}");
+        public Task<SeasonRewardDto> ClaimShadowSeasonAsync(string playerId) => PostJsonAsync<SeasonRewardDto>($"/api/v1/play/{Escape(playerId)}/competitive/shadow-arena/season/claim", "{}");
+
         public Task<ShopViewDto> GetShopAsync(string playerId) => GetAsync<ShopViewDto>($"/api/v1/play/{Escape(playerId)}/shop");
         public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId) => PostJsonAsync<ShopPurchaseResultDto>($"/api/v1/play/{Escape(playerId)}/shop/{Escape(shopId)}/{Escape(offerId)}/purchase", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<QuestBoardDto> GetQuestsAsync(string playerId) => GetAsync<QuestBoardDto>($"/api/v1/play/{Escape(playerId)}/quests");

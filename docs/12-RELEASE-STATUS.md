@@ -1,14 +1,14 @@
 # Mobile Release Status
 
-Current implementation checkpoint: **M62 — production Resource PvE loop.**
+Current implementation checkpoint: **M63 — production Arena + Shadow Arena meta-loop.**
 
-Merged/integration foundations now cover M54 battle presentation, M55 Android build pipeline, M57 evidence gates, M58 identity audit, M59 realtime mechanics audit, M60 balance/presentation gate, M61 Campaign and M62 Resource PvE.
+Merged/integration foundations now cover M54 battle presentation, M55 Android build pipeline, M57 evidence gates, M58 identity audit, M59 realtime mechanics audit, M60 balance/presentation gate, M61 Campaign, M62 Resource PvE and M63 competitive modes.
 
-## M62 release scope
+## M63 scope
 
-Nine release modes are data-driven and server-authoritative: Naruto Trial, Forest Hunt, Ninja Test, Gold Challenge, Daily Food, Resource Raid, Battle Relief, Obito Ultimate Trial and Tailed-Beast Conquer.
-
-Each mode has EN/VI metadata, Energy/min-level/daily-attempt gates, five enemies, UTC daily reset, victory rewards, persisted attempts/clears/best score, exact idempotent battle-result replay and Unity board/store contracts.
+- Arena: 5-unit offense + saved 5-unit defense, async opponents, realtime battle, rating/history, monthly UTC season/reset, idempotent Arena Coin battle and previous-season rewards.
+- Shadow Arena: 15-unit saved defense split into three squads, best-of-three realtime series, history, monthly UTC seasons/reset, idempotent Shadow Coin battle and previous-season rewards.
+- Canonical Unity `/competitive/...` API/store path uses request IDs; compatibility endpoints remain non-canonical.
 
 ## Hard release truth remains unchanged
 
@@ -22,4 +22,4 @@ Each mode has EN/VI metadata, Energy/min-level/daily-attempt gates, five enemies
 | Production art fully READY | 0/427 | 427/427 |
 | Physical Android device evidence | 0 | >=2 models/classes |
 
-Immediate queue: **M63 Arena/Shadow Arena → M64 Progression → M65 Economy/Live → M66–M68 production UI → M69–M77 art/parity/E2E/device/release**.
+Immediate queue: **M64 Progression → M65 Economy/Live → M66–M68 production UI → M69–M77 art/parity/E2E/device/release**.
