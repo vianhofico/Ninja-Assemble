@@ -6,6 +6,7 @@ on:
       - 'client-unity/Assets/Scripts/Game/Presentation/**'
       - 'client-unity/Assets/Tests/Editor/**'
       - 'scripts/validate-playable-quality.py'
+      - 'scripts/validate-battle-visual-stage.py'
       - '.github/workflows/playable-quality-integrity.yml'
   workflow_dispatch:
 
@@ -21,7 +22,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python scripts/validate-playable-quality.py
+      - name: Validate M54 playable quality contract
+        run: python scripts/validate-playable-quality.py
+      - name: Validate runtime visual-stage compatibility
+        run: python scripts/validate-battle-visual-stage.py
 
   unity-editmode:
     runs-on: ubuntu-latest
