@@ -92,7 +92,9 @@ namespace NinjaAssemble.Presentation
             float elapsed = 0f;
             while (elapsed < duration)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float alpha = 0.32f * (1f - Mathf.Clamp01(elapsed / duration));
                 image.color = new Color(1f, 1f, 1f, alpha);
                 yield return null;
@@ -121,7 +123,9 @@ namespace NinjaAssemble.Presentation
             float elapsed = 0f;
             while (elapsed < duration)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float t = Mathf.Clamp01(elapsed / duration);
                 rect.anchoredPosition = start + new Vector2(0f, 42f * t);
                 text.color = new Color(color.r, color.g, color.b, 1f - t);
@@ -140,7 +144,9 @@ namespace NinjaAssemble.Presentation
             float elapsed = 0f;
             while (elapsed < duration)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float t = Mathf.Clamp01(elapsed / duration);
                 float pulse = 1f + Mathf.Sin(t * Mathf.PI) * 0.08f;
                 target.localScale = original * pulse;
@@ -178,18 +184,28 @@ namespace NinjaAssemble.Presentation
             float elapsed = 0f;
             while (elapsed < inTime)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float t = Mathf.Clamp01(elapsed / inTime);
                 image.color = new Color(0.02f, 0.015f, 0.03f, 0.55f * t);
                 title.rectTransform.localScale = Vector3.one * Mathf.Lerp(1.18f, 1f, t);
                 yield return null;
             }
             elapsed = 0f;
-            while (elapsed < holdTime) { elapsed += PresentationDelta(); yield return null; }
+            while (elapsed < holdTime)
+            {
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
+                yield return null;
+            }
             elapsed = 0f;
             while (elapsed < outTime)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float t = Mathf.Clamp01(elapsed / outTime);
                 image.color = new Color(0.02f, 0.015f, 0.03f, 0.55f * (1f - t));
                 title.color = new Color(1f, 1f, 1f, 1f - t);
@@ -213,7 +229,9 @@ namespace NinjaAssemble.Presentation
             float elapsed = 0f;
             while (elapsed < duration)
             {
-                elapsed += PresentationDelta();
+                float delta;
+                if (!TryPresentationDelta(out delta)) { yield return null; continue; }
+                elapsed += delta;
                 float falloff = 1f - Mathf.Clamp01(elapsed / duration);
                 root.anchoredPosition = origin + Random.insideUnitCircle * magnitude * falloff;
                 yield return null;
@@ -222,10 +240,12 @@ namespace NinjaAssemble.Presentation
             shake = null;
         }
 
-        private float PresentationDelta()
+        private bool TryPresentationDelta(out float delta)
         {
-            if (timeline == null || timeline.IsPaused) return 0f;
-            return Time.unscaledDeltaTime * Mathf.Max(1, timeline.PlaybackSpeed);
+            delta = 0f;
+            if (timeline == null || timeline.IsPaused) return false;
+            delta = Time.unscaledDeltaTime * Mathf.Max(1, timeline.PlaybackSpeed);
+            return delta > 0f;
         }
 
         private Vector2 LocalPoint(Vector3 world)
