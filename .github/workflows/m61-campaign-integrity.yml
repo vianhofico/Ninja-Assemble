@@ -1,0 +1,23 @@
+name: m61-campaign-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/campaign/**'
+      - 'server/src/main/java/com/ninjaassemble/campaign/**'
+      - 'server/src/main/resources/db/migration/V13__campaign_sweep.sql'
+      - 'client-unity/Assets/Scripts/Game/Network/**'
+      - 'client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs'
+      - 'scripts/validate-m61-campaign.py'
+      - '.github/workflows/m61-campaign-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-campaign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m61-campaign.py --enforce

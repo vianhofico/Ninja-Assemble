@@ -29,6 +29,7 @@ namespace NinjaAssemble.Network
         public Task<FormationDto> SaveFormationAsync(string playerId, string[] heroIds) => PutJsonAsync<FormationDto>($"/api/v1/play/{Escape(playerId)}/formation", JsonUtility.ToJson(new FormationRequestDto { playerHeroIds = heroIds }));
         public Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId) => GetAsync<CampaignStageListDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages");
         public Task<PlayBattleDto> PlayCampaignStageAsync(string playerId, string stageId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages/{Escape(stageId)}/battle", "{}");
+        public Task<CampaignSweepDto> SweepCampaignStageAsync(string playerId, string stageId, string requestId) => PostJsonAsync<CampaignSweepDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages/{Escape(stageId)}/sweep", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<InventoryViewDto> GetInventoryAsync(string playerId) => GetAsync<InventoryViewDto>($"/api/v1/play/{Escape(playerId)}/inventory");
         public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/arena");
         public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle", "{}");

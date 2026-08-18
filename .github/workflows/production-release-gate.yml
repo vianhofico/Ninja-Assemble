@@ -26,6 +26,8 @@ jobs:
         run: python scripts/validate-m59-mechanics.py --enforce
       - name: Require final full-roster balance and presentation review
         run: python scripts/validate-m60-balance-presentation.py --enforce
+      - name: Require production Campaign
+        run: python scripts/validate-m61-campaign.py --enforce
       - name: Require full release readiness
         run: python scripts/validate-release-readiness.py --release
       - name: Require all hero art packages READY

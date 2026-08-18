@@ -32,8 +32,16 @@ public final class CampaignRewardService {
     }
 
     @Transactional
-    public RewardGrant grant(UUID playerId, String stageId, RewardBundle reward, UUID battleId) {
+    public RewardGrant grant(UUID playerId, String stageId, RewardBundle reward, UUID grantId) {
+        return grant(playerId, stageId, reward, grantId, "campaign");
+    }
+
+    @Transactional
+    public RewardGrant grant(UUID playerId, String stageId, RewardBundle reward, UUID grantId, String keyPrefix) {
         if (reward == null) throw new IllegalArgumentException("campaign reward is required");
+        if (grantId == null) throw new IllegalArgumentException("campaign reward grantId is required");
+        if (keyPrefix == null || keyPrefix.isBlank()) throw new IllegalArgumentException("campaign reward keyPrefix is required");
+        if (!keyPrefix.matches("[a-z0-9-]+")) throw new IllegalArgumentException("invalid campaign reward keyPrefix");
         PlayerEntity player = players.require(playerId);
         if (reward.playerExp() > 0) player.addAccountExp(reward.playerExp(), expPerLevel, clock.instant());
 
@@ -43,7 +51,7 @@ public final class CampaignRewardService {
             Currency currency = Currency.valueOf(entry.getKey());
             long amount = entry.getValue();
             if (amount <= 0) continue;
-            String key = "campaign:" + battleId + ":" + currency.name();
+            String key = keyPrefix + ":" + grantId + ":" + currency.name();
             wallet.mutate(playerId, currency, amount, "CAMPAIGN_STAGE_REWARD", stageId, key);
             if (currency == Currency.GOLD) gold += amount;
             if (currency == Currency.DIAMOND) diamond += amount;
@@ -58,7 +66,7 @@ public final class CampaignRewardService {
                     entry.getKey(),
                     amount,
                     "CAMPAIGN_STAGE_REWARD",
-                    "campaign:" + battleId + ":item:" + entry.getKey());
+                    keyPrefix + ":" + grantId + ":item:" + entry.getKey());
             itemGrants.add(new ItemGrant(entry.getKey(), amount, stack.quantity()));
         }
         return new RewardGrant(reward.playerExp(), gold, diamond, player.getAccountLevel(), List.copyOf(itemGrants));

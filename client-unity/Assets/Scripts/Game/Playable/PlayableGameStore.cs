@@ -23,6 +23,7 @@ namespace NinjaAssemble.Playable
         public int Energy { get; private set; }
 
         public CampaignStageDto RecommendedStage { get { CampaignStageDto[] stages = Campaign?.stages ?? Array.Empty<CampaignStageDto>(); return stages.FirstOrDefault(stage => stage.unlocked && stage.clearCount == 0) ?? stages.LastOrDefault(stage => stage.unlocked); } }
+        public CampaignStageDto SweepableStage { get { CampaignStageDto[] stages = Campaign?.stages ?? Array.Empty<CampaignStageDto>(); return stages.LastOrDefault(stage => stage.unlocked && stage.clearCount > 0 && stage.energyCost <= Energy); } }
         public ArenaOpponentDto RecommendedArenaOpponent => Arena?.opponents?.FirstOrDefault();
         public ShadowArenaOpponentDto RecommendedShadowOpponent => ShadowArena?.eligible == true ? ShadowArena.opponents?.FirstOrDefault() : null;
         public QuestDto ClaimableQuest => Quests?.quests?.FirstOrDefault(quest => quest.claimable);
@@ -45,6 +46,15 @@ namespace NinjaAssemble.Playable
             if (string.IsNullOrWhiteSpace(stageId)) throw new ArgumentException("stageId is required", nameof(stageId));
             PlayBattleDto result = await api.PlayCampaignStageAsync(PlayerId, stageId); Gold += result.goldReward; Diamond += result.diamondReward; Energy = Math.Max(0, Energy - result.energyCost);
             await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
+        }
+        public async Task<CampaignSweepDto> SweepCampaignAsync(string stageId)
+        {
+            if (string.IsNullOrWhiteSpace(stageId)) throw new ArgumentException("stageId is required", nameof(stageId));
+            CampaignSweepDto result = await api.SweepCampaignStageAsync(PlayerId, stageId, Guid.NewGuid().ToString());
+            if (!result.replayed) { Gold += result.goldReward; Diamond += result.diamondReward; }
+            Energy = result.energyAfter;
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshShopAsync(), RefreshQuestsAsync());
+            return result;
         }
         public async Task RefreshCampaignAsync() { Campaign = await api.GetCampaignStagesAsync(PlayerId); if (Campaign != null) Energy = Campaign.energy; }
         public async Task RefreshInventoryAsync() => Inventory = await api.GetInventoryAsync(PlayerId);
