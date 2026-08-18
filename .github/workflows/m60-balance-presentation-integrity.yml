@@ -1,0 +1,19 @@
+name: m60-balance-presentation-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/skills/**'
+      - 'scripts/validate-m60-balance-presentation.py'
+      - '.github/workflows/m60-balance-presentation-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-balance-presentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m60-balance-presentation.py
