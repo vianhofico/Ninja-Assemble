@@ -14,11 +14,6 @@ on:
       - 'scripts/validate-offline-playtest-release.py'
       - 'README.md'
   workflow_dispatch:
-    inputs:
-      release_version:
-        description: Optional release version, for example 0.1.0
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -82,7 +77,7 @@ jobs:
           buildsPath: builds/android
           androidExportType: androidPackage
           versioning: Custom
-          version: ${{ inputs.release_version != '' && inputs.release_version || format('0.1.{0}', github.run_number) }}
+          version: 0.1.${{ github.run_number }}
           androidVersionCode: ${{ github.run_number }}
           customParameters: -ninjaBuildCommit ${{ github.sha }}
           allowDirtyBuild: true
@@ -111,10 +106,9 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_VERSION: ${{ inputs.release_version }}
         shell: bash
         run: |
-          VERSION="${REQUESTED_VERSION:-0.1.${GITHUB_RUN_NUMBER}}"
+          VERSION="0.1.${GITHUB_RUN_NUMBER}"
           TAG="offline-playtest-v${VERSION}"
           cat > /tmp/release-notes.md <<EOF
           ## Ninja Assemble Offline Playtest ${VERSION}
