@@ -14,9 +14,11 @@ else:
         'name: Offline Playtest Release',
         'Run Unity EditMode standalone smoke',
         'Build Android offline APK',
+        'version: 0.1.${{ github.run_number }}',
         'NinjaAssemble-offline-playtest.apk',
         'sha256sum NinjaAssemble-offline-playtest.apk',
         "if: github.event_name != 'pull_request'",
+        'VERSION="0.1.${GITHUB_RUN_NUMBER}"',
         'gh release create',
         '--prerelease',
         'permissions:',
@@ -27,6 +29,8 @@ else:
             errors.append(f'workflow missing required marker: {marker}')
     if 'ANDROID_KEYSTORE' in text:
         errors.append('offline playtest release must not require Android store signing secrets')
+    if 'inputs.release_version' in text:
+        errors.append('release workflow must not read workflow_dispatch-only inputs on PR/push builds')
 
 if not README.is_file():
     errors.append('README.md is missing')
