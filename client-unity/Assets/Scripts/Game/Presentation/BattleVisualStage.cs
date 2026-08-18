@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NinjaAssemble.Network;
@@ -166,7 +165,7 @@ namespace NinjaAssemble.Presentation
 
             string initials = Initials(participant.displayName);
             CreateText(rect, "Initials", initials, 42f, TextAlignmentOptions.Center, Color.white,
-                new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.84f));
+                new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.81f));
             TMP_Text name = CreateText(rect, "Name", participant.displayName, 18f, TextAlignmentOptions.Center, Color.white,
                 new Vector2(0.02f, 0.16f), new Vector2(0.98f, 0.34f));
             TMP_Text level = CreateText(rect, "Level", "Lv." + participant.level, 15f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.5f, 1f),
@@ -175,9 +174,11 @@ namespace NinjaAssemble.Presentation
                 participant.awakened ? new Color(1f, 0.72f, 0.20f, 1f) : Color.white,
                 new Vector2(0.12f, 0.00f), new Vector2(0.88f, 0.09f));
             Slider hp = CreateHealthSlider(rect);
+            Slider rage = CreateRageSlider(rect);
 
             BattleActorView actor = actorObject.AddComponent<BattleActorView>();
             actor.ConfigureUi(name, level, hp);
+            actor.ConfigureEnergyUi(rage);
             actor.ConfigureStatusUi(status);
             ConfigureActor(actor, participant);
             return actor;
@@ -246,11 +247,39 @@ namespace NinjaAssemble.Presentation
 
         private static Slider CreateHealthSlider(RectTransform parent)
         {
-            var sliderObject = new GameObject("HP", typeof(RectTransform), typeof(Slider));
+            return CreateMeterSlider(
+                parent,
+                "HP",
+                new Vector2(0.08f, 0.90f),
+                new Vector2(0.92f, 0.96f),
+                new Color(0.14f, 0.08f, 0.08f, 0.95f),
+                new Color(0.30f, 0.90f, 0.32f, 1f));
+        }
+
+        private static Slider CreateRageSlider(RectTransform parent)
+        {
+            return CreateMeterSlider(
+                parent,
+                "Rage",
+                new Vector2(0.08f, 0.84f),
+                new Vector2(0.92f, 0.89f),
+                new Color(0.12f, 0.09f, 0.04f, 0.95f),
+                new Color(1f, 0.60f, 0.12f, 0.88f));
+        }
+
+        private static Slider CreateMeterSlider(
+            RectTransform parent,
+            string name,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            Color backgroundColor,
+            Color fillColor)
+        {
+            var sliderObject = new GameObject(name, typeof(RectTransform), typeof(Slider));
             RectTransform rect = sliderObject.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            rect.anchorMin = new Vector2(0.08f, 0.88f);
-            rect.anchorMax = new Vector2(0.92f, 0.96f);
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -262,7 +291,7 @@ namespace NinjaAssemble.Presentation
             background.offsetMin = Vector2.zero;
             background.offsetMax = Vector2.zero;
             Image backgroundImage = backgroundObject.GetComponent<Image>();
-            backgroundImage.color = new Color(0.14f, 0.08f, 0.08f, 0.95f);
+            backgroundImage.color = backgroundColor;
             backgroundImage.raycastTarget = false;
 
             var fillObject = new GameObject("Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -273,11 +302,12 @@ namespace NinjaAssemble.Presentation
             fill.offsetMin = new Vector2(2f, 2f);
             fill.offsetMax = new Vector2(-2f, -2f);
             Image fillImage = fillObject.GetComponent<Image>();
-            fillImage.color = new Color(0.30f, 0.90f, 0.32f, 1f);
+            fillImage.color = fillColor;
             fillImage.raycastTarget = false;
 
             Slider slider = sliderObject.GetComponent<Slider>();
             slider.fillRect = fill;
+            slider.targetGraphic = fillImage;
             slider.direction = Slider.Direction.LeftToRight;
             slider.interactable = false;
             return slider;
