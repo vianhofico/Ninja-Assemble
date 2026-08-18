@@ -39,7 +39,6 @@ namespace NinjaAssemble.Presentation
             artCatalog = HeroArtRuntimeCatalog.Load();
             CreateStageRoot();
             timeline = stageRoot.gameObject.AddComponent<BattleTimelinePlayer>();
-            timeline.EventPresented += OnEventPresented;
             timeline.PlaybackCompleted += OnPlaybackCompleted;
 
             BattleParticipantDto[] roster = result.participants ?? Array.Empty<BattleParticipantDto>();
@@ -182,52 +181,6 @@ namespace NinjaAssemble.Presentation
             actor.ConfigureStatusUi(status);
             ConfigureActor(actor, participant);
             return actor;
-        }
-
-        private void OnEventPresented(BattlePresentationEvent item)
-        {
-            if (item == null || item.Type != "DAMAGE") return;
-            RectTransform slot;
-            if (!actorSlots.TryGetValue(item.TargetId ?? string.Empty, out slot)) return;
-            StartCoroutine(FloatingDamage(slot, item.Amount, item.Critical));
-            if (item.Critical) StartCoroutine(CriticalShake());
-        }
-
-        private IEnumerator FloatingDamage(RectTransform slot, long amount, bool critical)
-        {
-            TMP_Text text = CreateText(stageRoot, "Damage", (critical ? "CRIT " : "-") + amount, critical ? 30f : 24f,
-                TextAlignmentOptions.Center,
-                critical ? new Color(1f, 0.78f, 0.18f, 1f) : new Color(1f, 0.34f, 0.28f, 1f),
-                slot.anchorMin, slot.anchorMax);
-            RectTransform rect = text.rectTransform;
-            rect.sizeDelta = new Vector2(180f, 60f);
-            rect.anchoredPosition = new Vector2(0f, 90f);
-            float duration = 0.55f;
-            float elapsed = 0f;
-            Color start = text.color;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-                rect.anchoredPosition = new Vector2(0f, 90f + 50f * t);
-                text.color = new Color(start.r, start.g, start.b, 1f - t);
-                yield return null;
-            }
-            Destroy(text.gameObject);
-        }
-
-        private IEnumerator CriticalShake()
-        {
-            Vector2 origin = stageRoot.anchoredPosition;
-            const float duration = 0.12f;
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                stageRoot.anchoredPosition = origin + UnityEngine.Random.insideUnitCircle * 5f;
-                yield return null;
-            }
-            stageRoot.anchoredPosition = origin;
         }
 
         private void OnPlaybackCompleted()
