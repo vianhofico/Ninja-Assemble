@@ -1,0 +1,23 @@
+name: m58-skill-identity-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/heroes/**'
+      - 'game-data/skills/**'
+      - 'scripts/generate-m50-skill-design.py'
+      - 'scripts/validate-m50-skill-design.py'
+      - 'scripts/validate-m58-skill-identity.py'
+      - '.github/workflows/m58-skill-identity-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-skill-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit full-roster identity/editorial state
+        run: python scripts/validate-m58-skill-identity.py
