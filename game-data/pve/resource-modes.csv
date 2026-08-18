@@ -1,0 +1,10 @@
+mode_id,mode_type,name_en,name_vi,team_size,energy_cost,daily_attempt_limit,min_player_level,reward_gold,reward_item_id,reward_item_quantity,reset_policy,release_status
+naruto-trial,NARUTO_TRIAL,Naruto Trial,Thử Thách Naruto,5,8,3,5,900,training-scroll,2,DAILY_UTC,PRODUCTION_READY
+forest-hunt,FOREST_HUNT,Forest Hunt,Săn Rừng,5,6,5,4,700,chakra-crystal,2,DAILY_UTC,PRODUCTION_READY
+ninja-test,NINJA_TEST,Ninja Test,Kỳ Thi Ninja,5,10,3,8,1200,elite-seal,1,DAILY_UTC,PRODUCTION_READY
+gold-challenge,GOLD_CHALLENGE,Gold Challenge,Thử Thách Vàng,5,5,2,3,3000,,,DAILY_UTC,PRODUCTION_READY
+daily-food,DAILY_FOOD,Daily Food,Thực Phẩm Hàng Ngày,5,4,3,2,500,training-scroll,1,DAILY_UTC,PRODUCTION_READY
+resource-raid,RESOURCE_RAID,Resource Raid,Đột Kích Tài Nguyên,5,10,3,10,1500,heroic-token,1,DAILY_UTC,PRODUCTION_READY
+battle-relief,BATTLE_RELIEF,Battle Relief,Cứu Trợ Chiến Đấu,5,6,3,6,850,chakra-crystal,3,DAILY_UTC,PRODUCTION_READY
+obito-ultimate-trial,OBITO_ULTIMATE_TRIAL,Obito Ultimate Trial,Thử Thách Tối Thượng Obito,5,12,2,12,1800,elite-seal,2,DAILY_UTC,PRODUCTION_READY
+tailed-beast-conquer,TAILED_BEAST_CONQUER,Tailed-Beast Conquer,Chinh Phục Vĩ Thú,5,15,2,15,2500,heroic-token,2,DAILY_UTC,PRODUCTION_READY
