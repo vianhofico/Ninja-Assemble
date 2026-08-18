@@ -46,3 +46,5 @@ jobs:
         run: python scripts/validate-production-assets.py
       - name: Enforce aggregate release audit
         run: python scripts/release-audit.py --enforce
+      - name: Require final M77 release hardening certification
+        run: python scripts/validate-m77-release-hardening.py --enforce
