@@ -34,7 +34,15 @@ namespace NinjaAssemble.Presentation
             switch (item.Type)
             {
                 case "DAMAGE":
-                    if (timeline.TryGetActor(item.TargetId, out actor)) StartCoroutine(ActorFlash(actor, item.Critical ? 0.20f : 0.11f));
+                    if (timeline.TryGetActor(item.TargetId, out actor))
+                    {
+                        StartCoroutine(ActorFlash(actor, item.Critical ? 0.20f : 0.11f));
+                        string damageText = (item.Critical ? "CRIT -" : "-") + item.Amount;
+                        Color damageColor = item.Critical
+                            ? new Color(1f, 0.78f, 0.18f, 1f)
+                            : new Color(1f, 0.34f, 0.28f, 1f);
+                        StartCoroutine(PopLabel(actor, damageText, damageColor, item.Critical ? 28f : 22f));
+                    }
                     if (item.Critical) StartShake(7f, 0.14f);
                     break;
                 case "STATUS_TICK":
