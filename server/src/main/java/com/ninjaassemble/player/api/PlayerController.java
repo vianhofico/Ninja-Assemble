@@ -4,6 +4,7 @@ import com.ninjaassemble.economy.application.WalletService;
 import com.ninjaassemble.player.application.EnergyService;
 import com.ninjaassemble.player.application.PlayerService;
 import com.ninjaassemble.player.domain.PlayerEntity;
+import com.ninjaassemble.security.SessionTokenService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
@@ -21,9 +22,10 @@ public class PlayerController {
     private final PlayerService players;
     private final EnergyService energy;
     private final WalletService wallet;
+    private final SessionTokenService sessions;
 
-    public PlayerController(PlayerService players, EnergyService energy, WalletService wallet) {
-        this.players = players; this.energy = energy; this.wallet = wallet;
+    public PlayerController(PlayerService players, EnergyService energy, WalletService wallet, SessionTokenService sessions) {
+        this.players = players; this.energy = energy; this.wallet = wallet; this.sessions = sessions;
     }
 
     @PostMapping("/guest")
@@ -39,10 +41,10 @@ public class PlayerController {
         return Map.of("player", view(players.require(id)), "energy", energy.refresh(id), "wallet", wallet.snapshot(id));
     }
 
-    private static PlayerView view(PlayerEntity p) {
-        return new PlayerView(p.getId(), p.getDisplayName(), p.getAccountLevel(), p.getAccountExp());
+    private PlayerView view(PlayerEntity p) {
+        return new PlayerView(p.getId(), p.getDisplayName(), p.getAccountLevel(), p.getAccountExp(), sessions.issue(p.getId()));
     }
 
     public record GuestLogin(@NotBlank String guestKey, String displayName) {}
-    public record PlayerView(UUID id, String displayName, int level, long exp) {}
+    public record PlayerView(UUID id, String displayName, int level, long exp, String sessionToken) {}
 }
