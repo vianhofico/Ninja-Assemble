@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - 'art/**'
+      - 'scripts/generate-art-batch-plan.py'
       - 'scripts/validate-m69-art-pipeline.py'
+      - 'scripts/validate-art-packages.py'
       - '.github/workflows/m69-art-pipeline-integrity.yml'
       - 'docs/art/**'
       - 'docs/release/M69_STATUS.md'
