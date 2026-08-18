@@ -1,3 +1,4 @@
+using NinjaAssemble.Settings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,6 +51,7 @@ namespace NinjaAssemble.UI.Production
             {
                 var binding=panel.gameObject.AddComponent<ProductionLegacyScreenBinding>();binding.Configure(sourceBody,sourceStatus,sourceButton,sourceAction,body,status,action,actionLabel);
             }
+            AccessibilityPreferences.ApplyTextScale();
             legacy.gameObject.SetActive(false);
         }
 
