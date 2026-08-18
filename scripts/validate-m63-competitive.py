@@ -17,7 +17,7 @@ def main():
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-playable-arena.py")],cwd=ROOT,check=True)
         subprocess.run([sys.executable,str(ROOT/"scripts/validate-shadow-arena.py")],cwd=ROOT,check=True)
         require("server/src/main/resources/db/migration/V15__competitive_production_runs.sql",
-                "competitive_daily_attempts","competitive_action_runs","game_date","attempts_used")
+                "competitive_daily_attempts","game_date","attempts_used","idx_competitive_daily_attempts_date")
         require("server/src/main/resources/db/migration/V16__competitive_defense_seasons.sql",
                 "competitive_battle_requests","competitive_season_results","shadow_defense_formations","result_json","claimed boolean")
         season=require("server/src/main/java/com/ninjaassemble/pvp/application/CompetitiveSeasonService.java",
