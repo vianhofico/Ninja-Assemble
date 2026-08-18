@@ -30,7 +30,8 @@ def main() -> int:
     require(timeline,
             "BattlePlaybackHud", "BattleImpactFeedback", "EnsurePlayableQualityLayer",
             "speed != 1 && speed != 2 && speed != 4", "SetPresentationRate", "CurrentTimestampMs",
-            "paused = false", "CurrentTimestampMs = 0")
+            "paused = false", "CurrentTimestampMs = 0", "yield return null;",
+            "if (item == null) continue;", "while (paused) yield return null;")
     require(actor,
             "SetPresentationRate", "RageSkill", "rageSkillClip", "Mathf.MoveTowards",
             "targetHealth01", "targetRage", "presentationPaused", "if (presentationPaused) return;")
@@ -48,12 +49,13 @@ def main() -> int:
             "TimestampMs = item.timestampMs", "RageAfter = item.rageAfter", "DurationMs = item.durationMs")
     require(unity_tests,
             "PlaybackSpeed_AcceptsOnlyOneTwoAndFour", "PauseState_IsExplicitAndReversible",
+            "EmptyReplay_CompletesWithoutLeavingStalePlayingHandle", "UnityTest",
             "Assert.Throws<ArgumentOutOfRangeException>")
     require(workflow,
             "game-ci/unity-test-runner@v4", "testMode: EditMode", "projectPath: client-unity",
             "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD", "actions/upload-artifact@v4")
 
-    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=single-path smooth_hud=1 unity_editmode_gate=1")
+    print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=single-path smooth_hud=1 replay_lifecycle=1 unity_editmode_gate=1")
     return 0
 
 
