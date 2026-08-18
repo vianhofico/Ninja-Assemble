@@ -12,6 +12,7 @@ namespace NinjaAssemble.Playable
         public OwnedHeroDto[] Heroes { get; private set; } = Array.Empty<OwnedHeroDto>();
         public FormationDto Formation { get; private set; }
         public CampaignStageListDto Campaign { get; private set; }
+        public ResourcePveBoardDto ResourcePve { get; private set; }
         public InventoryViewDto Inventory { get; private set; }
         public ArenaStateDto Arena { get; private set; }
         public ShadowArenaStateDto ShadowArena { get; private set; }
@@ -24,6 +25,7 @@ namespace NinjaAssemble.Playable
 
         public CampaignStageDto RecommendedStage { get { CampaignStageDto[] stages = Campaign?.stages ?? Array.Empty<CampaignStageDto>(); return stages.FirstOrDefault(stage => stage.unlocked && stage.clearCount == 0) ?? stages.LastOrDefault(stage => stage.unlocked); } }
         public CampaignStageDto SweepableStage { get { CampaignStageDto[] stages = Campaign?.stages ?? Array.Empty<CampaignStageDto>(); return stages.LastOrDefault(stage => stage.unlocked && stage.clearCount > 0 && stage.energyCost <= Energy); } }
+        public ResourcePveModeDto RecommendedResourcePve => (ResourcePve?.modes ?? Array.Empty<ResourcePveModeDto>()).FirstOrDefault(mode => mode.playable);
         public ArenaOpponentDto RecommendedArenaOpponent => Arena?.opponents?.FirstOrDefault();
         public ShadowArenaOpponentDto RecommendedShadowOpponent => ShadowArena?.eligible == true ? ShadowArena.opponents?.FirstOrDefault() : null;
         public QuestDto ClaimableQuest => Quests?.quests?.FirstOrDefault(quest => quest.claimable);
@@ -37,7 +39,7 @@ namespace NinjaAssemble.Playable
             BootstrapDto bootstrap = await api.BootstrapAsync(PlayerId); Heroes = bootstrap.heroes ?? Array.Empty<OwnedHeroDto>();
             Gold = bootstrap.gold; Diamond = bootstrap.diamond; Energy = bootstrap.energy;
             if (Heroes.Length >= 5) Formation = await api.SaveFormationAsync(PlayerId, Heroes.Take(5).Select(h => h.id).ToArray());
-            await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshArenaAsync(), RefreshShadowArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync(), RefreshMailAsync());
+            await Task.WhenAll(RefreshCampaignAsync(), RefreshResourcePveAsync(), RefreshInventoryAsync(), RefreshArenaAsync(), RefreshShadowArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync(), RefreshMailAsync());
         }
 
         public Task<PlayBattleDto> BattleAsync() => BattleCampaignAsync("c1-s1");
@@ -56,7 +58,17 @@ namespace NinjaAssemble.Playable
             await Task.WhenAll(RefreshCampaignAsync(), RefreshInventoryAsync(), RefreshShopAsync(), RefreshQuestsAsync());
             return result;
         }
+        public async Task<ResourcePveBattleDto> BattleResourcePveAsync(string modeId)
+        {
+            if (string.IsNullOrWhiteSpace(modeId)) throw new ArgumentException("modeId is required", nameof(modeId));
+            ResourcePveBattleDto result = await api.PlayResourcePveAsync(PlayerId, modeId, Guid.NewGuid().ToString());
+            if (!result.replayed && result.won) Gold += result.goldReward;
+            Energy = result.energyAfter;
+            await Task.WhenAll(RefreshResourcePveAsync(), RefreshInventoryAsync(), RefreshShopAsync(), RefreshQuestsAsync());
+            return result;
+        }
         public async Task RefreshCampaignAsync() { Campaign = await api.GetCampaignStagesAsync(PlayerId); if (Campaign != null) Energy = Campaign.energy; }
+        public async Task RefreshResourcePveAsync() { ResourcePve = await api.GetResourcePveAsync(PlayerId); if (ResourcePve != null) Energy = ResourcePve.energy; }
         public async Task RefreshInventoryAsync() => Inventory = await api.GetInventoryAsync(PlayerId);
         public async Task RefreshArenaAsync() => Arena = await api.GetArenaAsync(PlayerId);
         public async Task RefreshShadowArenaAsync() => ShadowArena = await api.GetShadowArenaAsync(PlayerId);

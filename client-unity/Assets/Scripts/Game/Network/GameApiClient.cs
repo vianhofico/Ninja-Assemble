@@ -30,6 +30,8 @@ namespace NinjaAssemble.Network
         public Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId) => GetAsync<CampaignStageListDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages");
         public Task<PlayBattleDto> PlayCampaignStageAsync(string playerId, string stageId) => PostJsonAsync<PlayBattleDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages/{Escape(stageId)}/battle", "{}");
         public Task<CampaignSweepDto> SweepCampaignStageAsync(string playerId, string stageId, string requestId) => PostJsonAsync<CampaignSweepDto>($"/api/v1/play/{Escape(playerId)}/campaign/stages/{Escape(stageId)}/sweep", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
+        public Task<ResourcePveBoardDto> GetResourcePveAsync(string playerId) => GetAsync<ResourcePveBoardDto>($"/api/v1/play/{Escape(playerId)}/resource-pve");
+        public Task<ResourcePveBattleDto> PlayResourcePveAsync(string playerId, string modeId, string requestId) => PostJsonAsync<ResourcePveBattleDto>($"/api/v1/play/{Escape(playerId)}/resource-pve/{Escape(modeId)}/battle", JsonUtility.ToJson(new ActionRequestDto { requestId = requestId }));
         public Task<InventoryViewDto> GetInventoryAsync(string playerId) => GetAsync<InventoryViewDto>($"/api/v1/play/{Escape(playerId)}/inventory");
         public Task<ArenaStateDto> GetArenaAsync(string playerId) => GetAsync<ArenaStateDto>($"/api/v1/play/{Escape(playerId)}/arena");
         public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId) => PostJsonAsync<ArenaBattleDto>($"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle", "{}");
