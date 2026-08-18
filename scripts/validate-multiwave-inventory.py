@@ -48,7 +48,8 @@ def main() -> int:
         "inventory_stacks", "inventory_ledger", "for update", "idempotencyKey", "InventoryView")
     require(
         "server/src/main/java/com/ninjaassemble/campaign/application/CampaignRewardService.java",
-        "inventory.mutate", "campaign:" , ":item:")
+        "inventory.mutate", "keyPrefix", 'return grant(playerId, stageId, reward, grantId, "campaign")',
+        'keyPrefix + ":" + grantId + ":item:"')
     require(
         "client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
         "CampaignWaveDto", "InventoryViewDto", "itemRewards", "waveRulesVersion")
@@ -62,7 +63,7 @@ def main() -> int:
         "client-unity/Assets/Scripts/Game/UI/MobileVerticalSliceController.cs",
         "WaitForReplayAsync", "CampaignWaveDto[] waves", "ScreenId.Inventory", "BuildInventory", "W{stage.waveCount}")
 
-    print(f"M28_MULTIWAVE_INVENTORY_OK enemy_rows={len(enemies)} items={len(items)} reward_rows={len(rewards)}")
+    print(f"M28_MULTIWAVE_INVENTORY_OK enemy_rows={len(enemies)} items={len(items)} reward_rows={len(rewards)} key_namespace=dynamic")
     return 0
 
 
