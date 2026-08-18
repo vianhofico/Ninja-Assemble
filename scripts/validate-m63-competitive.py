@@ -39,7 +39,7 @@ def main():
         require("client-unity/Assets/Scripts/Game/Network/PlayableDtos.cs",
                 "SeasonRewardDto","CompetitiveHistoryItemDto","defenseConfigured","replayed")
         api=require("client-unity/Assets/Scripts/Game/Network/GameApiClient.cs",
-                '"/competitive/arena"','"/competitive/shadow-arena"',"SaveArenaDefenseAsync","SaveShadowDefenseAsync","GetArenaHistoryAsync","GetShadowArenaHistoryAsync","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")
+                "/competitive/arena","/competitive/shadow-arena","SaveArenaDefenseAsync","SaveShadowDefenseAsync","GetArenaHistoryAsync","GetShadowArenaHistoryAsync","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")
         if '$"/api/v1/play/{Escape(playerId)}/arena/{Escape(opponentPlayerId)}/battle"' in api: raise ValueError("Unity production Arena path still uses legacy non-idempotent endpoint")
         require("client-unity/Assets/Scripts/Game/Playable/PlayableGameStore.cs",
                 "ArenaHistory","ShadowArenaHistory","SaveArenaDefenseAsync","SaveShadowDefenseAsync","Guid.NewGuid().ToString()","ClaimArenaSeasonAsync","ClaimShadowSeasonAsync")
