@@ -46,8 +46,8 @@ def main() -> int:
             "PlaybackSpeed_AcceptsOnlyOneTwoAndFour", "PauseState_IsExplicitAndReversible",
             "NewPlayback_ResetsPauseAndTimestamp", "Assert.Throws<ArgumentOutOfRangeException>")
     require(workflow,
-            "game-ci/unity-test-runner@v4", "testMode: EditMode", "coverageEnabled: false",
-            "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD")
+            "game-ci/unity-test-runner@v4", "testMode: EditMode", "projectPath: client-unity",
+            "UNITY_LICENSE", "UNITY_EMAIL", "UNITY_PASSWORD", "actions/upload-artifact@v4")
 
     print("PLAYABLE_QUALITY_OK controls=1x,2x,4x pause=full-freeze rage_cinematic=1 impact_feedback=1 smooth_hud=1 unity_editmode_gate=1")
     return 0
