@@ -11,7 +11,10 @@ namespace NinjaAssemble.Presentation
         private BattleTimelinePlayer timeline;
         private RectTransform root;
         private Coroutine cinematic;
+        private GameObject cinematicOverlay;
         private Coroutine shake;
+        private Vector2 shakeOrigin;
+        private bool shakeOriginValid;
 
         public void Bind(BattleTimelinePlayer value)
         {
@@ -25,6 +28,8 @@ namespace NinjaAssemble.Presentation
         private void OnDestroy()
         {
             if (timeline != null) timeline.EventPresented -= OnEventPresented;
+            ResetCinematic();
+            ResetShake();
         }
 
         private void OnEventPresented(BattlePresentationEvent item)
@@ -63,7 +68,7 @@ namespace NinjaAssemble.Presentation
                     if (timeline.TryGetActor(item.ActorId, out actor)) StartCoroutine(RageReadyPulse(actor));
                     break;
                 case "RAGE_SKILL_CAST_START":
-                    if (cinematic != null) StopCoroutine(cinematic);
+                    ResetCinematic();
                     cinematic = StartCoroutine(RageCinematic(item));
                     StartShake(10f, 0.20f);
                     break;
@@ -157,16 +162,16 @@ namespace NinjaAssemble.Presentation
 
         private IEnumerator RageCinematic(BattlePresentationEvent item)
         {
-            if (root == null) yield break;
-            var overlay = new GameObject("RageCinematic", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
-            RectTransform rect = overlay.GetComponent<RectTransform>();
+            if (root == null) { cinematic = null; yield break; }
+            cinematicOverlay = new GameObject("RageCinematic", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            RectTransform rect = cinematicOverlay.GetComponent<RectTransform>();
             rect.SetParent(root, false);
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
             rect.SetAsLastSibling();
-            Image image = overlay.GetComponent<Image>();
+            Image image = cinematicOverlay.GetComponent<Image>();
             image.color = new Color(0.02f, 0.015f, 0.03f, 0f);
             image.raycastTarget = false;
 
@@ -212,20 +217,41 @@ namespace NinjaAssemble.Presentation
                 subtitle.color = new Color(1f, 0.75f, 0.22f, 1f - t);
                 yield return null;
             }
-            Destroy(overlay);
+            Destroy(cinematicOverlay);
+            cinematicOverlay = null;
             cinematic = null;
+        }
+
+        private void ResetCinematic()
+        {
+            if (cinematic != null)
+            {
+                StopCoroutine(cinematic);
+                cinematic = null;
+            }
+            if (cinematicOverlay != null)
+            {
+                Destroy(cinematicOverlay);
+                cinematicOverlay = null;
+            }
         }
 
         private void StartShake(float magnitude, float duration)
         {
             if (root == null) return;
-            if (shake != null) StopCoroutine(shake);
+            if (shake != null)
+            {
+                StopCoroutine(shake);
+                shake = null;
+                if (shakeOriginValid) root.anchoredPosition = shakeOrigin;
+            }
+            shakeOrigin = root.anchoredPosition;
+            shakeOriginValid = true;
             shake = StartCoroutine(Shake(magnitude, duration));
         }
 
         private IEnumerator Shake(float magnitude, float duration)
         {
-            Vector2 origin = root.anchoredPosition;
             float elapsed = 0f;
             while (elapsed < duration)
             {
@@ -233,11 +259,17 @@ namespace NinjaAssemble.Presentation
                 if (!TryPresentationDelta(out delta)) { yield return null; continue; }
                 elapsed += delta;
                 float falloff = 1f - Mathf.Clamp01(elapsed / duration);
-                root.anchoredPosition = origin + Random.insideUnitCircle * magnitude * falloff;
+                root.anchoredPosition = shakeOrigin + Random.insideUnitCircle * magnitude * falloff;
                 yield return null;
             }
-            root.anchoredPosition = origin;
+            ResetShake();
+        }
+
+        private void ResetShake()
+        {
+            if (root != null && shakeOriginValid) root.anchoredPosition = shakeOrigin;
             shake = null;
+            shakeOriginValid = false;
         }
 
         private bool TryPresentationDelta(out float delta)
