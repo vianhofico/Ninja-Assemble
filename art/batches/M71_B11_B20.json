@@ -1,0 +1,10 @@
+{
+  "milestone": "M71",
+  "firstBatch": "B11",
+  "lastBatch": "B20",
+  "expectedPackages": 100,
+  "productionState": "ACTIVE",
+  "completionRule": "Every selected package must satisfy the M69 READY rule with repository-backed files and evidence.",
+  "readyCountSource": "scripts/validate-art-batch-range.py",
+  "notes": "This descriptor assigns production scope only and never certifies missing art."
+}
