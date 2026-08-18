@@ -1,0 +1,12 @@
+track_id,track_type,name_en,name_vi,max_level,min_player_level,gold_base,gold_growth,item_id,item_base,item_growth,bonus_stat,bonus_per_level,release_status
+scroll-mastery,SCROLL_MASTERY,Scroll Mastery,Tinh Thông Cuộn Thuật,20,5,800,250,training-scroll,1,1,SKILL_POWER_BPS,35,PRODUCTION_READY
+ninja-college,NINJA_COLLEGE,Ninja College,Học Viện Ninja,20,8,1200,300,elite-seal,1,0,HP_BPS,40,PRODUCTION_READY
+shukaku,JINCHURIKI,Shukaku - One Tail,Shukaku - Nhất Vĩ,15,10,1500,400,chakra-crystal,2,1,DEFENSE_BPS,45,PRODUCTION_READY
+matatabi,JINCHURIKI,Matatabi - Two Tails,Matatabi - Nhị Vĩ,15,11,1600,420,chakra-crystal,2,1,CHAKRA_ATTACK_BPS,45,PRODUCTION_READY
+isobu,JINCHURIKI,Isobu - Three Tails,Isobu - Tam Vĩ,15,12,1700,440,chakra-crystal,2,1,HP_BPS,50,PRODUCTION_READY
+son-goku,JINCHURIKI,Son Goku - Four Tails,Son Goku - Tứ Vĩ,15,13,1800,460,chakra-crystal,2,1,PHYSICAL_ATTACK_BPS,50,PRODUCTION_READY
+kokuo,JINCHURIKI,Kokuo - Five Tails,Kokuo - Ngũ Vĩ,15,14,1900,480,chakra-crystal,2,1,SPEED_BPS,35,PRODUCTION_READY
+saiken,JINCHURIKI,Saiken - Six Tails,Saiken - Lục Vĩ,15,15,2000,500,chakra-crystal,2,1,HEALING_BPS,50,PRODUCTION_READY
+chomei,JINCHURIKI,Chomei - Seven Tails,Chomei - Thất Vĩ,15,16,2100,520,chakra-crystal,2,1,CRITICAL_RATE_BPS,25,PRODUCTION_READY
+gyuki,JINCHURIKI,Gyuki - Eight Tails,Gyuki - Bát Vĩ,15,18,2400,560,heroic-token,1,1,PHYSICAL_ATTACK_BPS,60,PRODUCTION_READY
+kurama,JINCHURIKI,Kurama - Nine Tails,Kurama - Cửu Vĩ,15,20,2800,650,heroic-token,1,1,RAGE_GAIN_BPS,55,PRODUCTION_READY
