@@ -20,6 +20,7 @@ EXPECTED_CATEGORIES={
     'support-operations','aggregate-release-evidence'
 }
 REQUIRED_OPERATOR_TYPES={'DATABASE_RESTORE','SIGNED_AAB','STORE_REVIEW','SUPPORT_ENDPOINT','RIGHTS_CLEARANCE'}
+ALLOWED_PROVENANCE_STATUS={'READY','PENDING_REVIEW','PENDING_EVIDENCE','RIGHTS_NOT_DOCUMENTED'}
 
 
 def load(path:Path):return json.loads(path.read_text(encoding='utf-8'))
@@ -54,11 +55,12 @@ def validate_structure():
     prod=require('server/src/main/resources/application-prod.yml','${DB_URL}','${DB_USER}','${DB_PASSWORD}','${REDIS_PASSWORD}','${GAME_SESSION_SECRET}','shutdown: graceful','show-details: never')
     if 'DB_PASSWORD:' in prod or 'GAME_SESSION_SECRET:' in prod:raise ValueError('production config must not hard-code release secrets')
     require('server/src/main/java/com/ninjaassemble/security/SessionTokenService.java','HmacSHA256','MessageDigest.isEqual','expiresAt','expectedPlayerId')
-    require('server/src/main/java/com/ninjaassemble/security/PlayerAuthorizationFilter.java','@Profile("prod")','Authorization','Bearer ','UNAUTHORIZED_PLAYER_SESSION')
-    require('server/src/main/java/com/ninjaassemble/security/ProductionSecurityHeadersFilter.java','X-Content-Type-Options','X-Frame-Options','Permissions-Policy','Cache-Control')
-    require('server/src/main/java/com/ninjaassemble/security/ProductionRateLimitFilter.java','StringRedisTemplate','release-rate:','Retry-After','RATE_LIMIT_BACKEND_UNAVAILABLE','Authorization')
+    require('server/src/main/java/com/ninjaassemble/security/PlayerAuthorizationFilter.java','@Profile("prod")','@Order(Ordered.HIGHEST_PRECEDENCE + 20)','Authorization','Bearer ','UNAUTHORIZED_PLAYER_SESSION')
+    require('server/src/main/java/com/ninjaassemble/security/ProductionSecurityHeadersFilter.java','@Order(Ordered.HIGHEST_PRECEDENCE + 10)','X-Content-Type-Options','X-Frame-Options','Permissions-Policy','Cache-Control')
+    require('server/src/main/java/com/ninjaassemble/security/ProductionRateLimitFilter.java','@Order(Ordered.HIGHEST_PRECEDENCE + 15)','StringRedisTemplate','release-rate:','Retry-After','RATE_LIMIT_BACKEND_UNAVAILABLE','Authorization')
     require('server/src/main/java/com/ninjaassemble/player/api/PlayerController.java','SessionTokenService','sessionToken','sessions.issue')
     require('client-unity/Assets/Scripts/Game/Network/ApiAuthSession.cs','BearerToken','Set','Clear')
+    require('client-unity/Assets/Scripts/Game/Network/ApiDtos.cs','sessionToken')
     require('client-unity/Assets/Scripts/Game/Network/GameApiClient.cs','ApiAuthSession.Set','Authorization','Bearer ','signed player session token')
     require('client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionClient.cs','ApiAuthSession.HasToken','Authorization','Bearer ')
     require('server/src/test/java/com/ninjaassemble/security/SessionTokenServiceTest.java','issuedTokenIsBoundToPlayerAndSignature','expiredTokenIsRejected')
@@ -66,16 +68,23 @@ def validate_structure():
     require('client-unity/Assets/Scripts/Game/Settings/AccessibilityPreferences.cs','TextScaleKey','ReduceMotionKey','HapticsKey','1.3f','ApplyTextScale')
     require('client-unity/Assets/Scripts/Game/UI/Production/ProductionUiTokens.cs','TouchMin')
     require('client-unity/Assets/Scripts/Game/UI/Production/ProductionFeedback.cs','AccessibilityPreferences.HapticsEnabled')
+    require('client-unity/Assets/Scripts/Game/UI/Production/ProductionLiveScreenInstaller.cs','ScreenId.Settings','AccessibilityPreferences.ApplyTextScale')
+    require('client-unity/Assets/Scripts/Game/UI/Production/ProductionLiveFeatureBinding.cs','CycleTextScale','ToggleReduceMotion','ToggleHaptics','ProductionTextScaleAction','ProductionReduceMotionAction','ProductionHapticsAction')
 
     store=load(STORE)
     if store.get('metadataVersion')!='m77-store-metadata-v1':raise ValueError('M77 store metadata version drifted')
     if store.get('applicationId')!='com.vianhofico.ninjaassemble':raise ValueError('store applicationId does not match Android build contract')
     if set(store.get('supportedLocales',[]))!={'vi-VN','en-US'}:raise ValueError('M77 store locales must be vi-VN/en-US')
     if store.get('releaseNotesRef')!='docs/release/M77_RELEASE_NOTES.md':raise ValueError('store release notes ref drifted')
+    require('client-unity/Assets/Editor/MobileBuildAutomation.cs','ApplicationId = "com.vianhofico.ninjaassemble"')
 
     provenance=rows(PROVENANCE)
     if not provenance or len({row['scope'] for row in provenance})!=len(provenance):raise ValueError('M77 provenance ledger missing/duplicate scopes')
-    if not any(row['release_status']=='RIGHTS_NOT_DOCUMENTED' for row in provenance):raise ValueError('M77 provenance must truthfully retain undocumented third-party IP blocker')
+    if not {'source_code','unity_packages','spring_dependencies','character_ip','hero_art','music_voice'}.issubset({row['scope'] for row in provenance}):raise ValueError('M77 provenance scopes incomplete')
+    for row in provenance:
+        status=row.get('release_status','')
+        if status not in ALLOWED_PROVENANCE_STATUS:raise ValueError(f"{row.get('scope')}: invalid provenance status {status}")
+        if status=='READY' and not row.get('license_or_rights_ref','').strip():raise ValueError(f"{row.get('scope')}: READY provenance requires license_or_rights_ref")
 
     with OPERATOR.open(encoding='utf-8-sig',newline='') as handle:
         header=next(csv.reader(handle),[])
@@ -85,6 +94,7 @@ def validate_structure():
     require('docs/release/M77_SUPPORT_RUNBOOK.md','P0','request ID','rollback')
     require('docs/release/M77_KNOWN_ISSUES.md','Reference/parity evidence is incomplete','Third-party character/IP rights are not documented','Spring Boot 4 migration debt')
     require('docs/release/M77_RELEASE_NOTES.md','Certification blockers')
+    require('docs/release/M77_RELEASE_RUNBOOK.md','validate-m77-release-hardening.py --enforce','production-release-gate','SIGNED_AAB','RIGHTS_CLEARANCE')
 
     run('scripts/validate-runtime-localization.py')
     run('scripts/validate-m74-parity.py')
