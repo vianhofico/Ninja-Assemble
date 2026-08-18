@@ -5,7 +5,13 @@
     "portraitMaxDimension": 2048,
     "iconMaxDimension": 512,
     "chibiTextureMaxDimension": 2048,
-    "compression": "platform-mobile"
+    "compression": "ASTC",
+    "mipmaps": false
+  },
+  "animation": {
+    "maxControllerLayers": 4,
+    "maxBattleClipSeconds": 12,
+    "requiredStates": ["Idle", "Move", "Attack", "Hit", "KO", "Skill", "RageSkill"]
   },
   "runtime": {
     "maxMaterialsPerHero": 4,
@@ -18,11 +24,14 @@
     "maxPeakParticlesPerRageSkill": 500
   },
   "audio": {
+    "format": "Vorbis",
+    "sampleRateHz": 44100,
     "maxSkillClipSeconds": 12
   },
-  "release": {
-    "requiresRegressionCapture": true,
-    "requiresHumanReviewEvidence": true,
+  "package": {
+    "maxInstalledBytesPerHeroVariant": 12582912,
+    "releaseRequiresRegressionCapture": true,
+    "releaseRequiresHumanReviewEvidence": true,
     "readyMayNotUseFallbackAssets": true
   }
 }
