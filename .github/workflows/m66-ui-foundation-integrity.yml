@@ -1,0 +1,19 @@
+name: m66-ui-foundation-integrity
+on:
+  pull_request:
+    paths:
+      - 'client-unity/Assets/Scripts/Game/UI/Production/**'
+      - 'scripts/validate-m66-ui-foundation.py'
+      - '.github/workflows/m66-ui-foundation-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-ui-foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m66-ui-foundation.py
