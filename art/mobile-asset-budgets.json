@@ -1,0 +1,34 @@
+{
+  "budgetVersion": "m69-v1",
+  "texture": {
+    "portraitMaxDimension": 1024,
+    "iconMaxDimension": 512,
+    "chibiTextureMaxDimension": 2048,
+    "uiTextureMaxDimension": 2048,
+    "compression": "ASTC",
+    "mipmaps": false
+  },
+  "animation": {
+    "maxControllerLayers": 4,
+    "maxBattleClipSeconds": 12,
+    "requiredStates": ["Idle", "Move", "Attack", "Hit", "KO", "Skill", "RageSkill"]
+  },
+  "vfx": {
+    "maxConcurrentHeroSystems": 12,
+    "maxParticlesPerHeroEffect": 300,
+    "maxHeroEffectSeconds": 8,
+    "mobileOverdrawReviewRequired": true
+  },
+  "audio": {
+    "format": "Vorbis",
+    "sampleRateHz": 44100,
+    "maxSfxSeconds": 8,
+    "streamMusicOnly": true,
+    "normalizePeakDb": -1.0
+  },
+  "package": {
+    "maxInstalledBytesPerHeroVariant": 12582912,
+    "releaseRequiresRegressionCapture": true,
+    "releaseRequiresHumanReviewEvidence": true
+  }
+}
