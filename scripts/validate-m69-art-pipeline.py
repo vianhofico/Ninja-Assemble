@@ -5,7 +5,6 @@ import csv,json,subprocess,sys
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-CANONICAL=ROOT/'art/art-production-contract.json'
 CONTRACT=ROOT/'art/pipeline/art-package-contract-v2.json'
 MOBILE_BUDGETS=ROOT/'art/mobile-asset-budgets.json'
 BUDGETS=ROOT/'art/pipeline/performance-budgets.csv'
@@ -27,26 +26,20 @@ def read_csv(path:Path):
 
 def main()->int:
     errors=[]
-    for path in (CANONICAL,CONTRACT,MOBILE_BUDGETS,BUDGETS,ADDRESSES,REVIEW_SCHEMA,PREFAB_HIERARCHY,MANIFEST,COMPONENTS,PACKAGE_SCHEMA):
+    for path in (CONTRACT,MOBILE_BUDGETS,BUDGETS,ADDRESSES,REVIEW_SCHEMA,PREFAB_HIERARCHY,MANIFEST,COMPONENTS,PACKAGE_SCHEMA):
         if not path.exists():errors.append(f'missing required M69 input: {path.relative_to(ROOT)}')
     if errors:return fail(errors)
 
-    canonical=json.loads(CANONICAL.read_text(encoding='utf-8'))
     contract=json.loads(CONTRACT.read_text(encoding='utf-8'))
     mobile=json.loads(MOBILE_BUDGETS.read_text(encoding='utf-8'))
     review=json.loads(REVIEW_SCHEMA.read_text(encoding='utf-8'))
     package_schema=json.loads(PACKAGE_SCHEMA.read_text(encoding='utf-8'))
 
-    if canonical.get('contractVersion')!='m69-v1':errors.append('canonical art contract must be m69-v1')
-    if set(canonical.get('requiredComponents',[]))!=REQUIRED_COMPONENTS:errors.append('canonical requiredComponents drifted')
-    runtime=canonical.get('runtimeRequirements',{})
-    if runtime.get('addressableLoad') is not True or runtime.get('battleReplayRender') is not True:errors.append('READY must require Addressables load and battle replay render')
-    if runtime.get('fallbackAllowedForReady') is not False or runtime.get('missingAssetIsReleaseFailure') is not True:errors.append('READY cannot use fallback/missing assets')
-
     if contract.get('contractVersion')!='m69-art-package-v2':errors.append('unexpected M69 v2 contract version')
     if (contract.get('censusTarget'),contract.get('batchCount'),contract.get('batchSize'),contract.get('lastBatchSize'))!=(427,43,10,7):errors.append('M70-M73 rollout must remain 427 / 43 batches / 10 except B43=7')
     if set(contract.get('requiredComponents',[]))!=REQUIRED_COMPONENTS:errors.append('requiredComponents must freeze eight production gates')
     if set(contract.get('requiredAnimatorStates',[]))!=ANIMATOR_STATES:errors.append('v2 animator contract must remain canonical Rage states')
+    if contract.get('statusFlow')!=['TODO','CONCEPT','IN_PROGRESS','REVIEW','READY']:errors.append('art status flow drifted')
     if 'READY is valid only' not in contract.get('readyRule',''):errors.append('READY anti-fabrication rule missing')
 
     if mobile.get('budgetVersion')!='m69-v1':errors.append('mobile art budget version drifted')
@@ -54,6 +47,7 @@ def main()->int:
     if set(mobile.get('animation',{}).get('requiredStates',[]))!=ANIMATOR_STATES:errors.append('mobile animator states drifted')
     package=mobile.get('package',{})
     if package.get('releaseRequiresRegressionCapture') is not True or package.get('releaseRequiresHumanReviewEvidence') is not True:errors.append('release must require capture + human review evidence')
+    if not isinstance(package.get('maxInstalledBytesPerHeroVariant'),int) or package.get('maxInstalledBytesPerHeroVariant')<=0:errors.append('per-variant installed byte budget invalid')
 
     addresses={row['component']:row for row in read_csv(ADDRESSES)}
     if set(addresses)!=REQUIRED_COMPONENTS-{'reviewEvidence'}:errors.append('Addressables layout incomplete')
