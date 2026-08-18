@@ -49,15 +49,34 @@ namespace NinjaAssemble.Playable
             return Task.FromResult(new FormationDto { heroes = selected });
         }
 
+        public Task<AwakeningViewDto> GetAwakeningAsync(string playerId, string playerHeroId)
+        {
+            EnsureState();
+            OwnedHeroDto hero = state.heroes.FirstOrDefault(value => value.id == playerHeroId);
+            if (hero == null) throw new InvalidOperationException("Owned hero not found");
+            bool available = !string.IsNullOrWhiteSpace(hero.awakeningId);
+            return Task.FromResult(new AwakeningViewDto { hero = hero, available = available, awakened = hero.awakened, changed = false, awakeningId = hero.awakeningId, awakeningName = hero.awakeningName, visual = available ? OfflineAwakeningVisual(hero) : null });
+        }
+
+        public Task<AwakeningViewDto> AwakenAsync(string playerId, string playerHeroId)
+        {
+            EnsureState();
+            OwnedHeroDto hero = state.heroes.FirstOrDefault(value => value.id == playerHeroId);
+            if (hero == null) throw new InvalidOperationException("Owned hero not found");
+            if (string.IsNullOrWhiteSpace(hero.awakeningId)) throw new InvalidOperationException("This Hero Version has no Awakening");
+            bool changed = !hero.awakened;
+            hero.awakened = true;
+            hero.awakeningLevel = Math.Max(1, hero.awakeningLevel);
+            saves.Save(state);
+            return Task.FromResult(new AwakeningViewDto { hero = hero, available = true, awakened = true, changed = changed, awakeningId = hero.awakeningId, awakeningName = hero.awakeningName, visual = OfflineAwakeningVisual(hero) });
+        }
+
         public Task<CampaignStageListDto> GetCampaignStagesAsync(string playerId)
         {
             EnsureState();
             return Task.FromResult(new CampaignStageListDto
             {
-                catalogVersion = "offline-playtest-v1",
-                playerLevel = 20,
-                energy = state.energy,
-                energyCap = state.energyCap,
+                catalogVersion = "offline-playtest-v1", playerLevel = 20, energy = state.energy, energyCap = state.energyCap,
                 stages = new[]
                 {
                     Stage("c1-s1",1,1,"Training Grounds",5,true),
@@ -73,7 +92,6 @@ namespace NinjaAssemble.Playable
             CampaignStageDto stage = StageById(stageId);
             if (!stage.unlocked) throw new InvalidOperationException(stageId + " is locked");
             if (state.energy < stage.energyCost) throw new InvalidOperationException("Not enough Energy");
-
             bool firstClear = !state.clearedStageIds.Contains(stageId);
             long goldReward = firstClear ? 2500 : 1000;
             long diamondReward = firstClear ? 25 : 0;
@@ -81,7 +99,6 @@ namespace NinjaAssemble.Playable
             PlayBattleDto result = OfflineBattleSimulator.Simulate(stageId, ResolveFormation(), seed, stage.energyCost, goldReward, diamondReward);
             result.firstClear = firstClear;
             result.stars = 3;
-
             state.energy = Math.Max(0, state.energy - stage.energyCost);
             state.gold += goldReward;
             state.diamond += diamondReward;
@@ -107,12 +124,7 @@ namespace NinjaAssemble.Playable
         public Task<ResourcePveBoardDto> GetResourcePveAsync(string playerId)
         {
             EnsureState();
-            return Task.FromResult(new ResourcePveBoardDto
-            {
-                catalogVersion = "offline-resource-v1", rulesetVersion = "offline-rules-v1", gameDate = DateTime.UtcNow.ToString("yyyy-MM-dd"), playerLevel = 20,
-                energy = state.energy, energyCap = state.energyCap,
-                modes = new[] { new ResourcePveModeDto { modeId = "gold-trial", modeType = "GOLD", nameEn = "Gold Trial", nameVi = "Thử thách Vàng", teamSize = 5, energyCost = 5, dailyAttemptLimit = 99, attemptsRemaining = 99, minPlayerLevel = 1, clearsToday = 0, bestScore = 0, playable = state.energy >= 5, blockedReason = state.energy >= 5 ? string.Empty : "ENERGY", rewardGold = 5000, rewardItemId = "ramen", rewardItemQuantity = 2, resetPolicy = "LOCAL" } }
-            });
+            return Task.FromResult(new ResourcePveBoardDto { catalogVersion = "offline-resource-v1", rulesetVersion = "offline-rules-v1", gameDate = DateTime.UtcNow.ToString("yyyy-MM-dd"), playerLevel = 20, energy = state.energy, energyCap = state.energyCap, modes = new[] { new ResourcePveModeDto { modeId = "gold-trial", modeType = "GOLD", nameEn = "Gold Trial", nameVi = "Thử thách Vàng", teamSize = 5, energyCost = 5, dailyAttemptLimit = 99, attemptsRemaining = 99, minPlayerLevel = 1, clearsToday = 0, bestScore = 0, playable = state.energy >= 5, blockedReason = state.energy >= 5 ? string.Empty : "ENERGY", rewardGold = 5000, rewardItemId = "ramen", rewardItemQuantity = 2, resetPolicy = "LOCAL" } } });
         }
 
         public Task<ResourcePveBattleDto> PlayResourcePveAsync(string playerId, string modeId, string requestId)
@@ -136,18 +148,27 @@ namespace NinjaAssemble.Playable
             return Task.FromResult(new InventoryViewDto { catalogVersion = "offline-items-v1", items = new[] { new InventoryItemDto { itemId = "ramen", itemType = "MATERIAL", nameEn = "Ramen", nameVi = "Mì Ramen", quantity = state.ramen }, new InventoryItemDto { itemId = "hero-coin", itemType = "CURRENCY", nameEn = "Hero Coin", nameVi = "Xu Ninja", quantity = state.heroCoins } } });
         }
 
-        public Task<ArenaStateDto> GetArenaAsync(string playerId) => Task.FromResult(new ArenaStateDto { seasonId = "offline", rating = 1000, ratingProfileVersion = "offline", rewardProfileVersion = "offline", defenseConfigured = true, opponents = new[] { new ArenaOpponentDto { playerId = "offline-bot", displayName = "Training Team", rating = 1000, power = 50000, training = true } } });
+        public Task<ArenaStateDto> GetArenaAsync(string playerId)
+        {
+            EnsureState();
+            return Task.FromResult(new ArenaStateDto { seasonId = "offline", rating = state.arenaRating, ratingProfileVersion = "offline", rewardProfileVersion = "offline", defenseConfigured = true, opponents = new[] { new ArenaOpponentDto { playerId = "offline-bot", displayName = "Training Team", rating = state.arenaRating, power = 50000, training = true } } });
+        }
 
         public Task<ShadowArenaStateDto> GetShadowArenaAsync(string playerId)
         {
             EnsureState();
             bool eligible = state.heroes.Length >= 15;
-            return Task.FromResult(new ShadowArenaStateDto { seasonId = "offline", eligible = eligible, ownedCount = state.heroes.Length, requiredCount = 15, missingCount = Math.Max(0, 15 - state.heroes.Length), rating = 1000, ratingProfileVersion = "offline", seriesRulesVersion = "offline", rewardProfileVersion = "offline", defenseConfigured = eligible, opponents = eligible ? new[] { new ShadowArenaOpponentDto { playerId = "offline-shadow-bot", displayName = "Shadow Training Team", rating = 1000, totalPower = 150000, training = true } } : Array.Empty<ShadowArenaOpponentDto>() });
+            return Task.FromResult(new ShadowArenaStateDto { seasonId = "offline", eligible = eligible, ownedCount = state.heroes.Length, requiredCount = 15, missingCount = Math.Max(0, 15 - state.heroes.Length), rating = state.shadowRating, ratingProfileVersion = "offline", seriesRulesVersion = "offline", rewardProfileVersion = "offline", defenseConfigured = eligible, opponents = eligible ? new[] { new ShadowArenaOpponentDto { playerId = "offline-shadow-bot", displayName = "Shadow Training Team", rating = state.shadowRating, totalPower = 150000, training = true } } : Array.Empty<ShadowArenaOpponentDto>() });
         }
 
         public Task<CompetitiveHistoryItemDto[]> GetArenaHistoryAsync(string playerId, int limit = 20) => Task.FromResult(Array.Empty<CompetitiveHistoryItemDto>());
         public Task<CompetitiveHistoryItemDto[]> GetShadowArenaHistoryAsync(string playerId, int limit = 20) => Task.FromResult(Array.Empty<CompetitiveHistoryItemDto>());
-        public Task<ShopViewDto> GetShopAsync(string playerId) => Task.FromResult(new ShopViewDto { catalogVersion = "offline-shop-v1", resetKey = "offline", shops = new[] { new ShopEntryDto { shopId = "offline-general", nameEn = "Offline Shop", nameVi = "Cửa hàng Offline", refreshProfile = "NONE", offers = new[] { new ShopOfferDto { offerId = "ramen-pack", itemId = "ramen", itemNameEn = "Ramen", itemNameVi = "Mì Ramen", quantity = 5, currency = "GOLD", price = 1000, purchaseLimit = -1, purchasedCount = 0, remaining = -1, purchasable = state == null || state.gold >= 1000 } } } } });
+
+        public Task<ShopViewDto> GetShopAsync(string playerId)
+        {
+            EnsureState();
+            return Task.FromResult(new ShopViewDto { catalogVersion = "offline-shop-v1", resetKey = "offline", shops = new[] { new ShopEntryDto { shopId = "offline-general", nameEn = "Offline Shop", nameVi = "Cửa hàng Offline", refreshProfile = "NONE", offers = new[] { new ShopOfferDto { offerId = "ramen-pack", itemId = "ramen", itemNameEn = "Ramen", itemNameVi = "Mì Ramen", quantity = 5, currency = "GOLD", price = 1000, purchaseLimit = -1, purchasedCount = 0, remaining = -1, purchasable = state.gold >= 1000, blockedReason = state.gold >= 1000 ? string.Empty : "GOLD" } } } } });
+        }
 
         public Task<QuestBoardDto> GetQuestsAsync(string playerId)
         {
@@ -160,19 +181,98 @@ namespace NinjaAssemble.Playable
         {
             EnsureState();
             bool claimed = state.claimedMailIds.Contains("offline-welcome");
-            return Task.FromResult(new MailboxDto { mailProfileVersion = "offline-mail-v1", mails = new[] { new MailDto { mailId = "offline-welcome", subject = "Offline Playtest", body = "Welcome to the standalone playtest build.", attachments = new[] { new MailAttachmentDto { kind = "CURRENCY", id = "DIAMOND", quantity = 200 } }, read = claimed, claimed = claimed, createdAt = DateTime.UtcNow.ToString("O"), expiresAt = string.Empty } } });
+            bool read = claimed || state.readMailIds.Contains("offline-welcome");
+            return Task.FromResult(new MailboxDto { mailProfileVersion = "offline-mail-v1", mails = new[] { new MailDto { mailId = "offline-welcome", subject = "Offline Playtest", body = "Welcome to the standalone playtest build.", attachments = new[] { new MailAttachmentDto { kind = "CURRENCY", id = "DIAMOND", quantity = 200 } }, read = read, claimed = claimed, createdAt = DateTime.UtcNow.ToString("O"), expiresAt = string.Empty } } });
         }
 
         public Task<ArenaDefenseDto> SaveArenaDefenseAsync(string playerId, string[] heroIds) => Task.FromResult(new ArenaDefenseDto { formationId = "offline-defense", heroes = ResolveFormation() });
-        public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId, string requestId) => Unsupported<ArenaBattleDto>("Arena training is delivered in offline playtest 3/5");
-        public Task<SeasonRewardDto> ClaimArenaSeasonAsync(string playerId) => Task.FromResult(new SeasonRewardDto { seasonId = "offline", finalRating = 1000, rewardAmount = 0, claimable = false, claimed = true });
-        public Task<ShadowDefenseDto> SaveShadowDefenseAsync(string playerId, string[] heroIds) => Task.FromResult(new ShadowDefenseDto { seasonId = "offline", heroes = state?.heroes?.Take(15).ToArray() ?? Array.Empty<OwnedHeroDto>() });
-        public Task<ShadowArenaBattleDto> FightShadowArenaAsync(string playerId, string opponentPlayerId, string requestId) => Unsupported<ShadowArenaBattleDto>("Shadow Arena training is delivered in offline playtest 3/5");
-        public Task<SeasonRewardDto> ClaimShadowSeasonAsync(string playerId) => Task.FromResult(new SeasonRewardDto { seasonId = "offline", finalRating = 1000, rewardAmount = 0, claimable = false, claimed = true });
-        public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId) => Unsupported<ShopPurchaseResultDto>("Offline shop actions are delivered in offline playtest 3/5");
-        public Task<QuestClaimDto> ClaimQuestAsync(string playerId, string questId) => Unsupported<QuestClaimDto>("Offline quest claims are delivered in offline playtest 3/5");
-        public Task ReadMailAsync(string playerId, string mailId) => Task.CompletedTask;
-        public Task<MailClaimDto> ClaimMailAsync(string playerId, string mailId) => Unsupported<MailClaimDto>("Offline mail claims are delivered in offline playtest 3/5");
+
+        public Task<ArenaBattleDto> FightArenaAsync(string playerId, string opponentPlayerId, string requestId)
+        {
+            EnsureState();
+            long before = state.arenaRating;
+            long seed = OfflineBattleSimulator.StableSeed("arena-" + opponentPlayerId, ResolveFormation().Select(hero => hero.id), state.battleCount);
+            PlayBattleDto simulated = OfflineBattleSimulator.Simulate("arena-training", ResolveFormation(), seed, 0, 0, 0);
+            state.arenaRating += 10;
+            state.battleCount++;
+            saves.Save(state);
+            return Task.FromResult(new ArenaBattleDto { requestId = requestId, battleId = simulated.battleId, playerId = state.playerId, seasonId = "offline", replayed = false, training = true, opponentPlayerId = opponentPlayerId, opponentDisplayName = "Training Team", opponentRating = before, opponentPower = 50000, ratingBefore = before, ratingAfter = state.arenaRating, ratingDelta = state.arenaRating - before, ratingProfileVersion = "offline", arenaCoinReward = 0, rewardProfileVersion = "offline", combatStatsVersion = simulated.combatStatsVersion, abilityProfileVersion = simulated.abilityProfileVersion, techniqueMappingVersion = simulated.techniqueMappingVersion, passiveProfileVersion = simulated.passiveProfileVersion, participants = simulated.participants, battle = simulated.battle });
+        }
+
+        public Task<SeasonRewardDto> ClaimArenaSeasonAsync(string playerId) { EnsureState(); return Task.FromResult(new SeasonRewardDto { seasonId = "offline", finalRating = state.arenaRating, rewardAmount = 0, claimable = false, claimed = true }); }
+        public Task<ShadowDefenseDto> SaveShadowDefenseAsync(string playerId, string[] heroIds) { EnsureState(); return Task.FromResult(new ShadowDefenseDto { seasonId = "offline", heroes = state.heroes.Take(15).ToArray() }); }
+
+        public Task<ShadowArenaBattleDto> FightShadowArenaAsync(string playerId, string opponentPlayerId, string requestId)
+        {
+            EnsureState();
+            if (state.heroes.Length < 15) throw new InvalidOperationException("Shadow Arena requires 15 owned ninja");
+            long before = state.shadowRating;
+            long masterSeed = OfflineBattleSimulator.StableSeed("shadow-" + opponentPlayerId, state.heroes.Take(15).Select(hero => hero.id), state.battleCount);
+            var squads = new ShadowSquadBattleDto[3];
+            for (int squad = 0; squad < 3; squad++)
+            {
+                OwnedHeroDto[] formation = state.heroes.Skip(squad * 5).Take(5).ToArray();
+                long seed = masterSeed + squad + 1;
+                PlayBattleDto simulated = OfflineBattleSimulator.Simulate("shadow-training-" + squad, formation, seed, 0, 0, 0);
+                squads[squad] = new ShadowSquadBattleDto { squadIndex = squad, seed = seed, playerWon = true, tiebreak = string.Empty, participants = simulated.participants, battle = simulated.battle };
+            }
+            state.shadowRating += 12;
+            state.battleCount++;
+            saves.Save(state);
+            return Task.FromResult(new ShadowArenaBattleDto { requestId = requestId, battleId = "offline-shadow-" + masterSeed, playerId = state.playerId, seasonId = "offline", replayed = false, training = true, opponentPlayerId = opponentPlayerId, opponentRating = before, opponentPower = 150000, masterSeed = masterSeed, winner = state.playerId, ratingBefore = before, ratingAfter = state.shadowRating, ratingDelta = state.shadowRating - before, ratingProfileVersion = "offline", seriesRulesVersion = "offline", shadowCoinReward = 0, rewardProfileVersion = "offline", combatStatsVersion = "offline-stats-v1", abilityProfileVersion = "offline-ability-v1", techniqueMappingVersion = "offline-technique-v1", passiveProfileVersion = "offline-passive-v1", squads = squads });
+        }
+
+        public Task<SeasonRewardDto> ClaimShadowSeasonAsync(string playerId) { EnsureState(); return Task.FromResult(new SeasonRewardDto { seasonId = "offline", finalRating = state.shadowRating, rewardAmount = 0, claimable = false, claimed = true }); }
+
+        public Task<ShopPurchaseResultDto> PurchaseShopAsync(string playerId, string shopId, string offerId, string requestId)
+        {
+            EnsureState();
+            if (shopId != "offline-general" || offerId != "ramen-pack") throw new InvalidOperationException("Unknown offline shop offer");
+            if (state.gold < 1000) throw new InvalidOperationException("Not enough Gold");
+            state.gold -= 1000;
+            state.ramen += 5;
+            saves.Save(state);
+            return Task.FromResult(new ShopPurchaseResultDto { shopId = shopId, offerId = offerId, resetKey = "offline", replayed = false, currency = "GOLD", charged = 1000, itemBalanceAfter = state.ramen, purchaseCount = 1 });
+        }
+
+        public Task<QuestClaimDto> ClaimQuestAsync(string playerId, string questId)
+        {
+            EnsureState();
+            if (questId != "offline-battle") throw new InvalidOperationException("Unknown offline quest");
+            bool already = state.claimedQuestIds.Contains(questId);
+            if (!already && state.battleCount < 1) throw new InvalidOperationException("Quest is not complete");
+            if (!already)
+            {
+                state.gold += 5000;
+                state.diamond += 50;
+                state.claimedQuestIds = state.claimedQuestIds.Concat(new[] { questId }).Distinct().ToArray();
+                saves.Save(state);
+            }
+            return Task.FromResult(new QuestClaimDto { questId = questId, resetKey = "offline", replayed = already, gold = already ? 0 : 5000, diamond = already ? 0 : 50, itemId = string.Empty, itemQuantity = 0, finalValue = state.battleCount });
+        }
+
+        public Task ReadMailAsync(string playerId, string mailId)
+        {
+            EnsureState();
+            if (!state.readMailIds.Contains(mailId)) state.readMailIds = state.readMailIds.Concat(new[] { mailId }).Distinct().ToArray();
+            saves.Save(state);
+            return Task.CompletedTask;
+        }
+
+        public Task<MailClaimDto> ClaimMailAsync(string playerId, string mailId)
+        {
+            EnsureState();
+            if (mailId != "offline-welcome") throw new InvalidOperationException("Unknown offline mail");
+            bool already = state.claimedMailIds.Contains(mailId);
+            if (!already)
+            {
+                state.diamond += 200;
+                state.claimedMailIds = state.claimedMailIds.Concat(new[] { mailId }).Distinct().ToArray();
+                state.readMailIds = state.readMailIds.Concat(new[] { mailId }).Distinct().ToArray();
+                saves.Save(state);
+            }
+            return Task.FromResult(new MailClaimDto { mailId = mailId, replayed = already, grants = already ? Array.Empty<MailGrantDto>() : new[] { new MailGrantDto { kind = "CURRENCY", id = "DIAMOND", quantity = 200, balanceAfter = state.diamond } } });
+        }
 
         public Task<SummonResultDto> SummonAsync(string playerId, string requestId)
         {
@@ -188,11 +288,7 @@ namespace NinjaAssemble.Playable
             state.summonCount++;
             long duplicateCoins = duplicate ? 25 : 0;
             if (duplicate) state.heroCoins += duplicateCoins;
-            else
-            {
-                var hero = new OwnedHeroDto { id = "offline-summon-" + state.summonCount, characterId = characterId, heroId = heroId, displayName = name, level = 1, exp = 0, frameTier = "BLUE", awakened = false, currentVariant = "BASE", awakeningLevel = 0 };
-                state.heroes = state.heroes.Concat(new[] { hero }).ToArray();
-            }
+            else state.heroes = state.heroes.Concat(new[] { new OwnedHeroDto { id = "offline-summon-" + state.summonCount, characterId = characterId, heroId = heroId, displayName = name, level = 1, exp = 0, frameTier = "BLUE", awakened = false, currentVariant = "BASE", awakeningLevel = 0 } }).ToArray();
             saves.Save(state);
             long seed = OfflineBattleSimulator.StableSeed("summon", new[] { requestId ?? string.Empty }, state.summonCount);
             return Task.FromResult(new SummonResultDto { heroId = heroId, characterId = characterId, displayName = name, rarity = index % 5 == 0 ? "SSR" : index % 2 == 0 ? "SR" : "R", pityTriggered = state.summonCount % 50 == 0, duplicate = duplicate, duplicateHeroCoins = duplicateCoins, pullsSincePity = state.summonCount % 50, bannerVersion = "offline-banner-v1", seed = seed });
@@ -230,7 +326,7 @@ namespace NinjaAssemble.Playable
         private OwnedHeroDto[] ResolveFormation()
         {
             EnsureState();
-            OwnedHeroDto[] selected = (state.formationIds ?? Array.Empty<string>()).Select(id => state.heroes.FirstOrDefault(hero => hero.id == id)).Where(hero => hero != null).Take(5).ToArray();
+            OwnedHeroDto[] selected = state.formationIds.Select(id => state.heroes.FirstOrDefault(hero => hero.id == id)).Where(hero => hero != null).Take(5).ToArray();
             if (selected.Length == 5) return selected;
             selected = state.heroes.Take(5).ToArray();
             state.formationIds = selected.Select(hero => hero.id).ToArray();
@@ -238,8 +334,24 @@ namespace NinjaAssemble.Playable
             return selected;
         }
 
+        private static AwakeningVisualDto OfflineAwakeningVisual(OwnedHeroDto hero)
+        {
+            return new AwakeningVisualDto { awakeningId = hero.awakeningId, heroId = hero.heroId, transitionStart = "offline", transitionMid = "offline", transitionEnd = "offline", idleAnimation = "offline", movementAnimation = "offline", basicVfxModifier = "offline", skill1VfxModifier = "offline", skill2VfxModifier = "offline", ultimateVfxModifier = "offline", awakeningSkillVfx = "offline", cameraSequence = "offline", screenEffect = "offline", sfxDescription = "Offline playtest fallback", referenceSource = "offline-playtest", status = "OFFLINE_TEST" };
+        }
+
         private static string Slug(string value) => (value ?? string.Empty).Trim().ToLowerInvariant().Replace(' ', '-');
-        private void EnsureState() { if (state == null) state = saves.LoadOrCreate(); }
-        private static Task<T> Unsupported<T>(string message) => Task.FromException<T>(new InvalidOperationException(message));
+
+        private void EnsureState()
+        {
+            if (state == null) state = saves.LoadOrCreate();
+            if (state.heroes == null) state.heroes = Array.Empty<OwnedHeroDto>();
+            if (state.formationIds == null) state.formationIds = Array.Empty<string>();
+            if (state.clearedStageIds == null) state.clearedStageIds = Array.Empty<string>();
+            if (state.claimedQuestIds == null) state.claimedQuestIds = Array.Empty<string>();
+            if (state.claimedMailIds == null) state.claimedMailIds = Array.Empty<string>();
+            if (state.readMailIds == null) state.readMailIds = Array.Empty<string>();
+            if (state.arenaRating <= 0) state.arenaRating = 1000;
+            if (state.shadowRating <= 0) state.shadowRating = 1000;
+        }
     }
 }
