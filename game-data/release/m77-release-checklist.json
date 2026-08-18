@@ -1,0 +1,17 @@
+{
+  "checklistVersion": "m77-release-hardening-v1",
+  "categories": [
+    {"id":"security-config","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["server/src/main/resources/application-prod.yml","server/src/main/java/com/ninjaassemble/security/PlayerAuthorizationFilter.java","server/src/main/java/com/ninjaassemble/security/ProductionSecurityHeadersFilter.java"]},
+    {"id":"rate-limit-cache","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["server/src/main/java/com/ninjaassemble/security/ProductionRateLimitFilter.java","server/src/main/resources/application-prod.yml"]},
+    {"id":"database-backup-rollback","kind":"OPERATOR_EVIDENCE","implementationStatus":"READY","certificationStatus":"PENDING","evidenceRefs":["docs/release/M77_DATABASE_BACKUP_ROLLBACK.md"]},
+    {"id":"android-signing-reproducibility","kind":"EXTERNAL_EVIDENCE","implementationStatus":"READY","certificationStatus":"PENDING","evidenceRefs":[".github/workflows/android-playtest-build.yml","docs/release/M55_ANDROID_PLAYTEST_BUILD.md"]},
+    {"id":"localization","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["scripts/validate-runtime-localization.py"]},
+    {"id":"accessibility","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["client-unity/Assets/Scripts/Game/Settings/AccessibilityPreferences.cs","client-unity/Assets/Scripts/Game/UI/Production/ProductionUiTokens.cs"]},
+    {"id":"licensing-provenance","kind":"LEGAL_EVIDENCE","implementationStatus":"READY","certificationStatus":"PENDING","evidenceRefs":["game-data/release/m77-asset-provenance.csv"]},
+    {"id":"store-metadata","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["game-data/release/m77-store-metadata.json"]},
+    {"id":"release-notes-known-issues","kind":"STRUCTURAL","implementationStatus":"READY","certificationStatus":"READY","evidenceRefs":["docs/release/M77_RELEASE_NOTES.md","docs/release/M77_KNOWN_ISSUES.md"]},
+    {"id":"support-operations","kind":"OPERATOR_EVIDENCE","implementationStatus":"READY","certificationStatus":"PENDING","evidenceRefs":["docs/release/M77_SUPPORT_RUNBOOK.md"]},
+    {"id":"aggregate-release-evidence","kind":"EXTERNAL_EVIDENCE","implementationStatus":"READY","certificationStatus":"PENDING","evidenceRefs":["scripts/validate-m74-parity.py","scripts/validate-m75-e2e.py","scripts/validate-m76-android-performance.py","scripts/release-audit.py"]}
+  ],
+  "releaseRule": "RC/tagging is forbidden until every category certificationStatus is READY and scripts/validate-m77-release-hardening.py --enforce passes on the exact candidate SHA."
+}
