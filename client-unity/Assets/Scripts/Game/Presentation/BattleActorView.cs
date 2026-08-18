@@ -98,7 +98,7 @@ namespace NinjaAssemble.Presentation
             SnapUiToTargets();
         }
         public void ConfigureStatusUi(TMP_Text status) { statusLabel = status; RefreshStatusLabel(); }
-        public void ConfigureEnergyUi(Slider energy) { rageSlider = energy; ConfigureSliderRanges(); SnapUiToTargets(); }
+        public void ConfigureRageUi(Slider rage) { rageSlider = rage; ConfigureSliderRanges(); SnapUiToTargets(); }
         public void PlayAttack() => PlayAbility("BASIC");
 
         public void SetPresentationRate(int speed, bool paused)
