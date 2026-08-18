@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NinjaAssemble.Network;
@@ -24,7 +23,6 @@ namespace NinjaAssemble.Presentation
         };
 
         private readonly Dictionary<string, BattleParticipantDto> participants = new Dictionary<string, BattleParticipantDto>();
-        private readonly Dictionary<string, RectTransform> actorSlots = new Dictionary<string, RectTransform>();
         private readonly HeroAddressableLoader loader = new HeroAddressableLoader();
         private HeroArtRuntimeCatalog artCatalog;
         private RectTransform stageRoot;
@@ -39,7 +37,6 @@ namespace NinjaAssemble.Presentation
             artCatalog = HeroArtRuntimeCatalog.Load();
             CreateStageRoot();
             timeline = stageRoot.gameObject.AddComponent<BattleTimelinePlayer>();
-            timeline.EventPresented += OnEventPresented;
             timeline.PlaybackCompleted += OnPlaybackCompleted;
 
             BattleParticipantDto[] roster = result.participants ?? Array.Empty<BattleParticipantDto>();
@@ -48,7 +45,6 @@ namespace NinjaAssemble.Presentation
                 if (participant == null || string.IsNullOrWhiteSpace(participant.battleUnitId)) continue;
                 participants[participant.battleUnitId] = participant;
                 RectTransform slot = CreateSlot(participant);
-                actorSlots[participant.battleUnitId] = slot;
                 BattleActorView actor = await CreateActorAsync(participant, slot);
                 timeline.Register(actor);
             }
@@ -60,7 +56,6 @@ namespace NinjaAssemble.Presentation
         private void ClearStage()
         {
             participants.Clear();
-            actorSlots.Clear();
             currentBattle = null;
             if (stageRoot != null)
             {
@@ -167,7 +162,7 @@ namespace NinjaAssemble.Presentation
 
             string initials = Initials(participant.displayName);
             CreateText(rect, "Initials", initials, 42f, TextAlignmentOptions.Center, Color.white,
-                new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.84f));
+                new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.81f));
             TMP_Text name = CreateText(rect, "Name", participant.displayName, 18f, TextAlignmentOptions.Center, Color.white,
                 new Vector2(0.02f, 0.16f), new Vector2(0.98f, 0.34f));
             TMP_Text level = CreateText(rect, "Level", "Lv." + participant.level, 15f, TextAlignmentOptions.Center, new Color(1f, 0.88f, 0.5f, 1f),
@@ -176,63 +171,19 @@ namespace NinjaAssemble.Presentation
                 participant.awakened ? new Color(1f, 0.72f, 0.20f, 1f) : Color.white,
                 new Vector2(0.12f, 0.00f), new Vector2(0.88f, 0.09f));
             Slider hp = CreateHealthSlider(rect);
+            Slider rage = CreateRageSlider(rect);
 
             BattleActorView actor = actorObject.AddComponent<BattleActorView>();
             actor.ConfigureUi(name, level, hp);
+            actor.ConfigureRageUi(rage);
             actor.ConfigureStatusUi(status);
             ConfigureActor(actor, participant);
             return actor;
         }
 
-        private void OnEventPresented(BattlePresentationEvent item)
-        {
-            if (item == null || item.Type != "DAMAGE") return;
-            RectTransform slot;
-            if (!actorSlots.TryGetValue(item.TargetId ?? string.Empty, out slot)) return;
-            StartCoroutine(FloatingDamage(slot, item.Amount, item.Critical));
-            if (item.Critical) StartCoroutine(CriticalShake());
-        }
-
-        private IEnumerator FloatingDamage(RectTransform slot, long amount, bool critical)
-        {
-            TMP_Text text = CreateText(stageRoot, "Damage", (critical ? "CRIT " : "-") + amount, critical ? 30f : 24f,
-                TextAlignmentOptions.Center,
-                critical ? new Color(1f, 0.78f, 0.18f, 1f) : new Color(1f, 0.34f, 0.28f, 1f),
-                slot.anchorMin, slot.anchorMax);
-            RectTransform rect = text.rectTransform;
-            rect.sizeDelta = new Vector2(180f, 60f);
-            rect.anchoredPosition = new Vector2(0f, 90f);
-            float duration = 0.55f;
-            float elapsed = 0f;
-            Color start = text.color;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / duration);
-                rect.anchoredPosition = new Vector2(0f, 90f + 50f * t);
-                text.color = new Color(start.r, start.g, start.b, 1f - t);
-                yield return null;
-            }
-            Destroy(text.gameObject);
-        }
-
-        private IEnumerator CriticalShake()
-        {
-            Vector2 origin = stageRoot.anchoredPosition;
-            const float duration = 0.12f;
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                elapsed += Time.deltaTime;
-                stageRoot.anchoredPosition = origin + UnityEngine.Random.insideUnitCircle * 5f;
-                yield return null;
-            }
-            stageRoot.anchoredPosition = origin;
-        }
-
         private void OnPlaybackCompleted()
         {
-            if (currentBattle == null || currentBattle.battle == null) return;
+            if (currentBattle == null || currentBattle.battle == null || timeline == null) return;
             bool teamAWon = string.Equals(currentBattle.battle.outcome, "TEAM_A", StringComparison.OrdinalIgnoreCase);
             bool teamBWon = string.Equals(currentBattle.battle.outcome, "TEAM_B", StringComparison.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, BattleParticipantDto> pair in participants)
@@ -293,11 +244,39 @@ namespace NinjaAssemble.Presentation
 
         private static Slider CreateHealthSlider(RectTransform parent)
         {
-            var sliderObject = new GameObject("HP", typeof(RectTransform), typeof(Slider));
+            return CreateMeterSlider(
+                parent,
+                "HP",
+                new Vector2(0.08f, 0.90f),
+                new Vector2(0.92f, 0.96f),
+                new Color(0.14f, 0.08f, 0.08f, 0.95f),
+                new Color(0.30f, 0.90f, 0.32f, 1f));
+        }
+
+        private static Slider CreateRageSlider(RectTransform parent)
+        {
+            return CreateMeterSlider(
+                parent,
+                "Rage",
+                new Vector2(0.08f, 0.84f),
+                new Vector2(0.92f, 0.89f),
+                new Color(0.12f, 0.09f, 0.04f, 0.95f),
+                new Color(1f, 0.60f, 0.12f, 0.88f));
+        }
+
+        private static Slider CreateMeterSlider(
+            RectTransform parent,
+            string name,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            Color backgroundColor,
+            Color fillColor)
+        {
+            var sliderObject = new GameObject(name, typeof(RectTransform), typeof(Slider));
             RectTransform rect = sliderObject.GetComponent<RectTransform>();
             rect.SetParent(parent, false);
-            rect.anchorMin = new Vector2(0.08f, 0.88f);
-            rect.anchorMax = new Vector2(0.92f, 0.96f);
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -309,7 +288,7 @@ namespace NinjaAssemble.Presentation
             background.offsetMin = Vector2.zero;
             background.offsetMax = Vector2.zero;
             Image backgroundImage = backgroundObject.GetComponent<Image>();
-            backgroundImage.color = new Color(0.14f, 0.08f, 0.08f, 0.95f);
+            backgroundImage.color = backgroundColor;
             backgroundImage.raycastTarget = false;
 
             var fillObject = new GameObject("Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -320,11 +299,12 @@ namespace NinjaAssemble.Presentation
             fill.offsetMin = new Vector2(2f, 2f);
             fill.offsetMax = new Vector2(-2f, -2f);
             Image fillImage = fillObject.GetComponent<Image>();
-            fillImage.color = new Color(0.30f, 0.90f, 0.32f, 1f);
+            fillImage.color = fillColor;
             fillImage.raycastTarget = false;
 
             Slider slider = sliderObject.GetComponent<Slider>();
             slider.fillRect = fill;
+            slider.targetGraphic = fillImage;
             slider.direction = Slider.Direction.LeftToRight;
             slider.interactable = false;
             return slider;
