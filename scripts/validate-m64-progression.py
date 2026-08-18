@@ -36,7 +36,7 @@ def main():
         require("server/src/main/java/com/ninjaassemble/progression/application/AdvancedProgressionApplicationService.java","pg_advisory_xact_lock","progression:","Currency.GOLD","inventory.mutate","for update","withReplayed(true)","result_json")
         require("server/src/main/java/com/ninjaassemble/progression/api/AdvancedProgressionController.java",'"/{trackId}/upgrade"',"requestId is required")
         require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionDtos.cs","AdvancedProgressionBoardDto","AdvancedProgressionUpgradeDto","cumulativeBonus")
-        require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionClient.cs","GetBoardAsync","UpgradeAsync",'"/progression/advanced"')
+        require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionClient.cs","GetBoardAsync","UpgradeAsync","/progression/advanced","/upgrade")
         require("client-unity/Assets/Scripts/Game/Progression/AdvancedProgressionStore.cs","RecommendedTrack","Guid.NewGuid().ToString()","RefreshAsync")
         print("M64_PROGRESSION_OK frame=string-tier-policy hero_level=1 equipment=1 learning=2 tailed_beasts=9 upgrades=idempotent client_module=1")
         return 0
