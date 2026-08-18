@@ -1,0 +1,20 @@
+name: m65-economy-live-integrity
+on:
+  pull_request:
+    paths:
+      - 'game-data/release/m65-economy-live-census.csv'
+      - 'server/src/main/java/com/ninjaassemble/**'
+      - 'scripts/validate-m65-economy-live.py'
+      - '.github/workflows/m65-economy-live-integrity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-economy-live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/validate-m65-economy-live.py
