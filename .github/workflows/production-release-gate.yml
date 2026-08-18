@@ -34,6 +34,8 @@ jobs:
         run: python scripts/validate-m63-competitive.py
       - name: Require aggregate M74 parity verification
         run: python scripts/validate-m74-parity.py --enforce
+      - name: Require certified M75 end-to-end reliability run
+        run: python scripts/validate-m75-e2e.py --enforce
       - name: Require full release readiness
         run: python scripts/validate-release-readiness.py --release
       - name: Require all hero art packages READY

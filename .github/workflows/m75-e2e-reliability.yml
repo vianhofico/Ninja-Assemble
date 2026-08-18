@@ -1,0 +1,29 @@
+name: m75-e2e-reliability
+on:
+  pull_request:
+    paths:
+      - 'game-data/release/m75-*'
+      - 'game-data/release/evidence/m75/**'
+      - 'scripts/validate-m75-e2e.py'
+      - '.github/workflows/m75-e2e-reliability.yml'
+      - '.github/workflows/production-release-gate.yml'
+      - 'server/**'
+      - 'docs/verification/M75_E2E_RELIABILITY.md'
+      - 'docs/release/M75_STATUS.md'
+jobs:
+  validate-e2e-framework:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate M75 journey and reliability contracts
+        run: python scripts/validate-m75-e2e.py
+      - name: Run server regression suite
+        run: mvn -B -f server/pom.xml test
