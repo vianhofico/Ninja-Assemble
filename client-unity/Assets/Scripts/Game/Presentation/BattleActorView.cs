@@ -42,12 +42,14 @@ namespace NinjaAssemble.Presentation
         private float targetHealth01 = 1f;
         private float targetRage;
         private int presentationSpeed = 1;
+        private bool presentationPaused;
 
         public Transform HitAnchor => hitAnchor != null ? hitAnchor : transform;
         public bool IsAlive => CurrentHp > 0;
 
         private void Update()
         {
+            if (presentationPaused) return;
             float rate = Mathf.Max(1f, presentationSpeed);
             if (healthSlider != null)
                 healthSlider.value = Mathf.MoveTowards(healthSlider.value, targetHealth01, Time.unscaledDeltaTime * 3.8f * rate);
@@ -102,6 +104,7 @@ namespace NinjaAssemble.Presentation
         public void SetPresentationRate(int speed, bool paused)
         {
             presentationSpeed = Mathf.Clamp(speed, 1, 4);
+            presentationPaused = paused;
             if (animator != null) animator.speed = paused ? 0f : presentationSpeed;
             if (audioSource != null)
             {
