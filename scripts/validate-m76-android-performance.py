@@ -75,7 +75,7 @@ def main():
         require(PROBE,
                 'warmupSeconds = 30f','measurementSeconds = 180f','campaign-realtime-battle-rage-v1',
                 'Time.unscaledDeltaTime','Profiler.GetTotalAllocatedMemoryLong','Average','0.95f',
-                'Application.persistentDataPath','m76-performance-probe.json','presentation-only')
+                'Application.persistentDataPath','m76-performance-probe.json','Presentation-only benchmark probe')
         subprocess.run([sys.executable,str(ROOT/'scripts/validate-android-build.py')],cwd=ROOT,check=True)
         subprocess.run([sys.executable,str(ROOT/'scripts/validate-mobile-release-evidence.py'),*(['--release'] if args.enforce else [])],cwd=ROOT,check=True)
         print(f'M76_ANDROID_PERFORMANCE_OK framework=1 classes=3 physical_required=1 enforce={str(args.enforce).lower()}')
