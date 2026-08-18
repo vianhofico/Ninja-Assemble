@@ -61,6 +61,16 @@ namespace NinjaAssemble.Localization
             return values;
         }
 
-        private readonly record struct Entry(string En, string Vi);
+        private readonly struct Entry
+        {
+            public Entry(string en, string vi)
+            {
+                En = en;
+                Vi = vi;
+            }
+
+            public string En { get; }
+            public string Vi { get; }
+        }
     }
 }
