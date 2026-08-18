@@ -30,6 +30,8 @@ jobs:
         run: python scripts/validate-m61-campaign.py --enforce
       - name: Require production Resource PvE
         run: python scripts/validate-m62-resource-pve.py --enforce
+      - name: Require production Arena and Shadow Arena
+        run: python scripts/validate-m63-competitive.py
       - name: Require full release readiness
         run: python scripts/validate-release-readiness.py --release
       - name: Require all hero art packages READY

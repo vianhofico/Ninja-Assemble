@@ -16,6 +16,8 @@ namespace NinjaAssemble.Playable
         public InventoryViewDto Inventory { get; private set; }
         public ArenaStateDto Arena { get; private set; }
         public ShadowArenaStateDto ShadowArena { get; private set; }
+        public CompetitiveHistoryItemDto[] ArenaHistory { get; private set; } = Array.Empty<CompetitiveHistoryItemDto>();
+        public CompetitiveHistoryItemDto[] ShadowArenaHistory { get; private set; } = Array.Empty<CompetitiveHistoryItemDto>();
         public ShopViewDto Shop { get; private set; }
         public QuestBoardDto Quests { get; private set; }
         public MailboxDto Mail { get; private set; }
@@ -72,23 +74,39 @@ namespace NinjaAssemble.Playable
         public async Task RefreshInventoryAsync() => Inventory = await api.GetInventoryAsync(PlayerId);
         public async Task RefreshArenaAsync() => Arena = await api.GetArenaAsync(PlayerId);
         public async Task RefreshShadowArenaAsync() => ShadowArena = await api.GetShadowArenaAsync(PlayerId);
+        public async Task RefreshArenaHistoryAsync() => ArenaHistory = await api.GetArenaHistoryAsync(PlayerId);
+        public async Task RefreshShadowArenaHistoryAsync() => ShadowArenaHistory = await api.GetShadowArenaHistoryAsync(PlayerId);
         public async Task RefreshShopAsync() => Shop = await api.GetShopAsync(PlayerId);
         public async Task RefreshQuestsAsync() => Quests = await api.GetQuestsAsync(PlayerId);
         public async Task RefreshMailAsync() => Mail = await api.GetMailAsync(PlayerId);
 
+        public async Task<ArenaDefenseDto> SaveArenaDefenseAsync()
+        {
+            string[] ids = (Formation?.heroes ?? Array.Empty<OwnedHeroDto>()).Select(hero => hero.id).ToArray();
+            if (ids.Length != 5) throw new InvalidOperationException("Arena defense requires the saved five-ninja formation");
+            ArenaDefenseDto result = await api.SaveArenaDefenseAsync(PlayerId, ids); await RefreshArenaAsync(); return result;
+        }
+        public async Task<ShadowDefenseDto> SaveShadowDefenseAsync()
+        {
+            if (Heroes.Length < 15) throw new InvalidOperationException("Shadow Arena defense requires 15 owned ninja");
+            ShadowDefenseDto result = await api.SaveShadowDefenseAsync(PlayerId, Heroes.Take(15).Select(hero => hero.id).ToArray()); await RefreshShadowArenaAsync(); return result;
+        }
         public async Task<ArenaBattleDto> FightArenaAsync(string opponentPlayerId)
         {
             if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
-            ArenaBattleDto result = await api.FightArenaAsync(PlayerId, opponentPlayerId); await Task.WhenAll(RefreshArenaAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
+            ArenaBattleDto result = await api.FightArenaAsync(PlayerId, opponentPlayerId, Guid.NewGuid().ToString());
+            await Task.WhenAll(RefreshArenaAsync(), RefreshArenaHistoryAsync(), RefreshShopAsync(), RefreshQuestsAsync()); return result;
         }
         public async Task<ShadowArenaBattleDto> FightShadowArenaAsync(string opponentPlayerId)
         {
             if (ShadowArena?.eligible != true) throw new InvalidOperationException("Shadow Arena requires 15 owned ninja");
             if (string.IsNullOrWhiteSpace(opponentPlayerId)) throw new ArgumentException("opponentPlayerId is required", nameof(opponentPlayerId));
-            ShadowArenaBattleDto result = await api.FightShadowArenaAsync(PlayerId, opponentPlayerId);
-            await Task.WhenAll(RefreshShadowArenaAsync(), RefreshShopAsync());
-            return result;
+            ShadowArenaBattleDto result = await api.FightShadowArenaAsync(PlayerId, opponentPlayerId, Guid.NewGuid().ToString());
+            await Task.WhenAll(RefreshShadowArenaAsync(), RefreshShadowArenaHistoryAsync(), RefreshShopAsync()); return result;
         }
+        public async Task<SeasonRewardDto> ClaimArenaSeasonAsync() { SeasonRewardDto result = await api.ClaimArenaSeasonAsync(PlayerId); await Task.WhenAll(RefreshArenaAsync(), RefreshShopAsync()); return result; }
+        public async Task<SeasonRewardDto> ClaimShadowSeasonAsync() { SeasonRewardDto result = await api.ClaimShadowSeasonAsync(PlayerId); await Task.WhenAll(RefreshShadowArenaAsync(), RefreshShopAsync()); return result; }
+
         public async Task<ShopPurchaseResultDto> PurchaseShopAsync(string shopId, string offerId)
         {
             ShopPurchaseResultDto result = await api.PurchaseShopAsync(PlayerId, shopId, offerId, Guid.NewGuid().ToString());
