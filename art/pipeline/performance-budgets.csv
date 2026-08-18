@@ -1,0 +1,11 @@
+metric,limit,scope,notes
+portrait_texture_max_px,2048,per_hero,Longest portrait edge before platform compression
+icon_texture_max_px,512,per_hero,Square UI icon
+chibi_texture_max_px,2048,per_hero,Combined character texture atlas longest edge
+runtime_materials_max,4,per_hero,Materials active on chibi prefab
+skinned_mesh_renderers_max,4,per_hero,Renderer count before pooled effects
+bones_max,128,per_hero,Skeleton transforms participating in skinning
+vfx_particle_systems_max,12,per_rage_skill,Concurrent systems in signature presentation
+vfx_peak_particles_max,500,per_rage_skill,Peak live particles before mobile quality scaling
+audio_clip_seconds_max,12,per_skill,Skill presentation audio clip duration
+prefab_runtime_objects_max,160,per_hero,Active GameObjects excluding pooled global battle FX
