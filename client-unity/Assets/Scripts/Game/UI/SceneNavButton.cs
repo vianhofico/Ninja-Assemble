@@ -1,3 +1,4 @@
+using NinjaAssemble.Bootstrap;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,12 @@ namespace NinjaAssemble.UI
         private void Awake()
         {
             button = GetComponent<Button>();
+            if (button == null)
+            {
+                Debug.LogError("SceneNavButton requires a Button component", this);
+                enabled = false;
+                return;
+            }
             button.onClick.AddListener(Navigate);
         }
 
@@ -24,8 +31,9 @@ namespace NinjaAssemble.UI
 
         private void Navigate()
         {
+            if (!MobileGameBootstrap.IsReady) return;
             string sceneName = MobileSceneNames.For(target);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
+            if (!string.IsNullOrWhiteSpace(sceneName)) UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
         }
     }
 }
