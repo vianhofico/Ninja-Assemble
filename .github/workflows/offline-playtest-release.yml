@@ -37,8 +37,8 @@ jobs:
       - run: python scripts/validate-offline-runtime-smoke.py
       - run: python scripts/validate-offline-playtest-release.py
 
-  build-apk:
-    name: Build standalone offline APK
+  smoke:
+    name: Run Unity EditMode standalone smoke
     needs: contract
     runs-on: ubuntu-latest
     env:
@@ -66,6 +66,29 @@ jobs:
           artifactsPath: unity-smoke-artifacts
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
+  build-apk:
+    name: Build standalone offline APK
+    needs:
+      - contract
+      - smoke
+    if: ${{ always() && needs.contract.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Verify Unity license secrets
+        shell: bash
+        run: |
+          test -n "$UNITY_LICENSE" || { echo '::error::UNITY_LICENSE secret is required'; exit 1; }
+          test -n "$UNITY_EMAIL" || { echo '::error::UNITY_EMAIL secret is required'; exit 1; }
+          test -n "$UNITY_PASSWORD" || { echo '::error::UNITY_PASSWORD secret is required'; exit 1; }
+
       - name: Build Android offline APK
         uses: game-ci/unity-builder@v5
         with:
@@ -82,7 +105,7 @@ jobs:
           customParameters: -ninjaBuildCommit ${{ github.sha }}
           allowDirtyBuild: true
 
-      - name: Prepare release files
+      - name: Prepare APK artifact
         shell: bash
         run: |
           test -s builds/android/NinjaAssemble.apk
@@ -91,10 +114,10 @@ jobs:
           cd builds/android
           sha256sum NinjaAssemble-offline-playtest.apk > SHA256SUMS.txt
 
-      - name: Upload verified offline APK
+      - name: Upload offline APK candidate
         uses: actions/upload-artifact@v4
         with:
-          name: NinjaAssemble-offline-playtest-${{ github.run_number }}
+          name: NinjaAssemble-offline-playtest-candidate-${{ github.run_number }}
           path: |
             builds/android/NinjaAssemble-offline-playtest.apk
             builds/android/build-metadata.json
@@ -103,7 +126,7 @@ jobs:
           retention-days: 30
 
       - name: Publish GitHub playtest release
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && needs.smoke.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
