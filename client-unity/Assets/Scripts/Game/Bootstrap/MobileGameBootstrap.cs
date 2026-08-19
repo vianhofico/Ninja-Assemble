@@ -22,11 +22,14 @@ namespace NinjaAssemble.Bootstrap
         [SerializeField] private string guestDisplayName = "Ninja";
         [SerializeField] private bool autoEnterHome = true;
 
+        private static bool bootstrapReady;
+        private static bool bootstrapInProgress;
+
         public static PlayableGameStore Store { get; private set; }
         public static AdvancedProgressionStore AdvancedProgression { get; private set; }
         public static MobileRuntimeMode RuntimeMode { get; private set; } = MobileRuntimeMode.OfflinePlaytest;
         public static string StartupError { get; private set; }
-        public static bool IsReady => Store != null && !string.IsNullOrWhiteSpace(Store.PlayerId);
+        public static bool IsReady => bootstrapReady && Store != null && !string.IsNullOrWhiteSpace(Store.PlayerId);
         public static bool IsOffline => RuntimeMode == MobileRuntimeMode.OfflinePlaytest;
 
         public void Configure(GameApiConfig config, string displayName = "Ninja", bool enterHome = true, MobileRuntimeMode mode = MobileRuntimeMode.OfflinePlaytest)
@@ -43,16 +46,21 @@ namespace NinjaAssemble.Bootstrap
             RuntimeMode = runtimeMode;
             StartupError = null;
 
-            if (Store != null)
+            if (bootstrapInProgress)
             {
-                if (RuntimeMode == MobileRuntimeMode.Online && AdvancedProgression == null && apiConfig != null)
-                {
-                    AdvancedProgression = new AdvancedProgressionStore(new AdvancedProgressionClient(apiConfig));
-                    await AdvancedProgression.InitializeAsync(Store.PlayerId);
-                }
-                if (autoEnterHome) SceneManager.LoadScene(MobileSceneNames.For(ScreenId.Home));
+                Destroy(gameObject);
                 return;
             }
+
+            if (IsReady)
+            {
+                if (autoEnterHome && SceneManager.GetActiveScene().name == MobileSceneNames.Bootstrap)
+                    SceneManager.LoadScene(MobileSceneNames.For(ScreenId.Home));
+                return;
+            }
+
+            bootstrapReady = false;
+            bootstrapInProgress = true;
 
             try
             {
@@ -78,13 +86,20 @@ namespace NinjaAssemble.Bootstrap
                     await AdvancedProgression.InitializeAsync(Store.PlayerId);
                 }
 
+                bootstrapReady = true;
                 if (autoEnterHome) SceneManager.LoadScene(MobileSceneNames.For(ScreenId.Home));
             }
             catch (Exception exception)
             {
-                StartupError = exception.Message;
+                StartupError = exception.ToString();
+                bootstrapReady = false;
                 Store = null;
+                AdvancedProgression = null;
                 Debug.LogError("Ninja Assemble bootstrap failed: " + exception);
+            }
+            finally
+            {
+                bootstrapInProgress = false;
             }
         }
 
@@ -100,6 +115,8 @@ namespace NinjaAssemble.Bootstrap
             AdvancedProgression = null;
             StartupError = null;
             RuntimeMode = MobileRuntimeMode.OfflinePlaytest;
+            bootstrapReady = false;
+            bootstrapInProgress = false;
         }
 
         private static string LoadOrCreateGuestKey()
