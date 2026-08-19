@@ -85,20 +85,56 @@ jobs:
       - name: Prepare release files
         shell: bash
         run: |
-          test -s builds/android/NinjaAssemble.apk
-          test -s builds/android/build-metadata.json
-          cp builds/android/NinjaAssemble.apk builds/android/NinjaAssemble-offline-playtest.apk
-          cd builds/android
-          sha256sum NinjaAssemble-offline-playtest.apk > SHA256SUMS.txt
+          set -euo pipefail
+
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "APK candidates produced by Unity/GameCI:"
+          find "$GITHUB_WORKSPACE" -type f -name '*.apk' -size +0c -print || true
+          echo "Metadata candidates:"
+          find "$GITHUB_WORKSPACE" -type f -name 'build-metadata.json' -size +0c -print || true
+
+          APK=""
+          for candidate in \
+            "$GITHUB_WORKSPACE/builds/android/NinjaAssemble.apk" \
+            "$GITHUB_WORKSPACE/client-unity/builds/android/NinjaAssemble.apk"; do
+            if [ -s "$candidate" ]; then
+              APK="$candidate"
+              break
+            fi
+          done
+          if [ -z "$APK" ]; then
+            APK="$(find "$GITHUB_WORKSPACE" -type f -name '*.apk' -size +0c -print -quit)"
+          fi
+          test -n "$APK" || { echo '::error::Unity build completed but no non-empty APK was found in the workspace'; exit 1; }
+
+          METADATA="$(dirname "$APK")/build-metadata.json"
+          if [ ! -s "$METADATA" ]; then
+            METADATA="$(find "$GITHUB_WORKSPACE" -type f -name 'build-metadata.json' -size +0c -print -quit)"
+          fi
+          test -n "$METADATA" && test -s "$METADATA" || { echo '::error::No non-empty build-metadata.json was found'; exit 1; }
+
+          RELEASE_DIR="$GITHUB_WORKSPACE/release/offline-playtest"
+          mkdir -p "$RELEASE_DIR"
+          cp "$APK" "$RELEASE_DIR/NinjaAssemble-offline-playtest.apk"
+          cp "$METADATA" "$RELEASE_DIR/build-metadata.json"
+          (
+            cd "$RELEASE_DIR"
+            sha256sum NinjaAssemble-offline-playtest.apk > SHA256SUMS.txt
+          )
+
+          test -s "$RELEASE_DIR/NinjaAssemble-offline-playtest.apk"
+          test -s "$RELEASE_DIR/build-metadata.json"
+          test -s "$RELEASE_DIR/SHA256SUMS.txt"
+          ls -lh "$RELEASE_DIR"
 
       - name: Upload verified offline APK
         uses: actions/upload-artifact@v4
         with:
           name: NinjaAssemble-offline-playtest-${{ github.run_number }}
           path: |
-            builds/android/NinjaAssemble-offline-playtest.apk
-            builds/android/build-metadata.json
-            builds/android/SHA256SUMS.txt
+            release/offline-playtest/NinjaAssemble-offline-playtest.apk
+            release/offline-playtest/build-metadata.json
+            release/offline-playtest/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30
 
@@ -124,9 +160,9 @@ jobs:
           Source commit: ${GITHUB_SHA}
           EOF
           gh release create "$TAG" \
-            builds/android/NinjaAssemble-offline-playtest.apk \
-            builds/android/build-metadata.json \
-            builds/android/SHA256SUMS.txt \
+            release/offline-playtest/NinjaAssemble-offline-playtest.apk \
+            release/offline-playtest/build-metadata.json \
+            release/offline-playtest/SHA256SUMS.txt \
             --target "$GITHUB_SHA" \
             --title "Ninja Assemble Offline Playtest v${VERSION}" \
             --notes-file /tmp/release-notes.md \
