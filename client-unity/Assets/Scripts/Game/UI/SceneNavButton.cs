@@ -1,3 +1,4 @@
+using NinjaAssemble.Bootstrap;
 using UnityEngine;
 using UnityEngine.UI;
 
